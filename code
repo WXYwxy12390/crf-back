@@ -1,0 +1,5 @@
+记录错误code码的意义
+999 未知错误
+1002 token无效
+1003 token 过期
+1006 client type类型错误

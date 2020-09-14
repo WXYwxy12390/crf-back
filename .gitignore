@@ -1,0 +1,24 @@
+.idea
+.vs
+.vscode
+
+.DS_Store
+
+venv/
+
+*.pyc
+__pycache__
+
+
+#migrations/versions/*
+# except for .gitkeep
+!.gitkeep
+
+logs/access.log
+logs/error.log
+logs/my.log
+
+app/static/signature/*
+app/static/12_lead_ecg/*
+app/static/UCG/*
+app/static/photo_inspect/*
