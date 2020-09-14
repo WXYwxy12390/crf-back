@@ -1,7 +1,39 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime
 from app.models.base import Base
 
+# 治疗记录及疗效评估表
+class TreRec(Base):
+    __tablename__ = 'treRec'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    pid = Column(Integer, comment='病人id')
+    treNum = Column(Integer, comment='1-n，表示对应第x条治疗记录')
+    trement = Column(String(30), comment='几线治疗（手术、放疗、其他、1-5）(one,two,three,four,five,surgery,radiotherapy,other)')
+    date = Column(Date, comment='结束日期')
+    beEffEvaDate = Column(Date, comment='最佳疗效评估日期')
+    beEffEva = Column(String(10), comment='最佳疗效评估')
+    proDate = Column(Date, comment='进展日期')
+    proDes = Column(String(60), comment='进展描述')
 
+#1-5线及其他表
+class OneToFive(Base):
+    __tablename__ = 'oneToFive'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    pid = Column(Integer, comment='病人id')
+    treNum = Column(Integer, comment='number,对应病人的某一条治疗记录')
+    isTre = Column(Integer, comment='是否加入临床治疗')
+    clinTri = Column(String(40), comment='临床实验名称')
+    treSolu = Column(String(100), comment='治疗方案,多个以逗号分隔(Chemotherapy,TargetedTherapy,ImmunityTherapy,AntivascularTherapy,Other)')
+    spePlan = Column(String(60), comment='具体方案')
+    begDate = Column(Date, comment='开始日期')
+    endDate = Column(Date, comment='结束日期')
+    isRepBio  = Column(Boolean, comment='是否重复活检')
+    bioMet = Column(String(40), comment='活检方式')
+    matPart = Column(String(40), comment='取材部位')
+    specNum = Column(Integer, comment='标本库流水号')
+    patDiaRes = Column(Text(10000), comment='病理诊断结果')
+    patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
+    #patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
+    note = Column(String(60), comment='备注')
 
 
 #手术表
@@ -36,26 +68,7 @@ class Radiotherapy(Base):
 
 
 
-#1-5线及其他表
-class OneToFive(Base):
-    __tablename__ = 'oneToFive'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    pid = Column(Integer, comment='病人id')
-    treNum = Column(Integer, comment='number,对应病人的某一条治疗记录')
-    isTre = Column(Integer, comment='是否加入临床治疗')
-    clinTri = Column(String(40), comment='临床实验名称')
-    treSolu = Column(String(100), comment='治疗方案,多个以逗号分隔(Chemotherapy,TargetedTherapy,ImmunityTherapy,AntivascularTherapy,Other)')
-    spePlan = Column(String(60), comment='具体方案')
-    begDate = Column(Date, comment='开始日期')
-    endDate = Column(Date, comment='结束日期')
-    isRepBio  = Column(Boolean, comment='是否重复活检')
-    bioMet = Column(String(40), comment='活检方式')
-    matPart = Column(String(40), comment='取材部位')
-    specNum = Column(Integer, comment='标本库流水号')
-    patDiaRes = Column(Text(10000), comment='病理诊断结果')
-    patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
-    #patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
-    note = Column(String(60), comment='备注')
+
 
 #详细治疗方案
 class DetailTrePlan(Base):

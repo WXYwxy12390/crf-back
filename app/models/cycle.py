@@ -3,10 +3,12 @@ from app.models.base import Base
 
 
 
+
+
+
+
+
 # 病人免疫组化信息表
-
-
-
 class Immunohis(Base):
     __tablename__ = 'immunohis'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -114,18 +116,7 @@ class MoleDetec(Base):
 
 
 
-# 治疗记录及疗效评估表
-class TreRec(Base):
-    __tablename__ = 'treRec'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    pid = Column(Integer, comment='病人id')
-    treNum = Column(Integer, comment='1-n，表示对应第x条治疗记录')
-    trement = Column(String(30), comment='几线治疗（手术、放疗、其他、1-5）(one,two,three,four,five,surgery,radiotherapy,other)')
-    date = Column(Date, comment='结束日期')
-    beEffEvaDate = Column(Date, comment='最佳疗效评估日期')
-    beEffEva = Column(String(10), comment='最佳疗效评估')
-    proDate = Column(Date, comment='进展日期')
-    proDes = Column(String(60), comment='进展描述')
+
 
 
 

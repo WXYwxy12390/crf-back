@@ -13,8 +13,8 @@ def get_patient(id):
     return Success(data=patient if patient else {})
 
 
-@api.route('',methods = ['POST'])
-def add_patient():
+@api.route('/<int:id>',methods = ['POST'])
+def add_patient(id):
     data = request.get_json()
     json2db(data, Patient)
     return Success()
