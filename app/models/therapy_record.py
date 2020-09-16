@@ -12,7 +12,12 @@ class TreRec(Base):
     beEffEvaDate = Column(Date, comment='最佳疗效评估日期')
     beEffEva = Column(String(10), comment='最佳疗效评估')
     proDate = Column(Date, comment='进展日期')
-    proDes = Column(String(60), comment='进展描述')
+    proDes = Column(String(60), comment='进展描述')  # text
+
+    def keys(self):
+        return ['id','trement','date','beEffEvaDate','beEffEva','proDate','proDes']
+
+
 
 #1-5线及其他表
 class OneToFive(Base):
@@ -34,6 +39,26 @@ class OneToFive(Base):
     patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
     #patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
     note = Column(String(60), comment='备注')
+
+#详细治疗方案
+class DetailTrePlan(Base):
+    __tablename__ = 'DetailTrePlan'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    pid = Column(Integer, comment='病人id')
+    treNum = Column(Integer, comment='0对应初诊信息、1-n表示对应第x条治疗记录')
+    treSolu = Column(String(20), comment='治疗方案,Chemotherapy/TargetedTherapy/ImmunityTherapy/AntivascularTherapy/Other')
+    treSche = Column(String(50),comment='药物方案')
+    currPeriod = Column(Integer, comment='当前周期')
+    treatName = Column(String(20), comment='治疗名称')
+    begDate = Column(Date, comment='开始时间')
+    endDate = Column(Date, comment='结束时间')
+    drugs = Column(JSON, comment='药物使用情况, {drugName:{drugDosa: ,duration: },...}')
+    note = Column(String(500), comment='药物使用备注')
+
+    def keys(self):
+        return ['id','treSolu','treSche','currPeriod','treatName','begDate','endDate','drugs','note']
+
+
 
 
 #手术表
@@ -70,17 +95,3 @@ class Radiotherapy(Base):
 
 
 
-#详细治疗方案
-class DetailTrePlan(Base):
-    __tablename__ = 'DetailTrePlan'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    pid = Column(Integer, comment='病人id')
-    treNum = Column(Integer, comment='0对应初诊信息、1-n表示对应第x条治疗记录')
-    treSolu = Column(String(20), comment='治疗方案,Chemotherapy/TargetedTherapy/ImmunityTherapy/AntivascularTherapy/Other')
-    treSche = Column(String(50),comment='药物方案')
-    currPeriod = Column(Integer, comment='当前周期')
-    treatName = Column(String(20), comment='治疗名称')
-    begDate = Column(Date, comment='开始时间')
-    endDate = Column(Date, comment='结束时间')
-    drugs = Column(JSON, comment='药物使用情况, {drugName:{drugDosa: ,duration: },...}')
-    note = Column(String(500), comment='药物使用备注')

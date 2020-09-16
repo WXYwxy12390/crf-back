@@ -4,10 +4,6 @@ from app.models.base import Base
 
 
 
-
-
-
-
 # 病人免疫组化信息表
 class Immunohis(Base):
     __tablename__ = 'immunohis'

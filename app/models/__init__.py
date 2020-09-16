@@ -27,3 +27,8 @@ def json2db_add(jsondata, table):
     db.session.flush()
     db.session.commit()
     return new_record
+
+def delete_array(model_items):
+    with db.auto_commit():
+        for item in model_items:
+            item.delete()

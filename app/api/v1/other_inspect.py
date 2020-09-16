@@ -8,7 +8,7 @@ from flask import request
 
 from app.libs.error import Success
 from app.libs.redprint import Redprint
-from app.models import json2db
+from app.models import json2db, db, delete_array
 from app.models.other_inspect import Lung, OtherExams, ImageExams
 
 api = Redprint('other_inspect')
@@ -53,4 +53,11 @@ def add_image_exam(pid,treNum):
     data['pid'] = pid
     data['treNum'] = treNum
     json2db(data, ImageExams)
+    return Success()
+
+@api.route('/image_exam/<int:pid>/<int:treNum>',methods=['DELETE'])
+def del_image_exam(pid,treNum):
+    data = request.get_json()
+    items = ImageExams.query.filter(ImageExams.is_delete==0,ImageExams.id.in_(data['ids'])).all()
+    delete_array(items)
     return Success()

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime
+from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime, SmallInteger
 
 from app.models.base import Base
 # 病人基本信息表
@@ -47,6 +47,23 @@ class PastHis(Base):
     def keys(self):
         return ['id','pid','basDisHis','infDisHis','tumor','tumHis','tumorFam','tumFamHis','smoke','smokingHis',
                 'drink','drinkingHis','hormone','hormoneUseHis','drug','drugUseHis']
+
+#激素史与药物史
+class DrugHistory(Base):
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    pid = Column(Integer, comment='病人id')
+    type = Column(SmallInteger,comment='type=1,激素史，type = 0，其他药物史')
+    drug_name = Column(String(255))
+    drug_dose = Column(String(255))
+    use_time = Column(Integer)
+
+    def keys(self):
+        return ['id','drug_name','drug_dose','use_time']
+
+
+
+
+
 
 
 # 病人初诊过程信息表
