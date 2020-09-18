@@ -40,6 +40,11 @@ class OneToFive(Base):
     #patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
     note = Column(String(60), comment='备注')
 
+    def keys(self):
+        return ['id','pid','treNum','isTre','clinTri','treSolu','spePlan','begDate',
+                'endDate','isRepBio','bioMet','matPart','specNum','patDiaRes','patDiaOthers','note']
+
+
 #详细治疗方案
 class DetailTrePlan(Base):
     __tablename__ = 'DetailTrePlan'
@@ -76,7 +81,8 @@ class Surgery(Base):
     proDate = Column(Date, comment='进展日期')
     proDes = Column(String(40), comment='进展描述')
 
-
+    def keys(self):
+        return ['id','pid','treNum','surSco','lymDis','cleGro','surDate','posAdjChem','isPro','proDate','proDes']
 #放疗表
 class Radiotherapy(Base):
     __tablename__ = 'radiotherapy'
@@ -90,6 +96,9 @@ class Radiotherapy(Base):
     dosUnit = Column(Boolean, comment='剂量单位,0: Gy, 1:cGy')
     splTim = Column(Integer, comment='分割次数')
     method = Column(String(5), comment='分割次数单位')
+
+    def keys(self):
+        return ['id','pid','treNum','begDate','endDate','radSite','radDose','dosUnit','splTim','method']
 
 
 

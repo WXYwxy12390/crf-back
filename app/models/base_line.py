@@ -23,6 +23,24 @@ class Patient(Base):
         return ['id','patNumber','account','researchCenter','idNumber','hospitalNumber',
                     'patientName','gender','birthday','phoneNumber1','phoneNumber2','updateTime','nextFollowupTime','finishFollowup']
 
+    def get_fotmat_info(self):
+        data = {
+            'id':self.id,
+            'patNumber':self.patNumber,
+            'hospitalNumber':self.hospitalNumber,
+            'patientName':self.patientName,
+            'idNumber':self.idNumber,
+            'phoneNumber':self.phoneNumber1,
+            'gender':self.gender,
+            'patDia':'xxx'
+        }
+        return data
+
+
+
+
+
+
 
 # 病人既往史表
 class PastHis(Base):
