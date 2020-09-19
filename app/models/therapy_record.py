@@ -8,10 +8,10 @@ class TreRec(Base):
     pid = Column(Integer, comment='病人id')
     treNum = Column(Integer, comment='1-n，表示对应第x条治疗记录')
     trement = Column(String(30), comment='几线治疗（手术、放疗、其他、1-5）(one,two,three,four,five,surgery,radiotherapy,other)')
-    date = Column(Date, comment='结束日期')
+    date = Column(DateTime, comment='结束日期')
     beEffEvaDate = Column(Date, comment='最佳疗效评估日期')
     beEffEva = Column(String(10), comment='最佳疗效评估')
-    proDate = Column(Date, comment='进展日期')
+    proDate = Column(DateTime, comment='进展日期')
     proDes = Column(String(60), comment='进展描述')  # text
 
     def keys(self):
