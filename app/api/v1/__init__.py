@@ -1,5 +1,5 @@
 from flask import Blueprint
-from app.api.v1 import user, client, token, immunohis  # 直接导入模块，可以避免导入api重名的问题
+from app.api.v1 import user, client, token, immunohis, mole_detec  # 直接导入模块，可以避免导入api重名的问题
 from app.api.v1.base_line import patient,past_history,first_diagnose
 from app.api.v1 import lab_inspectation,other_inspect
 from app.api.v1.record_info import record_info,therapy_record
@@ -20,4 +20,5 @@ def create_blueprint_v1():
     therapy_record.api.register(bp_v1)
     sample.api.register(bp_v1)
     immunohis.api.register(bp_v1)
+    mole_detec.api.register(bp_v1)
     return bp_v1

@@ -115,7 +115,12 @@ class MoleDetec(Base):
     PDL1KT = Column(String(20), comment='PDL1抗体')
     TMB = Column(String(20), comment='TMB')
 
-
+    def keys(self):
+        return ['id', 'pid', 'treNum', 'ALK', 'BIM', 'BRAF', 'cMET', 'EGFR', 'HER_2', 'KRAS',
+                'PIK3CA', 'ROS1', 'RET', 'UGT1A1', 'ALKSam', 'BIMSam','BRAFSam','cMETSam', 'EGFRSam', 'HER_2Sam', 'KRASSam', 'PIK3CASam', 'ROS1Sam',
+                'RETSam', 'UGT1A1Sam', 'ALKDetMed', 'BIMDetMed', 'BRAFDetMed', 'cMETDetMed','EGFRDetMed', 'HER_2DetMed', 'KRASDetMed', 'PIK3CADetMed', 'ROS1DetMed',
+                'RETDetMed', 'UGT1A1DetMed','ALKDesc', 'BIMDesc', 'BRAFDesc', 'cMETDesc', 'EGFRDesc', 'HER_2Desc','KRASDesc','PIK3CADesc',
+                'ROS1Desc','RETDesc','UGT1A1Desc','path','MSI','PDL1','PDL1KT','TMB']
 
 
 
