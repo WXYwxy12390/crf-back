@@ -173,6 +173,17 @@ class BloodBio(Base):
     PNote = Column(Text(10000), comment='磷备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    def keys(self):
+        return ['id', 'pid', 'treNum', 'samplingTime', 'TP', 'ALB', 'GLO', 'ALT', 'AST', 'LDH', 'GGT',
+                'TBIL', 'DBIL', 'IBIL', 'GLU', 'TC', 'LDL', 'hDL', 'TG', 'UREA', 'ALP', 'CREA',
+                'UA', 'CO2', 'K', 'Na', 'Cl', 'Ca', 'Mg', 'P', 'TPMea',
+                'ALBMea', 'GLOMea', 'ALTMea', 'ASTMea', 'LDHMea', 'GGTMea', 'TBILMea', 'DBILMea', 'IBILMea',
+                'GLUMea','TCMea', 'LDLMea', 'hDLMea', 'TGMea', 'UREAMea', 'ALPMea', 'CREAMea', 'UAMea',
+                'CO2Mea','KMea', 'NaMea', 'ClMea', 'CaMea', 'MgMea', 'PMea', 'TPNote', 'ALBNote',
+                'GLONote','ALTNote','ASTNote','LDHNote','GGTNote','TBILNote','DBILNote','IBILNote','GLUNote','TCNote',
+                'LDLNote','hDLNote','TGNote','UREANote','ALPNote','CREANote','UANote','CO2Note','KNote','NaNote',
+                'ClNote','CaNote', 'MgNote','PNote','filePath']
+
 
 # 甲状腺功能表
 class Thyroid(Base):
@@ -192,6 +203,9 @@ class Thyroid(Base):
     TSHNote = Column(Text(10000), comment='促甲状腺激素备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    def keys(self):
+        return ['id', 'pid', 'treNum', 'samplingTime', 'FT3', 'FT4', 'TSH', 'FT3Mea', 'FT4Mea', 'TSHMea', 'FT3Note',
+                'FT4Note', 'TSHNote', 'filePath']
 
 # 凝血功能表
 class Coagulation(Base):
@@ -220,6 +234,10 @@ class Coagulation(Base):
     D_dimer_Note = Column(Text(10000), comment='D-二聚体备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    def keys(self):
+        return ['id', 'pid', 'treNum', 'samplingTime', 'PT', 'APTT', 'TT', 'FIB', 'INR', 'D_dimer', 'PTMea',
+                'APTTMea', 'TTMea', 'FIBMea','INRMea', 'D_dimer_Mea', 'PTNote', 'APTTNote', 'TTNote', 'FIBNote',
+                'INRNote', 'D_dimer_Note', 'filePath']
 
 # 心肌酶谱表
 class MyocardialEnzyme(Base):
@@ -254,6 +272,11 @@ class MyocardialEnzyme(Base):
     NT_proBNPNote = Column(Text(10000), comment='氨基末端脑钠肽前体备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    def keys(self):
+        return ['id', 'pid', 'treNum', 'samplingTime', 'LDH', 'CK', 'CK_MB', 'cTnI', 'cTnT', 'MYO', 'BNP',
+                'NT_proBNP', 'LDHMea', 'CKMea','CK_MBMea', 'cTnIMea', 'cTnTMea', 'MYOMea', 'BNPMea', 'NT_proBNPMea',
+                'LDHNote', 'CKNote', 'CK_MBNote','cTnINote', 'cTnTNote', 'MYONote', 'BNPNote', 'NT_proBNPNote', 'filePath']
+
 
 # 细胞因子表
 class Cytokines(Base):
@@ -281,6 +304,11 @@ class Cytokines(Base):
     IL_8Note = Column(Text(10000), comment='白介素8备注')
     IL_10Note = Column(Text(10000), comment='白介素10备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
+
+    def keys(self):
+        return ['id', 'pid', 'treNum', 'samplingTime', 'TNF_a', 'IL_1b', 'IL_2R', 'IL_6', 'IL_8', 'IL_10', 'TNF_aMea',
+                'IL_1bMea', 'IL_2RMea', 'IL_6Mea','IL_8Mea', 'IL_10Mea', 'TNF_aNote', 'IL_1bNote', 'IL_2RNote', 'IL_6Note',
+                'IL_8Note', 'IL_10Note', 'filePath']
 
 
 # 淋巴细胞亚群表
@@ -373,6 +401,17 @@ class LymSubsets(Base):
     CD4_CD25_CD127lowNote = Column(Text(10000), comment='CD4+CD25+CD127low备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    def keys(self):
+        return ['id', 'pid', 'treNum', 'samplingTime', 'CD19_', 'CD3_', 'CD4_', 'CD8_', 'CD16_56', 'LYMPH_', 'CD19',
+                'CD3', 'CD4', 'CD8', 'CD4CD8', 'CD56', 'CD3_CD8__', 'CD3_CD8_', 'CD3_CD4__', 'CD3_CD4_', 'CD3_CD16_56_', 'CD3_CD16_56',
+                'CD3_CD19__', 'CD3_CD19_', 'CD8_CD28_', 'CD20_', 'HLA_DR_', 'CD3_HLA_DR1', 'CD3_HLA_DR2', 'CD3_HLA_DR3', 'CD4_CD25_CD127low',
+                'CD19_Mea', 'CD3_Mea', 'CD4_Mea', 'CD8_Mea', 'CD16_56Mea', 'LYMPH_Mea', 'CD19Mea', 'CD3Mea', 'CD4Mea',
+                'CD8Mea','CD4CD8Mea', 'CD56Mea', 'CD3_CD8__Mea', 'CD3_CD8_Mea', 'CD3_CD4__Mea', 'CD3_CD4_Mea', 'CD3_CD16_56_Mea', 'CD3_CD16_56Mea',
+                'CD3_CD19__Mea','CD3_CD19_Mea', 'CD8_CD28_Mea', 'CD20_Mea', 'HLA_DR_Mea', 'CD3_HLA_DR1Mea', 'CD3_HLA_DR2Mea', 'CD3_HLA_DR3Mea', 'CD4_CD25_CD127lowMea',
+                'CD19_Note','CD3_Note','CD4_Note','CD8_Note','CD16_56Note','LYMPH_Note','CD19Note','CD3Note','CD4Note','CD8Note',
+                'CD4CD8Note','CD56Note','CD3_CD8__Note','CD3_CD8_Note','CD3_CD4__Note','CD3_CD4_Note','CD3_CD16_56_Note','CD3_CD16_56Note','CD3_CD19__Note','CD3_CD19_Note',
+                'CD8_CD28_Note','CD20_Note', 'HLA_DR_Note','CD3_HLA_DR1Note','CD3_HLA_DR2Note','CD3_HLA_DR3Note','CD4_CD25_CD127lowNote','filePath']
+
 
 # 尿常规表
 class UrineRoutine(Base):
@@ -422,6 +461,12 @@ class UrineRoutine(Base):
     CLANote = Column(Text(10000), comment='尿透明度备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    def keys(self):
+        return ['id', 'pid', 'treNum', 'samplingTime', 'UPH', 'UGLU', 'LEU', 'ERY', 'NIT', 'BIL', 'USG',
+                'KET', 'BLD', 'PRO', 'UBG', 'COL', 'CLA','UPHMea', 'UGLUMea', 'LEUMea', 'ERYMea', 'NITMea', 'BILMea', 'USGMea',
+                'KETMea', 'BLDMea', 'PROMea', 'UBGMea', 'COLMea', 'CLAMea','UPHNote', 'UGLUNote', 'LEUNote', 'ERYNote', 'NITNote',
+                'BILNote', 'USGNote','KETNote', 'BLDNote', 'PRONote', 'UBGNote', 'COLNote', 'CLANote','filePath']
+
 
 # 肿瘤标志物表
 class TumorMarker(Base):
@@ -452,3 +497,8 @@ class TumorMarker(Base):
     AFPNote = Column(Text(10000), comment='甲胎蛋白备注')
     SCCANote = Column(Text(10000), comment='鳞癌相关抗原备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
+
+    def keys(self):
+        return ['id', 'pid', 'treNum', 'samplingTime', 'CEA', 'NSE', 'pro_GPR', 'CYFRA', 'FERR', 'AFP', 'SCCA',
+                'CEAMea', 'NSEMea', 'pro_GPRMea', 'CYFRAMea', 'FERRMea', 'AFPMea','SCCAMea', 'CEANote', 'NSENote', 'pro_GPRNote', 'CYFRANote', 'FERRNote',
+                'AFPNote', 'SCCANote', 'filePath']
