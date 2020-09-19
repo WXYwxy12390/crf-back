@@ -2,7 +2,8 @@ from flask import request
 
 from app.libs.error import Success
 from app.libs.redprint import Redprint
-from app.models import json2db
+from app.models import json2db, delete_array
+from app.models.cycle import Signs
 from app.models.therapy_record import TreRec
 from app.utils.date import str2date
 
@@ -22,9 +23,29 @@ def add_treatment_evaluation(pid, treNum, trement):
     data['pid'] = pid
     data['treNum'] = treNum
     data['trement'] = trement
-    if data.get('beEffEvaDate') is not None:
-        data['beEffEvaDate'] = str2date(data['beEffEvaDate'])
-    if data.get('proDate') is not None:
-        data['proDate'] = str2date(data['proDate'])
     json2db(data, TreRec)
     return Success()
+
+# 症状体征的获取、提交、删除
+@api.route('/signs/<int:pid>/<int:treNum>', methods=['GET'])
+def get_signs(pid, treNum):
+    signs = Signs.query.filter_by(pid=pid, treNum=treNum).all()
+    return Success(data=signs if signs else {})
+
+
+@api.route('/signs/<int:pid>/<int:treNum>', methods=['POST'])
+def add_signs(pid, treNum):
+    data = request.get_json()
+    for _data in data:
+        _data['pid'] = pid
+        _data['treNum'] = treNum
+        json2db(_data, Signs)
+    return Success()
+
+
+@api.route('/signs/<int:sign_id>',methods=['DELETE'])
+def del_signs(sign_id):
+    sign = Signs.query.filter_by(id=sign_id).all()
+    delete_array(sign)
+    return Success()
+

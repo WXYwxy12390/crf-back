@@ -137,9 +137,11 @@ class Signs(Base):
     treNum = Column(Integer, comment='number,对应病人的某一条治疗记录')
     symName = Column(String(60), comment='症状名称')
     begDate = Column(Date, comment='开始日期')
-    isExe = Column(Boolean, comment='目前是否存在')
+    isExe = Column(Integer, comment='目前是否存在')
     endDate = Column(Date, comment='结束日期')
 
+    def keys(self):
+        return ['id', 'pid', 'treNum', 'symName', 'begDate', 'isExe', 'endDate']
 
 #副反应表
 class SideEffect(Base):
