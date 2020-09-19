@@ -52,6 +52,12 @@ class Immunohis(Base):
     other = Column(String(50), comment='其他')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    def keys(self):
+        return ['id', 'pid', 'treNum', 'ALKD5F3', 'ALKD5F3N', 'CAIX', 'CAM52', 'CD10', 'CD34', 'CD56',
+                'CD117', 'CDX2', 'CEA', 'CgA', 'CK', 'CK56','CK7', 'CK818', 'CK19', 'CK20', 'Cyn', 'DLL3', 'EMA',
+                'ERCC1', 'LCA', 'MCM2', 'NapsinA', 'P16', 'P40','p53', 'P63', 'PAX2', 'PAX8', 'PCK',
+                'PDL1', 'RRM1','SATB2', 'Syn', 'TTF1', 'VEGFC', 'Villin', 'Villinco','other','filePath']
+
 
 # 病人分子检测信息表
 class MoleDetec(Base):
