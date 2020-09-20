@@ -16,8 +16,8 @@ class Patient(Base):
     phoneNumber1 = Column(String(20), comment='电话号码1')
     phoneNumber2 = Column(String(20), comment='电话号码2')
     updateTime = Column(DateTime, comment='更新时间')
-    nextFollowupTime = Column(Date, comment='随访时间')
-    finishFollowup = Column(Boolean, comment='是否完成随访(True、False)')
+    nextFollowupTime = Column(DateTime, comment='随访时间')
+    finishFollowup = Column(Integer, comment='是否完成随访(True:1、False:0)')
 
     def keys(self):
         return ['id','patNumber','account','researchCenter','idNumber','hospitalNumber',

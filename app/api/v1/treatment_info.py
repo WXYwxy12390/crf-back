@@ -2,7 +2,9 @@ from flask import request
 
 from app.libs.error import Success
 from app.libs.redprint import Redprint
-from app.models import json2db, delete_array
+from app.models import json2db, delete_array, db
+from app.models.base_line import Patient
+from app.models.crf_info import FollInfo
 from app.models.cycle import Signs, SideEffect
 from app.models.therapy_record import TreRec
 from app.utils.date import str2date
@@ -70,4 +72,51 @@ def add_side_effect(pid, treNum):
 def del_side_effect(se_id):
     side_effect = SideEffect.query.filter_by(id=se_id).all()
     delete_array(side_effect)
+    return Success()
+
+
+# 随访信息表的获取、提交、删除
+@api.route('/follInfo/<int:pid>', methods=['GET'])
+def get_follInfo(pid):
+    follInfo = FollInfo.query.filter_by(pid=pid).all()
+    return Success(data=follInfo if follInfo else {})
+
+
+@api.route('/follInfo/<int:pid>', methods=['POST'])
+def add_follInfo(pid):
+    data = request.get_json()
+    for _data in data:
+        _data['pid'] = pid
+        json2db(_data, FollInfo)
+    return Success()
+
+
+@api.route('/follInfo/<int:fid>',methods=['DELETE'])
+def del_follInfo(fid):
+    follInfo = FollInfo.query.filter_by(id=fid).all()
+    delete_array(follInfo)
+    return Success()
+
+# 设置病人随访提醒
+@api.route('/patient/follInfo/<int:id>', methods=['POST'])
+def add_patient_follInfo(id):
+    data = request.get_json()
+    data['id'] = id
+    data['finishFollowup'] = 0
+    json2db(data, Patient)
+    return Success()
+
+# 获得随访提醒表单
+@api.route('/patient/follInfo', methods=['GET'])
+def get_patient_follInfo():
+    patients = Patient.query.filter_by(finishFollowup=0).all()
+    return Success(data=patients if patients else {})
+
+# 关闭随访提醒（完成随访）(通过用户id以及下次随访时间来查询）
+@api.route('/patient/follInfo/<int:id>/<nextFollowupTime>',methods=['PUT'])
+def update_patient_follInfo(id,nextFollowupTime):
+    patients = Patient.query.filter_by(id=id,finishFollowup=0,nextFollowupTime=str2date(nextFollowupTime)).all()
+    with db.auto_commit():
+        for patient in patients:
+            patient.finishFollowup = 1
     return Success()
