@@ -3,7 +3,7 @@ from flask import request
 from app.libs.error import Success
 from app.libs.redprint import Redprint
 from app.models import json2db, delete_array
-from app.models.cycle import Signs
+from app.models.cycle import Signs, SideEffect
 from app.models.therapy_record import TreRec
 from app.utils.date import str2date
 
@@ -49,3 +49,25 @@ def del_signs(sign_id):
     delete_array(sign)
     return Success()
 
+# 副反应的获取、提交、删除
+@api.route('/side_effect/<int:pid>/<int:treNum>', methods=['GET'])
+def get_side_effect(pid, treNum):
+    side_effect = SideEffect.query.filter_by(pid=pid, treNum=treNum).all()
+    return Success(data=side_effect if side_effect else {})
+
+
+@api.route('/side_effect/<int:pid>/<int:treNum>', methods=['POST'])
+def add_side_effect(pid, treNum):
+    data = request.get_json()
+    for _data in data:
+        _data['pid'] = pid
+        _data['treNum'] = treNum
+        json2db(_data, SideEffect)
+    return Success()
+
+
+@api.route('/side_effect/<int:se_id>',methods=['DELETE'])
+def del_side_effect(se_id):
+    side_effect = SideEffect.query.filter_by(id=se_id).all()
+    delete_array(side_effect)
+    return Success()
