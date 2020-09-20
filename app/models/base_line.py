@@ -113,8 +113,10 @@ class IniDiaPro(Base):
     cliStage = Column(String(30), comment='临床分期')
     pStage = Column(JSON, comment='p分期TNM,以逗号分隔,格式为(1,2,3或1,,2)')
     patStage = Column(String(30), comment='病理分期')
+    cRemark = Column(Text(10000))
+    pRemark = Column(Text(10000))
 
     def keys(self):
         return ["id","PSScore","cliniManifest","videography","part","bioMet","pleInv","speSite","firVisDate",
                 "patReDate","patNum","patDia","patDiaOthers","mitIma","comCar","necArea","massSize","Ki67",
-                "traSite","TSize","stage","cStage","cliStage","pStage","patStage"]
+                "traSite","TSize","stage","cStage","cliStage","pStage","patStage",'cRemark','pRemark']
