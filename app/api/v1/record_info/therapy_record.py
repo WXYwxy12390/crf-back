@@ -8,7 +8,7 @@ from flask import request
 
 from app.libs.error import Success
 from app.libs.redprint import Redprint
-from app.models import json2db
+from app.models import json2db, delete_array
 from app.models.therapy_record import TreRec, OneToFive, Surgery, Radiotherapy, DetailTrePlan
 
 api = Redprint('therapy_record')
@@ -18,35 +18,30 @@ def get_therapy_record(pid,treNum):
     tre_rec = TreRec.query.filter_by(pid=pid,treNum=treNum).first()
     data = {}
     if tre_rec :
-        one_to_five = OneToFive.query.filter_by(pid=pid,treNum=treNum).first()
-        surgery = Surgery.query.filter_by(pid=pid, treNum=treNum).first()
-        radiotherapy = Radiotherapy.query.filter_by(pid=pid, treNum=treNum).first()
-        data['one_to_five'] = one_to_five if one_to_five else {}
-        data['surgery'] = surgery if surgery else {}
-        data['radiotherapy'] = radiotherapy if radiotherapy else {}
-    data['trement'] = tre_rec.trement
+        data['parent'] = tre_rec.get_parent()
+        data['child'] = tre_rec.get_child()
     return Success(data=data)
 
 
 @api.route('/<int:pid>/<int:treNum>',methods=['POST'])
 def add_therapy_record(pid,treNum):
     data = request.get_json()
-    data['pid'] = pid
-    data['treNum'] = treNum
-    tre_rec_data = {
-
-    }
-    json2db(data, TreRec)
-    trement = data['parent']['trement']
-    if data[''] in ['one','two','three','four','five']:
-        json2db(data,OneToFive)
-    elif data['trement'] == 'surgery':
-        json2db(data, Surgery)
-    elif data['trement'] == 'radiotherapy':
-        json2db(data, Radiotherapy)
-
-
-    return Success(data=data)
+    if 'parent' in data:
+        data['parent']['pid'] = pid
+        data['parent']['treNum'] = treNum
+        json2db(data['parent'], TreRec)
+    if 'child' in data:
+        tre_rec = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+        trement = tre_rec.trement
+        data['child']['pid'] = pid
+        data['child']['treNum'] = treNum
+        if trement in ['one','two','three','four','five','other']:
+            json2db(data['child'],OneToFive)
+        elif trement == 'surgery':
+            json2db(data['child'], Surgery)
+        elif trement == 'radiotherapy':
+            json2db(data['child'], Radiotherapy)
+    return Success()
 
 
 
@@ -58,3 +53,19 @@ def get_therapy_plan(pid,treNum):
     return Success(data=items if items else [])
 
 
+@api.route('/therapy_plan/<int:pid>/<int:treNum>',methods=['POST'])
+def add_therapy_plan(pid,treNum):
+    data = request.get_json()
+    data['pid'] = pid
+    data['treNum'] = treNum
+    json2db(data,DetailTrePlan)
+    return Success()
+
+
+@api.route('/therapy_plan/<int:pid>/<int:treNum>',methods=['DELETE'])
+def del_therapy_plan(pid,treNum):
+    data = request.get_json()
+    items = DetailTrePlan.query.filter(DetailTrePlan.is_delete==0,DetailTrePlan.id.in_(data['ids'])).all()
+    delete_array(items)
+
+    return Success()

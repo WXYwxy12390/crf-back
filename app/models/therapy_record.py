@@ -17,7 +17,23 @@ class TreRec(Base):
     def keys(self):
         return ['id','trement','date','beEffEvaDate','beEffEva','proDate','proDes']
 
-
+    def get_parent(self):
+        data = {
+            'id':self.id,
+            'trement':self.trement
+        }
+        return data
+    def get_child(self):
+        trement = self.trement
+        if trement in ['one','two','three','four','five','other']:
+            child = OneToFive.query.filter_by(pid=self.pid, treNum=self.treNum).first()
+        elif trement == 'surgery':
+            child = Surgery.query.filter_by(pid=self.pid, treNum=self.treNum).first()
+        elif trement == 'radiotherapy':
+            child = Radiotherapy.query.filter_by(pid=self.pid, treNum=self.treNum).first()
+        else:
+            child = {}
+        return child if child else {}
 
 #1-5线及其他表
 class OneToFive(Base):
