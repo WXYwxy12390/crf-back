@@ -28,3 +28,10 @@ def get_sample_all():
         "total": total
     }
     return jsonify(data)
+
+@api.route('',methods=['POST'])
+def add_sample():
+    json2db({},Patient)
+    return Success()
+
+
