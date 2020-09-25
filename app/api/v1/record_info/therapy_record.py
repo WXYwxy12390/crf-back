@@ -47,10 +47,14 @@ def add_therapy_record(pid,treNum):
 
 @api.route('/therapy_plan/<int:pid>/<int:treNum>',methods=['GET'])
 def get_therapy_plan(pid,treNum):
-    args = request.args.to_dict()
-    treSolu = args['treSolu']
-    items = DetailTrePlan.query.filter_by(pid=pid,treNum=treNum,treSolu=treSolu).all()
-    return Success(data=items if items else [])
+    items = DetailTrePlan.query.filter_by(pid=pid,treNum=treNum).all()
+    data = {}
+    data['Chemotherapy'] ,data['TargetedTherapy'],data['ImmunityTherapy'],data['AntivascularTherapy']= [],[],[],[]
+    for item in items:
+        if item.treSolu:
+            data[item.treSolu].append(item)
+
+    return Success(data=data)
 
 
 @api.route('/therapy_plan/<int:pid>/<int:treNum>',methods=['POST'])
