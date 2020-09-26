@@ -26,7 +26,7 @@ class Patient(Base):
 
     def keys(self):
         return ['id','patNumber','account','researchCenter','idNumber','hospitalNumber',
-                    'patientName','gender','birthday','phoneNumber1','phoneNumber2','updateTime','nextFollowupTime','finishFollowup']
+                    'patientName','gender','birthday','phoneNumber1','phoneNumber2','updateTime','nextFollowupTime','finishFollowup','update_time']
 
     def get_fotmat_info(self):
         data = {
@@ -37,7 +37,8 @@ class Patient(Base):
             'idNumber':self.idNumber,
             'phoneNumber':self.phoneNumber1,
             'gender':self.gender,
-            'patDia':'xxx'
+            'patDia':'xxx',
+            'update_time':self.update_time
         }
         return data
 

@@ -23,8 +23,8 @@ class SQLAlchemy(_SQLAlchemy):
 
 class Query(BaseQuery):
     def filter_by(self, **kwargs):
-        # if 'is_delete' not in kwargs.keys():
-        #     kwargs['is_delete'] = 0
+        if 'is_delete' not in kwargs.keys():
+            kwargs['is_delete'] = 0
         return super(Query, self).filter_by(**kwargs)
 
     def get_or_404(self, ident):
@@ -45,9 +45,9 @@ db = SQLAlchemy(query_class=Query)
 
 class Base(db.Model):
     __abstract__ = True
-    # create_time = Column(DateTime,server_default=func.now())
-    # update_time = Column(DateTime,server_default=func.now(),onupdate=func.now())
-    # is_delete = Column(SmallInteger, server_default='0')
+    create_time = Column(DateTime,server_default=func.now())
+    update_time = Column(DateTime,server_default=func.now(),onupdate=func.now())
+    is_delete = Column(SmallInteger, server_default='0')
     # record_date = Column(Date)
     # def __init__(self):
     #     self.create_time = int(datetime.now().timestamp())
