@@ -20,7 +20,7 @@ def get_sample_all():
     args = request.args.to_dict()
     data = request.get_json()
     patients = Patient.query.filter_by().all()
-    if len(data) > 0:
+    if data and len(data) > 0:
         patients = Patient.search(patients,data)
     res = [patient.get_fotmat_info() for patient in patients]
     res, total = get_paging(res, int(args['page']), int(args['limit']))
