@@ -48,7 +48,7 @@ class Base(db.Model):
     create_time = Column(DateTime,server_default=func.now())
     update_time = Column(DateTime,server_default=func.now(),onupdate=func.now())
     is_delete = Column(SmallInteger, server_default='0')
-    record_date = Column(Date)
+    # record_date = Column(Date)
     # def __init__(self):
     #     self.create_time = int(datetime.now().timestamp())
     #对象转换为字典，要重写的2个方法，可以提取一个到基类

@@ -15,11 +15,15 @@ from app.utils.paging import get_paging
 api = Redprint('sample')
 
 
-@api.route('/all',methods=['GET'])
+@api.route('/all',methods=['POST'])
 def get_sample_all():
     args = request.args.to_dict()
+    data = request.get_json()
     patients = Patient.query.filter_by().all()
+    if data and len(data) > 0:
+        patients = Patient.search(patients,data)
     res = [patient.get_fotmat_info() for patient in patients]
+    res = sorted(res, key=lambda re: re['update_time'], reverse=True)
     res, total = get_paging(res, int(args['page']), int(args['limit']))
     data = {
         "code": 200,
@@ -35,3 +39,9 @@ def add_sample():
     return Success()
 
 
+@api.route('',methods=['DELETE'])
+def del_sample():
+    data = request.get_json()
+    patients = Patient.query.filter(Patient.is_delete==0,Patient.id.in_(data['ids'])).all()
+    delete_array(patients)
+    return Success()
