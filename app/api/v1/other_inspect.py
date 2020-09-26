@@ -50,9 +50,10 @@ def get_image_exam(pid,treNum):
 @api.route('/image_exam/<int:pid>/<int:treNum>',methods=['POST'])
 def add_image_exam(pid,treNum):
     data = request.get_json()
-    data['pid'] = pid
-    data['treNum'] = treNum
-    json2db(data, ImageExams)
+    for _data in data['data']:
+        _data['pid'] = pid
+        _data['treNum'] = treNum
+        json2db(_data, ImageExams)
     return Success()
 
 @api.route('/image_exam/<int:pid>/<int:treNum>',methods=['DELETE'])

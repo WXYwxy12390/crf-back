@@ -13,13 +13,13 @@ api = Redprint('treatment_info')
 
 
 # 疗效评估的获取和提交
-@api.route('/evaluation/<int:pid>/<int:treNum>/<int:trement>', methods=['GET'])
+@api.route('/evaluation/<int:pid>/<int:treNum>/<string:trement>', methods=['GET'])
 def get_treatment_evaluation(pid, treNum, trement):
     treRec = TreRec.query.filter_by(pid=pid, treNum=treNum, trement=trement).first()
     return Success(data=treRec if treRec else {})
 
 
-@api.route('/evaluation/<int:pid>/<int:treNum>/<int:trement>', methods=['POST'])
+@api.route('/evaluation/<int:pid>/<int:treNum>/<string:trement>', methods=['POST'])
 def add_treatment_evaluation(pid, treNum, trement):
     data = request.get_json()
     data['pid'] = pid
@@ -38,7 +38,8 @@ def get_signs(pid, treNum):
 @api.route('/signs/<int:pid>/<int:treNum>', methods=['POST'])
 def add_signs(pid, treNum):
     data = request.get_json()
-    for _data in data:
+    print(data)
+    for _data in data['data']:
         _data['pid'] = pid
         _data['treNum'] = treNum
         json2db(_data, Signs)
@@ -61,7 +62,7 @@ def get_side_effect(pid, treNum):
 @api.route('/side_effect/<int:pid>/<int:treNum>', methods=['POST'])
 def add_side_effect(pid, treNum):
     data = request.get_json()
-    for _data in data:
+    for _data in data['data']:
         _data['pid'] = pid
         _data['treNum'] = treNum
         json2db(_data, SideEffect)
@@ -85,7 +86,7 @@ def get_follInfo(pid):
 @api.route('/follInfo/<int:pid>', methods=['POST'])
 def add_follInfo(pid):
     data = request.get_json()
-    for _data in data:
+    for _data in data['data']:
         _data['pid'] = pid
         json2db(_data, FollInfo)
     return Success()
