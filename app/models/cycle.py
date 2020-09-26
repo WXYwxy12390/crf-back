@@ -113,7 +113,7 @@ class MoleDetec(Base):
     MSI = Column(Integer, comment='MSI 0-MSS,1-MSIH,2-MSIL')
     PDL1 = Column(Integer, comment='PD-L1表达 0-未测,1-不详,2->50%,3-1%-50%,4-<1%,5-阴性')
     PDL1KT = Column(String(20), comment='PDL1抗体')
-    TMB = Column(String(20), comment='TMB')
+    TMB = Column(String(20), comment='TMB') #???
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'ALK', 'BIM', 'BRAF', 'cMET', 'EGFR', 'HER_2', 'KRAS',
