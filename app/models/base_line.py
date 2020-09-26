@@ -46,9 +46,10 @@ class Patient(Base):
     def search(cls,patients,search_data):
         if 'patDia' in search_data:
             patients = [patient for patient in patients if patient.filter_patDia(search_data['patDia'])]
-
+        if 'traSite' in search_data:
+            patients = [patient for patient in patients if patient.filter_traSite(search_data['traSite'])]
         #病理诊断，病理分期，转移部位
-        if 'patStage' in search_data  or 'traSite' in search_data:
+        if 'patStage' in search_data:
             condition = Patient.condition_iniDiaPro(patients, search_data)
             items = IniDiaPro.query.filter(condition).all()
             pids = [item.pid for item in items]
@@ -119,8 +120,6 @@ class Patient(Base):
         condtion = and_(IniDiaPro.pid.in_(pids))
         if 'patStage' in data:
             condtion = and_(condtion, IniDiaPro.patStage == data['patStage'])
-        if 'traSite' in data:
-            condtion = and_(condtion, IniDiaPro.traSite == data['traSite'])
         return condtion
 
     #过滤基因突变
@@ -202,6 +201,17 @@ class Patient(Base):
         cur_patDia = ini_dia_pro.patDia.split(',')
         for item in items:
             if item not in cur_patDia:
+                return None
+        return self
+
+
+    def filter_traSite(self,items):
+        ini_dia_pro = IniDiaPro.query.filter_by(pid=self.id).first()
+        if ini_dia_pro is None or ini_dia_pro.traSite is None:
+            return None
+        cur_traSite = ini_dia_pro.traSite.split(',')
+        for item in items:
+            if item not in cur_traSite:
                 return None
         return self
 
