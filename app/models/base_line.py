@@ -29,6 +29,7 @@ class Patient(Base):
                     'patientName','gender','birthday','phoneNumber1','phoneNumber2','updateTime','nextFollowupTime','finishFollowup','update_time']
 
     def get_fotmat_info(self):
+        ini_dia_pro = IniDiaPro.query.filter_by(pid=self.id).first()
         data = {
             'id':self.id,
             'patNumber':self.patNumber,
@@ -37,7 +38,7 @@ class Patient(Base):
             'idNumber':self.idNumber,
             'phoneNumber':self.phoneNumber1,
             'gender':self.gender,
-            'patDia':'xxx',
+            'patDia':ini_dia_pro.patDia,
             'update_time':self.update_time
         }
         return data
