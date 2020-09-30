@@ -16,7 +16,7 @@ class Patient(Base):
     idNumber = Column(String(18), comment='身份证号', unique=True)
     hospitalNumber = Column(String(20), comment='住院号')
     patientName = Column(String(100), comment='姓名')
-    gender = Column(String(2), comment='性别')      #格式问题
+    gender = Column(SmallInteger, comment='性别')      #格式问题
     birthday = Column(Date, comment='出生日期')
     phoneNumber1 = Column(String(20), comment='电话号码1')
     phoneNumber2 = Column(String(20), comment='电话号码2')
@@ -38,7 +38,7 @@ class Patient(Base):
             'idNumber':self.idNumber,
             'phoneNumber':self.phoneNumber1,
             'gender':self.gender,
-            'patDia':ini_dia_pro.patDia,
+            'patDia':ini_dia_pro.patDia if ini_dia_pro else None,
             'update_time':self.update_time
         }
         return data
