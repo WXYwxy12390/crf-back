@@ -32,7 +32,7 @@ def add_treatment_evaluation(pid, treNum, trement):
 @api.route('/signs/<int:pid>/<int:treNum>', methods=['GET'])
 def get_signs(pid, treNum):
     signs = Signs.query.filter_by(pid=pid, treNum=treNum).all()
-    return Success(data=signs if signs else {})
+    return Success(data=signs if signs else [])
 
 
 @api.route('/signs/<int:pid>/<int:treNum>', methods=['POST'])
@@ -56,7 +56,7 @@ def del_signs(sign_id):
 @api.route('/side_effect/<int:pid>/<int:treNum>', methods=['GET'])
 def get_side_effect(pid, treNum):
     side_effect = SideEffect.query.filter_by(pid=pid, treNum=treNum).all()
-    return Success(data=side_effect if side_effect else {})
+    return Success(data=side_effect if side_effect else [])
 
 
 @api.route('/side_effect/<int:pid>/<int:treNum>', methods=['POST'])
