@@ -80,7 +80,7 @@ def del_side_effect(se_id):
 @api.route('/follInfo/<int:pid>', methods=['GET'])
 def get_follInfo(pid):
     follInfo = FollInfo.query.filter_by(pid=pid).all()
-    return Success(data=follInfo if follInfo else {})
+    return Success(data=follInfo if follInfo else [])
 
 
 @api.route('/follInfo/<int:pid>', methods=['POST'])
@@ -111,7 +111,7 @@ def add_patient_follInfo(id):
 @api.route('/patient/follInfo', methods=['GET'])
 def get_patient_follInfo():
     patients = Patient.query.filter_by(finishFollowup=0).all()
-    return Success(data=patients if patients else {})
+    return Success(data=patients if patients else [])
 
 # 关闭随访提醒（完成随访）(通过用户id以及下次随访时间来查询）
 @api.route('/patient/follInfo/<int:id>/<nextFollowupTime>',methods=['PUT'])

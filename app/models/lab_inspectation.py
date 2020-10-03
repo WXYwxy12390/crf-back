@@ -77,7 +77,8 @@ class BloodRoutine(Base):
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'RBC', 'HGb', 'HCT', 'MCV', 'MCH', 'MCHC', 'RDWCV',
-                'RDWSD', 'WBC', 'GRAN_', 'LYM_', 'EOS_', 'MID_', 'BASO_', 'NEUT', 'RBCMea', 'HGbMea', 'HCTMea',
+                'RDWSD', 'WBC', 'GRAN_', 'LYM_', 'EOS_', 'MID_', 'BASO_','PLT','LYM','MID','GRAN','EOS','BASO',
+                'NEUT', 'RBCMea', 'HGbMea', 'HCTMea',
                 'MCVMea', 'MCHMea', 'MCHCMea', 'WBCMea', 'GRAN_Mea', 'LYM_Mea', 'EOS_Mea', 'MID_Mea', 'BASO_Mea',
                 'PLTMea', 'LYMMea', 'MIDMea', 'GRANMea', 'EOSMea', 'BASOMea', 'NEUTMea', 'RBCNote', 'HGbNote',
                 'HCTNote','MCVNote', 'MCHNote', 'MCHCNote', 'RDWCVNote', 'RDWSDNote', 'WBCNote', 'GRAN_Note', 'LYM_Note',
