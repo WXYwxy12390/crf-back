@@ -15,7 +15,7 @@ class TreRec(Base):
     proDes = Column(String(60), comment='进展描述')  # text
 
     def keys(self):
-        return ['id','trement','date','beEffEvaDate','beEffEva','proDate','proDes']
+        return ['id','treNum','trement','date','beEffEvaDate','beEffEva','proDate','proDes']
 
     def get_parent(self):
         data = {

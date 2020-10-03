@@ -32,7 +32,7 @@ def add_treatment_evaluation(pid, treNum, trement):
 @api.route('/signs/<int:pid>/<int:treNum>', methods=['GET'])
 def get_signs(pid, treNum):
     signs = Signs.query.filter_by(pid=pid, treNum=treNum).all()
-    return Success(data=signs if signs else {})
+    return Success(data=signs if signs else [])
 
 
 @api.route('/signs/<int:pid>/<int:treNum>', methods=['POST'])
@@ -56,7 +56,7 @@ def del_signs(sign_id):
 @api.route('/side_effect/<int:pid>/<int:treNum>', methods=['GET'])
 def get_side_effect(pid, treNum):
     side_effect = SideEffect.query.filter_by(pid=pid, treNum=treNum).all()
-    return Success(data=side_effect if side_effect else {})
+    return Success(data=side_effect if side_effect else [])
 
 
 @api.route('/side_effect/<int:pid>/<int:treNum>', methods=['POST'])
@@ -80,7 +80,7 @@ def del_side_effect(se_id):
 @api.route('/follInfo/<int:pid>', methods=['GET'])
 def get_follInfo(pid):
     follInfo = FollInfo.query.filter_by(pid=pid).all()
-    return Success(data=follInfo if follInfo else {})
+    return Success(data=follInfo if follInfo else [])
 
 
 @api.route('/follInfo/<int:pid>', methods=['POST'])
@@ -111,7 +111,7 @@ def add_patient_follInfo(id):
 @api.route('/patient/follInfo', methods=['GET'])
 def get_patient_follInfo():
     patients = Patient.query.filter_by(finishFollowup=0).all()
-    return Success(data=patients if patients else {})
+    return Success(data=patients if patients else [])
 
 # 关闭随访提醒（完成随访）(通过用户id以及下次随访时间来查询）
 @api.route('/patient/follInfo/<int:id>/<nextFollowupTime>',methods=['PUT'])
