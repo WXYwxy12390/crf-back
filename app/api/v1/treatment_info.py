@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import request
 
 from app.libs.error import Success
@@ -28,6 +30,7 @@ def add_treatment_evaluation(pid, treNum, trement):
     json2db(data, TreRec)
     return Success()
 
+
 # 症状体征的获取、提交、删除
 @api.route('/signs/<int:pid>/<int:treNum>', methods=['GET'])
 def get_signs(pid, treNum):
@@ -46,11 +49,12 @@ def add_signs(pid, treNum):
     return Success()
 
 
-@api.route('/signs/<int:sign_id>',methods=['DELETE'])
+@api.route('/signs/<int:sign_id>', methods=['DELETE'])
 def del_signs(sign_id):
     sign = Signs.query.filter_by(id=sign_id).all()
     delete_array(sign)
     return Success()
+
 
 # 副反应的获取、提交、删除
 @api.route('/side_effect/<int:pid>/<int:treNum>', methods=['GET'])
@@ -69,7 +73,7 @@ def add_side_effect(pid, treNum):
     return Success()
 
 
-@api.route('/side_effect/<int:se_id>',methods=['DELETE'])
+@api.route('/side_effect/<int:se_id>', methods=['DELETE'])
 def del_side_effect(se_id):
     side_effect = SideEffect.query.filter_by(id=se_id).all()
     delete_array(side_effect)
@@ -92,11 +96,12 @@ def add_follInfo(pid):
     return Success()
 
 
-@api.route('/follInfo/<int:fid>',methods=['DELETE'])
+@api.route('/follInfo/<int:fid>', methods=['DELETE'])
 def del_follInfo(fid):
     follInfo = FollInfo.query.filter_by(id=fid).all()
     delete_array(follInfo)
     return Success()
+
 
 # 设置病人随访提醒
 @api.route('/patient/follInfo/<int:id>', methods=['POST'])
@@ -107,16 +112,19 @@ def add_patient_follInfo(id):
     json2db(data, Patient)
     return Success()
 
+
 # 获得随访提醒表单
 @api.route('/patient/follInfo', methods=['GET'])
 def get_patient_follInfo():
     patients = Patient.query.filter_by(finishFollowup=0).all()
     return Success(data=patients if patients else [])
 
+
 # 关闭随访提醒（完成随访）(通过用户id以及下次随访时间来查询）
-@api.route('/patient/follInfo/<int:id>/<nextFollowupTime>',methods=['PUT'])
-def update_patient_follInfo(id,nextFollowupTime):
-    patients = Patient.query.filter_by(id=id,finishFollowup=0,nextFollowupTime=str2date(nextFollowupTime)).all()
+@api.route('/patient/follInfo/<int:id>/<string:nextFollowupTime>', methods=['PUT'])
+def update_patient_follInfo(id, nextFollowupTime):
+    patients = Patient.query.filter_by(id=id, finishFollowup=0,
+                                       nextFollowupTime=datetime.strptime(nextFollowupTime, "%Y-%m-%d")).all()
     with db.auto_commit():
         for patient in patients:
             patient.finishFollowup = 1
