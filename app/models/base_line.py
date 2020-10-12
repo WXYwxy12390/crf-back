@@ -38,6 +38,7 @@ class Patient(Base):
             'idNumber':self.idNumber,
             'phoneNumber':self.phoneNumber1,
             'gender':self.gender,
+            'age':get_age_by_birth(get_birth_date_by_id_card(self.idNumber)),
             'patDia':ini_dia_pro.patDia if ini_dia_pro else None,
             'update_time':self.update_time
         }

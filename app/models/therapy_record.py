@@ -98,9 +98,15 @@ class Surgery(Base):
     isPro = Column(Boolean, comment='是否进展')
     proDate = Column(Date, comment='进展日期')
     proDes = Column(String(40), comment='进展描述')
-
+    isRepBio  = Column(Boolean, comment='是否重复活检')
+    bioMet = Column(String(40), comment='活检方式')
+    matPart = Column(String(40), comment='取材部位')
+    specNum = Column(Integer, comment='标本库流水号')
+    patDiaRes = Column(Text(10000), comment='病理诊断结果')
+    patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
     def keys(self):
-        return ['id','pid','treNum','surSco','lymDis','cleGro','surDate','posAdjChem','isPro','proDate','proDes']
+        return ['id','pid','treNum','surSco','lymDis','cleGro','surDate','posAdjChem','isPro','proDate','proDes',
+                'isRepBio','bioMet','matPart','specNum','patDiaRes','patDiaOthers']
 #放疗表
 class Radiotherapy(Base):
     __tablename__ = 'radiotherapy'
@@ -114,9 +120,15 @@ class Radiotherapy(Base):
     dosUnit = Column(Boolean, comment='剂量单位,0: Gy, 1:cGy')
     splTim = Column(Integer, comment='分割次数')
     method = Column(String(5), comment='分割次数单位')
-
+    isRepBio  = Column(Boolean, comment='是否重复活检')
+    bioMet = Column(String(40), comment='活检方式')
+    matPart = Column(String(40), comment='取材部位')
+    specNum = Column(Integer, comment='标本库流水号')
+    patDiaRes = Column(Text(10000), comment='病理诊断结果')
+    patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
     def keys(self):
-        return ['id','pid','treNum','begDate','endDate','radSite','radDose','dosUnit','splTim','method']
+        return ['id','pid','treNum','begDate','endDate','radSite','radDose','dosUnit','splTim','method',
+                'isRepBio','bioMet','matPart','specNum','patDiaRes','patDiaOthers']
 
 
 

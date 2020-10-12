@@ -28,7 +28,7 @@ def get_age_by_birth(birth_date):
 
 
 def get_birth_date_by_id_card(id_card):
-    if len(id_card)!=18:
+    if id_card is None or len(id_card)!=18:
         return None
     year = id_card[6:10]
     month = id_card[10:12]
