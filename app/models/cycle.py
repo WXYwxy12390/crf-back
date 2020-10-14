@@ -49,7 +49,7 @@ class Immunohis(Base):
     VEGFC = Column(Integer, comment='VEGF-C')
     Villin = Column(Integer, comment='Villin')
     Villinco = Column(Integer, comment='Villin')
-    other = Column(String(50), comment='其他')
+    other = Column(String(50), comment='其他')      #长度
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
     def keys(self):
@@ -76,7 +76,7 @@ class MoleDetec(Base):
     ROS1 = Column(Integer, comment='ROS1(0-阴性,1-阳性,2-无)')
     RET = Column(Integer, comment='RET(0-阴性,1-阳性,2-无)')
     UGT1A1 = Column(Integer, comment='UGT1A1(0-阴性,1-阳性,2-无)')
-    ALKSam = Column(String(20), comment='ALK检测样本')
+    ALKSam = Column(String(20), comment='ALK检测样本')  #下面的文本都要改
     BIMSam = Column(String(20), comment='BIM检测样本')
     BRAFSam = Column(String(20), comment='BRAF检测样本')
     cMETSam = Column(String(20), comment='cMET检测样本')
@@ -108,11 +108,11 @@ class MoleDetec(Base):
     PIK3CADesc = Column(String(30), comment='PIK3CA结果描述')
     ROS1Desc = Column(String(30), comment='ROS1结果描述')
     RETDesc = Column(String(30), comment='RET结果描述')
-    UGT1A1Desc = Column(String(30), comment='UGT1A1结果描述')
+    UGT1A1Desc = Column(String(30), comment='UGT1A1结果描述')  #长度
     path = Column(String(200), comment='报告文件路径')
     MSI = Column(Integer, comment='MSI 0-MSS,1-MSIH,2-MSIL')
     PDL1 = Column(Integer, comment='PD-L1表达 0-未测,1-不详,2->50%,3-1%-50%,4-<1%,5-阴性')
-    PDL1KT = Column(String(20), comment='PDL1抗体')
+    PDL1KT = Column(String(20), comment='PDL1抗体') #长度
     TMB = Column(String(20), comment='TMB') #???
 
     def keys(self):

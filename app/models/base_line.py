@@ -10,23 +10,28 @@ from app.utils.date import get_birth_date_by_id_card, get_age_by_birth, str2date
 class Patient(Base):
     __tablename__ = 'patient'
     id = Column(Integer, primary_key=True, autoincrement=True, comment='病人id')
-    patNumber = Column(String(20), comment='编号')
-    account = Column(String(40), comment='录入人,多个以逗号分隔,格式为(,17,23,)')
-    researchCenter = Column(String(20), comment='研究中心,多个以逗号分隔,格式为(,17,23,)')
+    patNumber = Column(String(20), comment='编号')  #长度
+    _account = Column(String(40), comment='录入人,多个以逗号分隔,格式为(,17,23,)')
+    account = Column(JSON, comment='录入人,多个以逗号分隔,格式为(,17,23,)')
+
+    _researchCenter = Column(String(20), comment='研究中心,多个以逗号分隔,格式为(,17,23,)')
+    researchCenter = Column(Integer, comment='研究中心,多个以逗号分隔,格式为(,17,23,)')
+
     idNumber = Column(String(18), comment='身份证号', unique=True)
-    hospitalNumber = Column(String(20), comment='住院号')
+    hospitalNumber = Column(String(20), comment='住院号') #长度
     patientName = Column(String(100), comment='姓名')
     gender = Column(SmallInteger, comment='性别')      #格式问题
     birthday = Column(Date, comment='出生日期')
-    phoneNumber1 = Column(String(20), comment='电话号码1')
-    phoneNumber2 = Column(String(20), comment='电话号码2')
+    phoneNumber1 = Column(String(20), comment='电话号码1')  #长度
+    phoneNumber2 = Column(String(20), comment='电话号码2')  #长度
     updateTime = Column(DateTime, comment='更新时间')
     nextFollowupTime = Column(DateTime, comment='随访时间')
     finishFollowup = Column(Integer, comment='是否完成随访(True:1、False:0)')
 
     def keys(self):
         return ['id','patNumber','account','researchCenter','idNumber','hospitalNumber',
-                    'patientName','gender','birthday','phoneNumber1','phoneNumber2','updateTime','nextFollowupTime','finishFollowup','update_time']
+                    'patientName','gender','birthday','phoneNumber1','phoneNumber2','updateTime','nextFollowupTime','finishFollowup','update_time',
+                    '_researchCenter','_account']
 
     def get_fotmat_info(self):
         ini_dia_pro = IniDiaPro.query.filter_by(pid=self.id).first()
@@ -223,12 +228,23 @@ class PastHis(Base):
     __tablename__ = 'pastHis'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
-    basDisHis = Column(String(100), comment='基础疾病史,多个以逗号分隔')
-    infDisHis = Column(String(100), comment='传染疾病史,多个以逗号分隔')
+
+    _basDisHis = Column(JSON, comment='基础疾病史,多个以逗号分隔')
+    basDisHis = Column(String(100), comment='基础疾病史,多个以逗号分隔')  #长度
+
+    _infDisHis = Column(JSON, comment='传染疾病史,多个以逗号分隔')
+    infDisHis = Column(String(100), comment='传染疾病史,多个以逗号分隔')  #长度
+
     tumor = Column(Boolean, comment='肿瘤史（无、有）')
-    tumHis = Column(String(100), comment='肿瘤史,多个以逗号分隔')
+
+    _tumHis = Column(JSON, comment='肿瘤史,多个以逗号分隔')  # 长度
+    tumHis = Column(String(100), comment='肿瘤史,多个以逗号分隔')        #长度
+
     tumorFam = Column(Boolean, comment='肿瘤家族史（无、有）')
-    tumFamHis = Column(String(100), comment='肿瘤家族史,多个以逗号分隔')
+
+    _tumFamHis = Column(JSON, comment='肿瘤家族史,多个以逗号分隔')
+    tumFamHis = Column(String(100), comment='肿瘤家族史,多个以逗号分隔')  #长度
+
     smoke = Column(Boolean, comment='是否吸烟')
     smokingHis = Column(JSON, comment='吸烟史, {stopSmoke: 是否戒烟, smokeDayAvg: 日平均吸烟量/支, smokeYearAvg: 累计吸烟时间/年,stopSmokeHis: 戒烟时间}')
     drink = Column(Boolean, comment='是否饮酒（否、是）')
@@ -240,7 +256,7 @@ class PastHis(Base):
 
     def keys(self):
         return ['id','pid','basDisHis','infDisHis','tumor','tumHis','tumorFam','tumFamHis','smoke','smokingHis',
-                'drink','drinkingHis','hormone','hormoneUseHis','drug','drugUseHis']
+                'drink','drinkingHis','hormone','hormoneUseHis','drug','drugUseHis','_basDisHis','_tumHis','_tumFamHis']
 
 #激素史与药物史
 class DrugHistory(Base):
@@ -266,25 +282,36 @@ class IniDiaPro(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
     PSScore = Column(Integer, comment='首诊PS评分0-4')
-    cliniManifest = Column(String(40), comment='临床表现,多个以逗号分隔')
+
+    cliniManifest = Column(JSON, comment='临床表现,多个以逗号分隔')  # 长度
+    _cliniManifest = Column(String(40), comment='临床表现,多个以逗号分隔')  #长度
+
     videography = Column(Boolean, comment='影像学 0-周围型；1-中央型')
-    part = Column(String(100), comment='部位,多个以逗号分隔')
-    bioMet = Column(String(40), comment='活检方式,多个以逗号分隔')
+
+    part = Column(JSON, comment='部位,多个以逗号分隔')
+    _part = Column(String(100), comment='部位,多个以逗号分隔')
+
+    bioMet = Column(JSON, comment='活检方式,多个以逗号分隔')  # 长度
+    _bioMet = Column(String(40), comment='活检方式,多个以逗号分隔') #长度
+
     pleInv = Column(Boolean, comment='是否胸膜侵犯')
-    speSite = Column(String(30), comment='标本部位')
+    speSite = Column(String(30), comment='标本部位') #长度
     firVisDate = Column(Date, comment='初诊日期')
     patReDate = Column(Date, comment='病理报告日期')
-    patNum = Column(Integer, comment='病理号')
+    patNum = Column(Integer, comment='病理号') # 改为字符串
     patDia = Column(String(10000), comment='病理诊断,多个以逗号分隔')
     patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
     mitIma = Column(Integer, comment='核分裂像')
-    comCar = Column(String(100), comment='复合性癌')
+    comCar = Column(String(100), comment='复合性癌') #长度
     necArea = Column(Float, comment='坏死面积')
     massSize = Column(String(100), comment='肿块大小')
     Ki67 = Column(Float, comment='Ki67')
-    traSite = Column(String(100), comment='转移部位')
-    TSize = Column(Float, comment='TSize')
-    stage = Column(String(30), comment='分期情况')
+
+    traSite = Column(JSON, comment='转移部位')  #长度
+    _traSite = Column(String(100), comment='转移部位')  # 长度
+
+    TSize = Column(Float, comment='TSize')           #文本
+    stage = Column(String(30), comment='分期情况')    #格式问题
     cStage = Column(JSON, comment='c分期TNM,以逗号分隔,格式为(1,2,3或1,,2)')
     cliStage = Column(String(30), comment='临床分期')
     pStage = Column(JSON, comment='p分期TNM,以逗号分隔,格式为(1,2,3或1,,2)')
@@ -295,4 +322,5 @@ class IniDiaPro(Base):
     def keys(self):
         return ["id","PSScore","cliniManifest","videography","part","bioMet","pleInv","speSite","firVisDate",
                 "patReDate","patNum","patDia","patDiaOthers","mitIma","comCar","necArea","massSize","Ki67",
-                "traSite","TSize","stage","cStage","cliStage","pStage","patStage",'cRemark','pRemark']
+                "traSite","TSize","stage","cStage","cliStage","pStage","patStage",'cRemark','pRemark',
+                '_cliniManifest','_part','_bioMet','_traSite']

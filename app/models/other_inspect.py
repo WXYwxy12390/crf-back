@@ -95,10 +95,10 @@ class OtherExams(Base):
     pid = Column(Integer, comment='病人id')
     treNum = Column(Integer, comment='0对应初诊信息、1-n表示对应第x条治疗记录')
     ECGDetTime = Column(Date, comment='12导联心电图检测时间')
-    ECGDesc = Column(String(200), comment='12导联心电图结果描述')
+    ECGDesc = Column(String(200), comment='12导联心电图结果描述')  #长度
     ECGPath = Column(String(200), comment='12导联心电图报告路径,多个以逗号分隔')
     UCGDetTime = Column(Date, comment='超声心动图检测时间')
-    UCGDesc = Column(String(200), comment='超声心动图结果描述')
+    UCGDesc = Column(String(200), comment='超声心动图结果描述')    #长度
     UCGPath = Column(String(200), comment='超声心动图报告路径,多个以逗号分隔')
     def keys(self):
         return ['id','pid','treNum','ECGDetTime','ECGDesc','ECGPath','UCGDetTime','UCGDesc','UCGPath']
