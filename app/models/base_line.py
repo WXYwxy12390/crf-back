@@ -229,21 +229,21 @@ class PastHis(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
 
-    _basDisHis = Column(JSON, comment='基础疾病史,多个以逗号分隔')
-    basDisHis = Column(String(100), comment='基础疾病史,多个以逗号分隔')  #长度
+    basDisHis = Column(JSON, comment='基础疾病史,多个以逗号分隔')
+    _basDisHis = Column(String(100), comment='基础疾病史,多个以逗号分隔')  #长度
 
-    _infDisHis = Column(JSON, comment='传染疾病史,多个以逗号分隔')
-    infDisHis = Column(String(100), comment='传染疾病史,多个以逗号分隔')  #长度
+    infDisHis = Column(JSON, comment='传染疾病史,多个以逗号分隔')
+    _infDisHis = Column(String(100), comment='传染疾病史,多个以逗号分隔')  #长度
 
     tumor = Column(Boolean, comment='肿瘤史（无、有）')
 
-    _tumHis = Column(JSON, comment='肿瘤史,多个以逗号分隔')  # 长度
-    tumHis = Column(String(100), comment='肿瘤史,多个以逗号分隔')        #长度
+    tumHis = Column(JSON, comment='肿瘤史,多个以逗号分隔')  # 长度
+    _tumHis = Column(String(100), comment='肿瘤史,多个以逗号分隔')        #长度
 
     tumorFam = Column(Boolean, comment='肿瘤家族史（无、有）')
 
-    _tumFamHis = Column(JSON, comment='肿瘤家族史,多个以逗号分隔')
-    tumFamHis = Column(String(100), comment='肿瘤家族史,多个以逗号分隔')  #长度
+    tumFamHis = Column(JSON, comment='肿瘤家族史,多个以逗号分隔')
+    _tumFamHis = Column(String(100), comment='肿瘤家族史,多个以逗号分隔')  #长度
 
     smoke = Column(Boolean, comment='是否吸烟')
     smokingHis = Column(JSON, comment='吸烟史, {stopSmoke: 是否戒烟, smokeDayAvg: 日平均吸烟量/支, smokeYearAvg: 累计吸烟时间/年,stopSmokeHis: 戒烟时间}')
