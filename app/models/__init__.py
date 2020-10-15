@@ -7,14 +7,14 @@ def json2db(jsondata, table):
     #     sample = Sample.query.get_or_404(jsondata['sample_id'])
     #     if sample.is_submit == 1:
     #         return
-
-    new_record = table()
-    for k in jsondata:
-        # print(k, jsondata[k])
-        if jsondata is not None:
-            setattr(new_record, k, jsondata[k])
-    db.session.merge(new_record)
-    db.session.commit()
+    with db.auto_commit():
+        new_record = table()
+        for k in jsondata:
+            # print(k, jsondata[k])
+            if jsondata is not None:
+                setattr(new_record, k, jsondata[k])
+        db.session.merge(new_record)
+        # db.session.commit()
 
 
 def json2db_add(jsondata, table):

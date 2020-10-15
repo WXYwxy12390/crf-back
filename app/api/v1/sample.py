@@ -14,6 +14,7 @@ from app.libs.token_auth import auth
 from app.models import json2db, db, delete_array
 from app.models.base_line import Patient
 from app.spider.research_center import ResearchCenterSpider
+from app.spider.user_info import UserInfo
 from app.utils.paging import get_paging
 
 api = Redprint('sample')
@@ -24,7 +25,7 @@ api = Redprint('sample')
 def get_sample_all():
     args = request.args.to_dict()
     data = request.get_json()
-    if 'OperateAllCrf' in g.user.scopes:
+    if 'OperateAllCRF' in g.user.scopes:
         patients = Patient.query.filter_by().all()
     elif 'CheckCenterCRF' in g.user.scopes:
         centers = ResearchCenterSpider().search_by_uid_project(current_app.config['PROJECT_ID'],g.user.user_id)['data']
@@ -32,7 +33,7 @@ def get_sample_all():
         patients = Patient.query.filter(Patient.is_delete==0,Patient.researchCenter.in_(center_ids)).all()
     else:
         items = Patient.query.filter(Patient.is_delete==0).all()
-        patients = [item for item in items if item.account and 89 in item.account]
+        patients = [item for item in items if item.account and g.user.user_id in item.account]
 
 
     if data and len(data) > 0:
@@ -52,7 +53,9 @@ def get_sample_all():
 @auth.login_required
 @edit_need_auth
 def add_sample():
-    json2db({},Patient)
+    user = UserInfo().search_by_uid(g.user.user_id)['data']
+    data = {'account':[user['id']],'researchCenter':user['research_center_id']}
+    json2db(data,Patient)
     return Success()
 
 

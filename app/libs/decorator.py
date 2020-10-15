@@ -49,7 +49,7 @@ def post_not_null(func):
 def edit_need_auth(func):
     @wraps(func)
     def wrapper(**kwargs):
-        if 'OperateAllCrf' in g.user.scopes:
+        if 'OperateAllCRF' in g.user.scopes:
             return func(**kwargs)
         elif 'EditCenterCRF' in g.user.scopes:
             return func(**kwargs)
