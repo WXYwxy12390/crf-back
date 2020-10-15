@@ -6,8 +6,10 @@
 
 from flask import request
 
+from app.libs.decorator import edit_need_auth
 from app.libs.error import Success
 from app.libs.redprint import Redprint
+from app.libs.token_auth import auth
 from app.models import json2db, db
 from app.models.base_line import PastHis, Patient, DrugHistory
 
@@ -20,6 +22,8 @@ def get_past_history(pid):
 
 
 @api.route('/<int:pid>',methods = ['POST'])
+@auth.login_required
+@edit_need_auth
 def add_past_history(pid):
     data = request.get_json()
     patient = Patient.query.get_or_404(pid)
@@ -35,6 +39,8 @@ def get_drug_history(pid):
     return Success(data= drugs if drugs else [])
 
 @api.route('/drug_history/<int:pid>',methods=['POST'])
+@auth.login_required
+@edit_need_auth
 def add_drug_history(pid):
     data = request.get_json()
     patient = Patient.query.get_or_404(pid)
@@ -43,6 +49,8 @@ def add_drug_history(pid):
     return Success()
 
 @api.route('/drug_history/<int:pid>',methods=['DELETE'])
+@auth.login_required
+@edit_need_auth
 def del_hormone_history(pid):
     data = request.get_json()
     items = DrugHistory.query.filter(DrugHistory.is_delete==0,DrugHistory.id.in_(data['ids'])).all()

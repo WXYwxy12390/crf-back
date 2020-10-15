@@ -1,8 +1,10 @@
 from flask import request
 
+from app.libs.decorator import edit_need_auth
 from app.libs.error import Success
 from app.libs.error_code import ParameterException
 from app.libs.redprint import Redprint
+from app.libs.token_auth import auth
 from app.models import json2db
 from app.models.base_line import Patient
 
@@ -15,6 +17,8 @@ def get_patient(id):
 
 
 @api.route('/<int:id>',methods = ['POST'])
+@auth.login_required
+@edit_need_auth
 def add_patient(id):
     data = request.get_json()
     if 'idNumber' in data:

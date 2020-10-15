@@ -2,8 +2,10 @@ from datetime import datetime
 
 from flask import request
 
+from app.libs.decorator import edit_need_auth
 from app.libs.error import Success
 from app.libs.redprint import Redprint
+from app.libs.token_auth import auth
 from app.models import json2db, delete_array, db
 from app.models.base_line import Patient
 from app.models.crf_info import FollInfo
@@ -22,6 +24,8 @@ def get_treatment_evaluation(pid, treNum, trement):
 
 
 @api.route('/evaluation/<int:pid>/<int:treNum>/<string:trement>', methods=['POST'])
+@auth.login_required
+@edit_need_auth
 def add_treatment_evaluation(pid, treNum, trement):
     data = request.get_json()
     data['pid'] = pid
@@ -39,6 +43,8 @@ def get_signs(pid, treNum):
 
 
 @api.route('/signs/<int:pid>/<int:treNum>', methods=['POST'])
+@auth.login_required
+@edit_need_auth
 def add_signs(pid, treNum):
     data = request.get_json()
     print(data)
@@ -50,6 +56,8 @@ def add_signs(pid, treNum):
 
 
 @api.route('/signs/<int:sign_id>', methods=['DELETE'])
+@auth.login_required
+@edit_need_auth
 def del_signs(sign_id):
     sign = Signs.query.filter_by(id=sign_id).all()
     delete_array(sign)
@@ -64,6 +72,8 @@ def get_side_effect(pid, treNum):
 
 
 @api.route('/side_effect/<int:pid>/<int:treNum>', methods=['POST'])
+@auth.login_required
+@edit_need_auth
 def add_side_effect(pid, treNum):
     data = request.get_json()
     for _data in data['data']:
@@ -74,6 +84,8 @@ def add_side_effect(pid, treNum):
 
 
 @api.route('/side_effect/<int:se_id>', methods=['DELETE'])
+@auth.login_required
+@edit_need_auth
 def del_side_effect(se_id):
     side_effect = SideEffect.query.filter_by(id=se_id).all()
     delete_array(side_effect)
@@ -88,6 +100,8 @@ def get_follInfo(pid):
 
 
 @api.route('/follInfo/<int:pid>', methods=['POST'])
+@auth.login_required
+@edit_need_auth
 def add_follInfo(pid):
     data = request.get_json()
     for _data in data['data']:
@@ -97,6 +111,7 @@ def add_follInfo(pid):
 
 
 @api.route('/follInfo/<int:fid>', methods=['DELETE'])
+@auth.login_required
 def del_follInfo(fid):
     follInfo = FollInfo.query.filter_by(id=fid).all()
     delete_array(follInfo)
@@ -104,10 +119,12 @@ def del_follInfo(fid):
 
 
 # 设置病人随访提醒
-@api.route('/patient/follInfo/<int:id>', methods=['POST'])
-def add_patient_follInfo(id):
+@api.route('/patient/follInfo/<int:pid>', methods=['POST'])
+@auth.login_required
+@edit_need_auth
+def add_patient_follInfo(pid):
     data = request.get_json()
-    data['id'] = id
+    data['id'] = pid
     data['finishFollowup'] = 0
     json2db(data, Patient)
     return Success()
@@ -121,9 +138,11 @@ def get_patient_follInfo():
 
 
 # 关闭随访提醒（完成随访）(通过用户id以及下次随访时间来查询）
-@api.route('/patient/follInfo/<int:id>/<string:nextFollowupTime>', methods=['PUT'])
-def update_patient_follInfo(id, nextFollowupTime):
-    patients = Patient.query.filter_by(id=id, finishFollowup=0,
+@api.route('/patient/follInfo/<int:pid>/<string:nextFollowupTime>', methods=['PUT'])
+@auth.login_required
+@edit_need_auth
+def update_patient_follInfo(pid, nextFollowupTime):
+    patients = Patient.query.filter_by(id=pid, finishFollowup=0,
                                        nextFollowupTime=datetime.strptime(nextFollowupTime, "%Y-%m-%d")).all()
     with db.auto_commit():
         for patient in patients:

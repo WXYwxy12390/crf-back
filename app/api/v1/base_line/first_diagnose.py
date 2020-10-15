@@ -5,8 +5,10 @@
 """
 from flask import request
 
+from app.libs.decorator import edit_need_auth
 from app.libs.error import Success
 from app.libs.redprint import Redprint
+from app.libs.token_auth import auth
 from app.models import json2db
 from app.models.base_line import IniDiaPro, Patient
 
@@ -19,6 +21,8 @@ def get_first_diagnose(pid):
 
 
 @api.route('/<int:pid>',methods = ['POST'])
+@auth.login_required
+@edit_need_auth
 def add_first_diagnose(pid):
     data = request.get_json()
     patient = Patient.query.get_or_404(pid)

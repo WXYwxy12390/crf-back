@@ -3,7 +3,7 @@ from flask import jsonify
 from app.libs.redprint import Redprint
 from app.models import db, json2db
 from app.models.base_line import Patient, PastHis, DrugHistory, IniDiaPro
-from app.models.therapy_record import Surgery, Radiotherapy
+from app.models.therapy_record import Surgery, Radiotherapy, OneToFive
 
 api = Redprint('migrate')
 #迁移update_time
@@ -94,18 +94,26 @@ def migrate_ini_dia_pro():
 
 @api.route('/therapy_record',methods=['GET'])
 def migrate_therapy_record():
-    items = Surgery.query.filter_by().all()
     with db.auto_commit():
+        items = OneToFive.query.filter_by().all()
+        radio_array = ['手术','纵隔镜','胸腔镜','肺穿刺','纤支镜','EBUS','EUS','淋巴结活检','其他']
         for item in items:
-            if item._surSco:
-                item.surSco = generate_value(item._surSco)
-            if item._lymDis:
-                item.lymDis = generate_value(item._lymDis)
-    items = Radiotherapy.query.filter_by().all()
-    with db.auto_commit():
-        for item in items:
-            if item._radSite:
-                item.radSite = generate_value(item._radSite)
+            if item._bioMet:
+                item.bioMet = generate_value_with_radio_list(item._bioMet,radio_array)
+
+    # with db.auto_commit():
+    #     items = Surgery.query.filter_by().all()
+    #     for item in items:
+    #         if item._surSco:
+    #             item.surSco = generate_value(item._surSco)
+    #         if item._lymDis:
+    #             item.lymDis = generate_value(item._lymDis)
+    #
+    # with db.auto_commit():
+    #     items = Radiotherapy.query.filter_by().all()
+    #     for item in items:
+    #         if item._radSite:
+    #             item.radSite = generate_value(item._radSite)
     return 'ok'
 
 @api.route('/patient',methods=['GET'])
@@ -150,5 +158,29 @@ def generate_value(str):
             else:
                 i = i + 1
         else:
+            i = i + 1
+    return data
+
+def generate_value_with_radio_list(str,radio_list):
+    if type(str) is list:
+        strs = str
+    else:
+        strs = str.split(',')
+    data = {
+        'radio': [],
+        'other': None
+    }
+    i = 0
+    while i < len(strs):
+        if strs[i] != '' and strs[i] != '其他' and strs[i] in radio_list:
+            data['radio'].append(strs[i])
+            i = i + 1
+        elif strs[i] == '其他':
+            data['other'] = ''
+            i = i + 1
+        else:
+            if data['other'] is None:
+                data['other'] = ''
+            data['other'] += strs[i]
             i = i + 1
     return data

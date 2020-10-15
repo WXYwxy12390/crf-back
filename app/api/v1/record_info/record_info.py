@@ -3,8 +3,10 @@
 @file: record_info.py
 @time: 2020-09-16 20:44
 """
+from app.libs.decorator import edit_need_auth
 from app.libs.error import Success
 from app.libs.redprint import Redprint
+from app.libs.token_auth import auth
 from app.models import json2db, db
 from app.models.therapy_record import TreRec
 
@@ -16,6 +18,8 @@ def get_record_info_nav(pid):
     return Success(data=len(tre_recs))
 
 @api.route('/<int:pid>',methods = ['POST'])
+@auth.login_required
+@edit_need_auth
 def add_record_info(pid):
     tre_recs = TreRec.query.filter_by(pid=pid).all()
     json2db({
@@ -25,6 +29,8 @@ def add_record_info(pid):
     return Success()
 
 @api.route('/<int:pid>',methods = ['DELETE'])
+@auth.login_required
+@edit_need_auth
 def del_record_info(pid):
     tre_rec = TreRec.query.filter_by(pid=pid).order_by(TreRec.treNum.desc()).first()
     if tre_rec:

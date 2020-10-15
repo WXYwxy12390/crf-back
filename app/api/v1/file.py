@@ -1,5 +1,6 @@
 from flask import request, jsonify
 
+from app.libs.decorator import edit_need_auth
 from app.libs.error import Success
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
@@ -21,6 +22,8 @@ def get_file(folder,id):
 
 
 @api.route('/<string:folder>/<int:id>', methods=['POST'])
+@auth.login_required
+@edit_need_auth
 def add_file(folder, id):
     file = request.files['file']  # 获取到用户上传的文件对象file
     StaticFile(folder).add_file(id, file)
@@ -28,6 +31,8 @@ def add_file(folder, id):
 
 
 @api.route('/<string:folder>/<int:id>', methods=['DELETE'])
+@auth.login_required
+@edit_need_auth
 def del_file(folder, id):
     filename = request.get_json()['filename']
     static_file = StaticFile(folder)

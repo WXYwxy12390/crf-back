@@ -6,8 +6,10 @@
 
 from flask import request
 
+from app.libs.decorator import edit_need_auth
 from app.libs.error import Success
 from app.libs.redprint import Redprint
+from app.libs.token_auth import auth
 from app.models import json2db, db, delete_array
 from app.models.other_inspect import Lung, OtherExams, ImageExams
 
@@ -19,6 +21,8 @@ def get_lung_function(pid,treNum):
     return Success(data=data if data else {})
 
 @api.route('/lung_function/<int:pid>/<int:treNum>',methods=['POST'])
+@auth.login_required
+@edit_need_auth
 def add_lung_function(pid,treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -34,6 +38,8 @@ def get_other_exam(pid,treNum):
     return Success(data=data if data else {})
 
 @api.route('/other_exam/<int:pid>/<int:treNum>',methods=['POST'])
+@auth.login_required
+@edit_need_auth
 def add_other_exam(pid,treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -48,6 +54,8 @@ def get_image_exam(pid,treNum):
     return Success(data=data if data else [])
 
 @api.route('/image_exam/<int:pid>/<int:treNum>',methods=['POST'])
+@auth.login_required
+@edit_need_auth
 def add_image_exam(pid,treNum):
     data = request.get_json()
     for _data in data['data']:
@@ -57,6 +65,8 @@ def add_image_exam(pid,treNum):
     return Success()
 
 @api.route('/image_exam/<int:pid>/<int:treNum>',methods=['DELETE'])
+@auth.login_required
+@edit_need_auth
 def del_image_exam(pid,treNum):
     data = request.get_json()
     items = ImageExams.query.filter(ImageExams.is_delete==0,ImageExams.id.in_(data['ids'])).all()

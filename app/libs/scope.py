@@ -36,16 +36,29 @@ class Scope:
 #         #通过运算符重载，实现了 干净的代码--舒服
 #         self +  UserScope()+ AdminScope()
 
+class OperateUserCRF(Scope):
+    allow_api = ['v1.sample+add_sample','v1.sample+get_sample_all']
+    allow_module = ['v1.first_diagnose', 'v1.past_history', 'v1.patient', 'v1.record_info', 'v1.therapy_record',
+                    'v1.file', 'v1.immunohis', 'v1.lab_inspectation', 'v1.mole_detec', 'v1.other_inspect']
 
+class CheckCenterCRF(Scope):
+    allow_api = ['v1.sample+get_sample_all']
+
+
+class EditCenterCRF(Scope):
+    def __init__(self):
+        self + OperateUserCRF()
+
+class OperateAllCRF(Scope):
+    def __init__(self):
+        self + OperateUserCRF()
+
+class DeleteCRF(Scope):
+    allow_api = ['v1.sample+del_sample']
 
 class Export(Scope):
     # 导出
     allow_api = []
-
-
-class UnlockSample(Scope):
-    # 6 解锁
-    allow_api = ["v1.sample+unlock_sample"]
 
 
 class InputCRF(Scope):
@@ -58,7 +71,6 @@ class InputCRF(Scope):
         ]
 
 
-# 7 多中心查看CRF
 class CheckCRF(Scope):
     allow_api = ["v1.adverse_event+get_adverse_event",
                  "v1.concomitant_medication+get_concomitant_medication",
@@ -97,21 +109,9 @@ class CheckCRF(Scope):
                  ]
 
 
-class CycleSignitrue(Scope):
-    allow_api = ["sample.add_sample_sign", "v1.cycle+add_cycle_signature"]
-
-
-#最后的样本Pi签名
-class SampleSignitrue(Scope):
-    allow_api = ["v1.sample+add_sample_signature"]
-
-
-class CRASignitrue(Scope):
-    allow_api = []
-
 
 # 能够查看全部样本
-class CheckAllSamples(Scope):
+class CheckAllCrf(Scope):
     forbidden = []
 
 

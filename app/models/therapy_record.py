@@ -1,7 +1,14 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime
-from app.models.base import Base
+from app.models.base import Base, db
+
 
 # 治疗记录及疗效评估表
+from app.models.cycle import Immunohis, MoleDetec, Signs, SideEffect
+from app.models.lab_inspectation import BloodRoutine, BloodBio, Thyroid, Coagulation, MyocardialEnzyme, Cytokines, \
+    LymSubsets, UrineRoutine, TumorMarker
+from app.models.other_inspect import Lung, OtherExams, ImageExams
+
+
 class TreRec(Base):
     __tablename__ = 'treRec'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -35,6 +42,49 @@ class TreRec(Base):
             child = {}
         return child if child else {}
 
+    def delete(self):
+        with db.auto_commit():
+            self.is_delete = 1
+            self.delete_in_cycle(OneToFive)
+            self.delete_in_cycle(DetailTrePlan)
+            self.delete_in_cycle(Surgery)
+            self.delete_in_cycle(Radiotherapy)
+
+            #删除实验室检查
+            self.delete_in_cycle(BloodRoutine)
+            self.delete_in_cycle(BloodBio)
+            self.delete_in_cycle(Thyroid)
+            self.delete_in_cycle(Coagulation)
+            self.delete_in_cycle(MyocardialEnzyme)
+            self.delete_in_cycle(Cytokines)
+            self.delete_in_cycle(LymSubsets)
+            self.delete_in_cycle(UrineRoutine)
+            self.delete_in_cycle(TumorMarker)
+
+            #删除其他检查
+            self.delete_in_cycle(Lung)
+            self.delete_in_cycle(OtherExams)
+            self.delete_in_cycle(ImageExams)
+
+            #删除免疫组化，分子检测，症状体征，副反应
+            self.delete_in_cycle(Immunohis)
+            self.delete_in_cycle(MoleDetec)
+            self.delete_in_cycle(Signs)
+            self.delete_in_cycle(SideEffect)
+
+
+
+
+
+
+
+
+    def delete_in_cycle(self,table):
+
+        records = table.query.filter_by(pid=self.pid,treNum=self.treNum).all()
+        with db.auto_commit():
+            for record in records:
+                record.delete()
 
 
 #1-5线及其他表
@@ -50,7 +100,8 @@ class OneToFive(Base):
     begDate = Column(Date, comment='开始日期')
     endDate = Column(Date, comment='结束日期')
     isRepBio  = Column(Boolean, comment='是否重复活检')
-    bioMet = Column(String(40), comment='活检方式')   #长度
+    bioMet = Column(JSON, comment='活检方式')   #长度
+    _bioMet = Column(String(40), comment='活检方式')  # 长度
     matPart = Column(String(40), comment='取材部位') #长度
     specNum = Column(Integer, comment='标本库流水号')  #类型 改为字符串
     patDiaRes = Column(Text(10000), comment='病理诊断结果')
@@ -60,7 +111,8 @@ class OneToFive(Base):
 
     def keys(self):
         return ['id','pid','treNum','isTre','clinTri','treSolu','spePlan','begDate',
-                'endDate','isRepBio','bioMet','matPart','specNum','patDiaRes','patDiaOthers','note']
+                'endDate','isRepBio','bioMet','matPart','specNum','patDiaRes','patDiaOthers','note',
+                '_bioMet']
 
 
 #详细治疗方案
@@ -101,7 +153,8 @@ class Surgery(Base):
     proDate = Column(Date, comment='进展日期')
     proDes = Column(String(40), comment='进展描述')
     isRepBio  = Column(Boolean, comment='是否重复活检')
-    bioMet = Column(String(40), comment='活检方式')
+    # bioMet = Column(JSON, comment='活检方式')  # 长度
+    bioMet = Column(String(40), comment='活检方式')  # 长度
     matPart = Column(String(40), comment='取材部位')
     specNum = Column(Integer, comment='标本库流水号')
     patDiaRes = Column(Text(10000), comment='病理诊断结果')
@@ -109,7 +162,7 @@ class Surgery(Base):
     def keys(self):
         return ['id','pid','treNum','surSco','lymDis','cleGro','surDate','posAdjChem','isPro','proDate','proDes',
                 'isRepBio','bioMet','matPart','specNum','patDiaRes','patDiaOthers',
-                '_surSco','_lymDis']
+                '_surSco',]
 #放疗表
 class Radiotherapy(Base):
     __tablename__ = 'radiotherapy'
@@ -127,15 +180,17 @@ class Radiotherapy(Base):
     splTim = Column(Integer, comment='分割次数')
     method = Column(String(5), comment='分割次数单位')
     isRepBio  = Column(Boolean, comment='是否重复活检')
-    bioMet = Column(String(40), comment='活检方式')
+
+    # bioMet = Column(JSON, comment='活检方式')  # 长度
+    bioMet = Column(String(40), comment='活检方式')  # 长度
+
     matPart = Column(String(40), comment='取材部位')
     specNum = Column(Integer, comment='标本库流水号')
     patDiaRes = Column(Text(10000), comment='病理诊断结果')
     patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
     def keys(self):
         return ['id','pid','treNum','begDate','endDate','radSite','radDose','dosUnit','splTim','method',
-                'isRepBio','bioMet','matPart','specNum','patDiaRes','patDiaOthers',
-                '_radSite']
+                'isRepBio','bioMet','matPart','specNum','patDiaRes','patDiaOthers']
 
 
 

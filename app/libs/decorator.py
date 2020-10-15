@@ -5,8 +5,8 @@ from flask import request, g
 from app.libs.enums import SampleStatus, interface_dict
 from app.libs.error_code import SubmitError, ParameterException
 from app.models import db
-
-
+from app.models.base_line import Patient
+from app.spider.user_info import UserInfo
 
 
 def sample_no_submit(func):
@@ -46,6 +46,20 @@ def post_not_null(func):
 
     return wrapper
 
+def edit_need_auth(func):
+    @wraps(func)
+    def wrapper(**kwargs):
+        if 'OperateAllCrf' in g.user.scopes:
+            return func(**kwargs)
+        elif 'EditCenterCRF' in g.user.scopes:
+            return func(**kwargs)
+        patient = Patient.query.get_or_404(kwargs.get('pid'))
+        user = UserInfo().search_by_uid(g.user.user_id)['data']
+        if patient.researchCenter == user['research_center_id']:
+            return func(**kwargs)
+        return func(**kwargs)
+
+    return wrapper
 
 
 
