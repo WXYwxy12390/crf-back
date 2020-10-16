@@ -93,22 +93,22 @@ class Patient(Base):
 
     #获取样本中最新的病例诊断
     def get_pat_dia(self):
-        tre_recs = TreRec.query.filter_by(pid=self.pid).order_by(TreRec.treNum).all()
+        tre_recs = TreRec.query.filter_by(pid=self.id).order_by(TreRec.treNum).all()
         data = {}
         for tre_rec in tre_recs:
             trement = tre_rec.trement
             if trement is None:
                 continue
             if trement in ['one','two','three','four','five','other']:
-                item = OneToFive.query.filter_by(pid=self.pid,treNum=tre_rec.treNum).first_or_404()
-                if item.patDiaRes:
+                item = OneToFive.query.filter_by(pid=self.id,treNum=tre_rec.treNum).first()
+                if item and item.patDiaRes:
                     data['patDia'] = item.patDiaRes
                     data['patDiaOthers'] = item.patDiaOthers
                     break
         if data == {}:
             ini_dia_pro = IniDiaPro.query.filter_by(pid=self.id).first()
             data['patDia'] = ini_dia_pro.patDia if ini_dia_pro else None
-            data['patDiaOthers'] = ini_dia_pro.patDiaOthers
+            data['patDiaOthers'] = ini_dia_pro.patDiaOthers if ini_dia_pro else None
 
         return data
 

@@ -51,7 +51,6 @@ def get_sample_all():
 
 @api.route('',methods=['POST'])
 @auth.login_required
-@edit_need_auth
 def add_sample():
     user = UserInfo().search_by_uid(g.user.user_id)['data']
     data = {'account':[user['id']],'researchCenter':user['research_center_id']}
