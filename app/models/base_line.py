@@ -18,7 +18,7 @@ class Patient(Base):
     researchCenter = Column(Integer, comment='研究中心,多个以逗号分隔,格式为(,17,23,)')
 
     idNumber = Column(String(18), comment='身份证号', unique=True)
-    hospitalNumber = Column(String(20), comment='住院号') #长度
+    hospitalNumber = Column(String(256), comment='住院号') #长度
     patientName = Column(String(100), comment='姓名')
     gender = Column(SmallInteger, comment='性别')      #格式问题
     birthday = Column(Date, comment='出生日期')
@@ -34,7 +34,7 @@ class Patient(Base):
                     '_researchCenter','_account']
 
     def get_fotmat_info(self):
-        ini_dia_pro = IniDiaPro.query.filter_by(pid=self.id).first()
+
         data = {
             'id':self.id,
             'patNumber':self.patNumber,
@@ -44,8 +44,9 @@ class Patient(Base):
             'phoneNumber':self.phoneNumber1,
             'gender':self.gender,
             'age':get_age_by_birth(get_birth_date_by_id_card(self.idNumber)),
-            'patDia':ini_dia_pro.patDia if ini_dia_pro else None,
-            'update_time':self.update_time
+            'patDia':self.get_pat_dia(),
+            'update_time':self.update_time,
+            'research_center_id':self.researchCenter
         }
         return data
 
@@ -89,6 +90,32 @@ class Patient(Base):
 
 
         return patients
+
+    #获取样本中最新的病例诊断
+    def get_pat_dia(self):
+        tre_recs = TreRec.query.filter_by(pid=self.pid).order_by(TreRec.treNum).all()
+        data = {}
+        for tre_rec in tre_recs:
+            trement = tre_rec.trement
+            if trement is None:
+                continue
+            if trement in ['one','two','three','four','five','other']:
+                item = OneToFive.query.filter_by(pid=self.pid,treNum=tre_rec.treNum).first_or_404()
+                if item.patDiaRes:
+                    data['patDia'] = item.patDiaRes
+                    data['patDiaOthers'] = item.patDiaOthers
+                    break
+        if data == {}:
+            ini_dia_pro = IniDiaPro.query.filter_by(pid=self.id).first()
+            data['patDia'] = ini_dia_pro.patDia if ini_dia_pro else None
+            data['patDiaOthers'] = ini_dia_pro.patDiaOthers
+
+        return data
+
+
+
+
+
 
 
     @staticmethod

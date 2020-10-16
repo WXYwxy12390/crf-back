@@ -35,7 +35,6 @@ def add_blood_routine(pid, treNum):
 
 # 血生化的获取和提交
 @api.route('/blood_bio/<int:pid>/<int:treNum>', methods=['GET'])
-@edit_need_auth
 def get_blood_bio(pid, treNum):
     blood_bio = BloodBio.query.filter_by(pid=pid, treNum=treNum).first()
     return Success(data=blood_bio if blood_bio else {})
