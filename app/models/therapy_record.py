@@ -112,7 +112,7 @@ class OneToFive(Base):
 
     def keys(self):
         return ['id','pid','treNum','isTre','clinTri','treSolu','spePlan','begDate',
-                'endDate','isRepBio','bioMet','matPart','specNum','patDiaRes','patDiaOthers','note','patDia'
+                'endDate','isRepBio','bioMet','matPart','specNum','patDiaRes','patDiaOthers','note','patDia',
                 '_bioMet']
 
 

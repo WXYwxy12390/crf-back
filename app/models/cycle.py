@@ -150,6 +150,7 @@ class SideEffect(Base):
     pid = Column(Integer, comment='病人id')
     treNum = Column(Integer, comment='number,对应病人的某一条治疗记录')
     sidReaName = Column(String(60), comment='副反应名称')
+    sidReaNameOther = Column(String(2048),comment='副反应其他名称')
     sidRecCla = Column(Integer, comment='副反应分级')
     begDate = Column(DateTime, comment='开始日期')
     isExe = Column(Integer, comment='目前是否存在')
@@ -157,4 +158,4 @@ class SideEffect(Base):
     endDate = Column(DateTime, comment='结束日期')
 
     def keys(self):
-        return ['id', 'pid', 'treNum', 'sidReaName', 'sidRecCla', 'begDate', 'isExe','treatment','endDate']
+        return ['id', 'pid', 'treNum', 'sidReaName', 'sidRecCla', 'begDate', 'isExe','treatment','endDate','sidReaNameOther']

@@ -356,6 +356,6 @@ class IniDiaPro(Base):
 
     def keys(self):
         return ["id","PSScore","cliniManifest","videography","part","bioMet","pleInv","speSite","firVisDate",
-                "patReDate","patNum","patDia","patDiaOthers","mitIma","comCar","necArea","massSize","Ki67",
+                "patReDate","patNum","patDia","mitIma","comCar","necArea","massSize","Ki67",
                 "traSite","TSize","stage","cStage","cliStage","pStage","patStage",'cRemark','pRemark',
                 '_cliniManifest','_part','_bioMet','_traSite','_patDia','_patDiaOthers']
