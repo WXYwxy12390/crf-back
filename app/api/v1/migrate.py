@@ -6,6 +6,7 @@ from app.models.base_line import Patient, PastHis, DrugHistory, IniDiaPro
 from app.models.therapy_record import Surgery, Radiotherapy, OneToFive
 
 api = Redprint('migrate')
+
 #迁移update_time
 @api.route('/update_time',methods=['GET'])
 def migrate_update_time():
@@ -58,7 +59,7 @@ def migrate_gender():
 
     return 'ok'
 
-
+#迁移既往史
 @api.route('/past_history',methods=['GET'])
 def migrate_past_history():
     items = PastHis.query.filter_by().all()
@@ -76,6 +77,7 @@ def migrate_past_history():
 
     return 'ok'
 
+#迁移 初诊过程
 @api.route('/IniDiaPro',methods=['GET'])
 def migrate_ini_dia_pro():
     items = IniDiaPro.query.filter_by().all()
@@ -92,6 +94,7 @@ def migrate_ini_dia_pro():
 
     return  'ok'
 
+#迁移治疗记录
 @api.route('/therapy_record',methods=['GET'])
 def migrate_therapy_record():
     with db.auto_commit():
@@ -101,19 +104,19 @@ def migrate_therapy_record():
             if item._bioMet:
                 item.bioMet = generate_value_with_radio_list(item._bioMet,radio_array)
 
-    # with db.auto_commit():
-    #     items = Surgery.query.filter_by().all()
-    #     for item in items:
-    #         if item._surSco:
-    #             item.surSco = generate_value(item._surSco)
-    #         if item._lymDis:
-    #             item.lymDis = generate_value(item._lymDis)
-    #
-    # with db.auto_commit():
-    #     items = Radiotherapy.query.filter_by().all()
-    #     for item in items:
-    #         if item._radSite:
-    #             item.radSite = generate_value(item._radSite)
+    with db.auto_commit():
+        items = Surgery.query.filter_by().all()
+        for item in items:
+            if item._surSco:
+                item.surSco = generate_value(item._surSco)
+            if item._lymDis:
+                item.lymDis = generate_value(item._lymDis)
+
+    with db.auto_commit():
+        items = Radiotherapy.query.filter_by().all()
+        for item in items:
+            if item._radSite:
+                item.radSite = generate_value(item._radSite)
     return 'ok'
 
 @api.route('/patient',methods=['GET'])
@@ -136,6 +139,28 @@ def migrate_patient():
 
 
     return 'ok'
+
+
+#迁移病理诊断
+@api.route('/patDia',methods = ['GET'])
+def migrate_patDia():
+    items = IniDiaPro.query.filter_by().all()
+    with db.auto_commit():
+        for item in items:
+            if item._patDia:
+                item.patDia = generate_value(item._patDia)
+                if item._patDiaOthers:
+                    item.patDia['other'] = item._patDiaOthers
+
+    with db.auto_commit():
+        items = OneToFive.query.filter_by().all()
+        for item in items:
+            if item.patDiaRes:
+                item.patDia = generate_value(item.patDiaRes)
+                if item.patDiaOthers:
+                    item.patDia['other'] = item.patDiaOthers
+    return 'ok'
+
 def generate_value(str):
     if type(str) is list:
         strs = str

@@ -3,7 +3,7 @@ from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON
 from app.models.base import Base
 # 病人基本信息表
 from app.models.cycle import MoleDetec
-from app.models.therapy_record import TreRec, OneToFive
+from app.models.therapy_record import TreRec, OneToFive, Surgery, Radiotherapy
 from app.utils.date import get_birth_date_by_id_card, get_age_by_birth, str2date
 
 
@@ -94,23 +94,28 @@ class Patient(Base):
     #获取样本中最新的病例诊断
     def get_pat_dia(self):
         tre_recs = TreRec.query.filter_by(pid=self.id).order_by(TreRec.treNum.desc()).all()
-        data = {}
+
         for tre_rec in tre_recs:
             trement = tre_rec.trement
             if trement is None:
                 continue
             if trement in ['one','two','three','four','five','other']:
                 item = OneToFive.query.filter_by(pid=self.id,treNum=tre_rec.treNum).first()
-                if item and item.patDiaRes:
-                    data['patDia'] = item.patDiaRes
-                    data['patDiaOthers'] = item.patDiaOthers
-                    break
-        if data == {}:
-            ini_dia_pro = IniDiaPro.query.filter_by(pid=self.id).first()
-            data['patDia'] = ini_dia_pro.patDia if ini_dia_pro else None
-            data['patDiaOthers'] = ini_dia_pro.patDiaOthers if ini_dia_pro else None
+                if item and item.patDia:
+                    return item.patDia
+            elif trement == 'surgery':
+                item = Surgery.query.filter_by(pid=self.id,treNum=tre_rec.treNum).first()
+                if item and item.patDia:
+                    return item.patDia
+            elif trement == 'radiotherapy':
+                item = Radiotherapy.query.filter_by(pid=self.id,treNum=tre_rec.treNum).first()
+                if item and item.patDia:
+                    return item.patDia
 
-        return data
+
+        ini_dia_pro = IniDiaPro.query.filter_by(pid=self.id).first()
+        return ini_dia_pro.patDia if ini_dia_pro else None
+
 
 
 
@@ -326,8 +331,11 @@ class IniDiaPro(Base):
     firVisDate = Column(Date, comment='初诊日期')
     patReDate = Column(Date, comment='病理报告日期')
     patNum = Column(Integer, comment='病理号') # 改为字符串
-    patDia = Column(String(10000), comment='病理诊断,多个以逗号分隔')
-    patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
+
+    patDia = Column(JSON, comment='病理诊断,多个以逗号分隔')
+    _patDia = Column(String(10000), comment='病理诊断,多个以逗号分隔')
+    _patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
+
     mitIma = Column(Integer, comment='核分裂像')
     comCar = Column(String(100), comment='复合性癌') #长度
     necArea = Column(Float, comment='坏死面积')
@@ -350,4 +358,4 @@ class IniDiaPro(Base):
         return ["id","PSScore","cliniManifest","videography","part","bioMet","pleInv","speSite","firVisDate",
                 "patReDate","patNum","patDia","patDiaOthers","mitIma","comCar","necArea","massSize","Ki67",
                 "traSite","TSize","stage","cStage","cliStage","pStage","patStage",'cRemark','pRemark',
-                '_cliniManifest','_part','_bioMet','_traSite']
+                '_cliniManifest','_part','_bioMet','_traSite','_patDia','_patDiaOthers']

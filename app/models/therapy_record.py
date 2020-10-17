@@ -104,6 +104,7 @@ class OneToFive(Base):
     _bioMet = Column(String(40), comment='活检方式')  # 长度
     matPart = Column(String(40), comment='取材部位') #长度
     specNum = Column(Integer, comment='标本库流水号')  #类型 改为字符串
+    patDia = Column(JSON, comment='病理诊断结果')
     patDiaRes = Column(Text(10000), comment='病理诊断结果')
     patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
     #patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
@@ -111,7 +112,7 @@ class OneToFive(Base):
 
     def keys(self):
         return ['id','pid','treNum','isTre','clinTri','treSolu','spePlan','begDate',
-                'endDate','isRepBio','bioMet','matPart','specNum','patDiaRes','patDiaOthers','note',
+                'endDate','isRepBio','bioMet','matPart','specNum','patDiaRes','patDiaOthers','note','patDia'
                 '_bioMet']
 
 
@@ -157,11 +158,11 @@ class Surgery(Base):
     bioMet = Column(String(40), comment='活检方式')  # 长度
     matPart = Column(String(40), comment='取材部位')
     specNum = Column(Integer, comment='标本库流水号')
-    patDiaRes = Column(Text(10000), comment='病理诊断结果')
-    patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
+
+    patDia = Column(JSON, comment='病理诊断结果')
     def keys(self):
         return ['id','pid','treNum','surSco','lymDis','cleGro','surDate','posAdjChem','isPro','proDate','proDes',
-                'isRepBio','bioMet','matPart','specNum','patDiaRes','patDiaOthers',
+                'isRepBio','bioMet','matPart','specNum','patDia',
                 '_surSco',]
 #放疗表
 class Radiotherapy(Base):
@@ -186,11 +187,11 @@ class Radiotherapy(Base):
 
     matPart = Column(String(40), comment='取材部位')
     specNum = Column(Integer, comment='标本库流水号')
-    patDiaRes = Column(Text(10000), comment='病理诊断结果')
-    patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
+    patDia = Column(JSON, comment='病理诊断结果')
+
     def keys(self):
         return ['id','pid','treNum','begDate','endDate','radSite','radDose','dosUnit','splTim','method',
-                'isRepBio','bioMet','matPart','specNum','patDiaRes','patDiaOthers']
+                'isRepBio','bioMet','matPart','specNum','patDia']
 
 
 
