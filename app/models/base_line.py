@@ -93,7 +93,7 @@ class Patient(Base):
 
     #获取样本中最新的病例诊断
     def get_pat_dia(self):
-        tre_recs = TreRec.query.filter_by(pid=self.id).order_by(TreRec.treNum).all()
+        tre_recs = TreRec.query.filter_by(pid=self.id).order_by(TreRec.treNum.desc()).all()
         data = {}
         for tre_rec in tre_recs:
             trement = tre_rec.trement
