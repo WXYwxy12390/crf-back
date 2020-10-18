@@ -39,7 +39,7 @@ class Scope:
 class OperateUserCRF(Scope):
     allow_api = ['v1.sample+add_sample','v1.sample+get_sample_all']
     allow_module = ['v1.first_diagnose', 'v1.past_history', 'v1.patient', 'v1.record_info', 'v1.therapy_record',
-                    'v1.file', 'v1.immunohis', 'v1.lab_inspectation', 'v1.mole_detec', 'v1.other_inspect']
+                    'v1.file', 'v1.immunohis', 'v1.lab_inspectation', 'v1.mole_detec', 'v1.other_inspect','v1.treatment_info']
 
 class CheckCenterCRF(Scope):
     allow_api = ['v1.sample+get_sample_all']

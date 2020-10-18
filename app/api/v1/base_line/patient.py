@@ -16,13 +16,13 @@ def get_patient(id):
     return Success(data=patient if patient else {})
 
 
-@api.route('/<int:id>',methods = ['POST'])
+@api.route('/<int:pid>',methods = ['POST'])
 @auth.login_required
 @edit_need_auth
-def add_patient(id):
+def add_patient(pid):
     data = request.get_json()
     if 'idNumber' in data:
-        patient = Patient.query.filter(Patient.is_delete==0,Patient.idNumber==data['idNumber'],Patient.id!=id).first()
+        patient = Patient.query.filter(Patient.is_delete==0,Patient.idNumber==data['idNumber'],Patient.id!=pid).first()
         if patient:
             raise ParameterException(msg='已经存在相同身份证号码。')
     json2db(data, Patient)
