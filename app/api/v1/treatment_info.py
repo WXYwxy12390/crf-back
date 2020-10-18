@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import timedelta as td, datetime
 
 from flask import request
 
@@ -132,9 +132,15 @@ def add_patient_follInfo(pid):
 
 # 获得随访提醒表单
 @api.route('/patient/follInfo', methods=['GET'])
+@auth.login_required
 def get_patient_follInfo():
-    patients = Patient.query.filter_by(finishFollowup=0).all()
-    return Success(data=patients if patients else [])
+    id = g.user.user_id
+    today = datetime.today().__format__("%Y-%m-%d")
+    today = datetime.strptime(today, "%Y-%m-%d")
+    tomorrow = today + td(days=3)
+    patients = Patient.query.filter(Patient.nextFollowupTime >= today, Patient.nextFollowupTime <= tomorrow,Patient.is_delete == 0).order_by(Patient.nextFollowupTime.asc()).all()
+    new_patients = filter(lambda patient: True if patient.account and id in patient.account else False, patients)
+    return Success(data=list(new_patients) if list(new_patients) else [])
 
 
 # 关闭随访提醒（完成随访）(通过用户id以及下次随访时间来查询）
