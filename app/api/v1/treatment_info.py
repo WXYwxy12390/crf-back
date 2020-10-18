@@ -1,6 +1,6 @@
 from datetime import timedelta as td, datetime
 
-from flask import request
+from flask import request, g
 
 from app.libs.decorator import edit_need_auth
 from app.libs.error import Success

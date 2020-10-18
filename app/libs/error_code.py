@@ -95,3 +95,7 @@ class NoProjectId(Forbidden):
     # code = 403
     error_code = 10041
     msg = '无法获取项目id'
+
+class PostError(Forbidden):
+    error_code = 10021
+    msg = 'Post Error!'

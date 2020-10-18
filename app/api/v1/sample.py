@@ -9,6 +9,7 @@ from sqlalchemy import func
 
 from app.libs.decorator import edit_need_auth
 from app.libs.error import Success
+from app.libs.error_code import PostError
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
 from app.models import json2db, db, delete_array
@@ -62,12 +63,49 @@ def get_sample_all():
     }
     return jsonify(data)
 
+#新增样本
 @api.route('',methods=['POST'])
 @auth.login_required
 def add_sample():
+    data = request.get_json()
     user = UserInfo().search_by_uid(g.user.user_id)['data']
-    data = {'account':[user['id']],'researchCenter':user['research_center_id']}
-    json2db(data,Patient)
+    patients = None
+    if 'idNumber' in data:
+        patients = Patient.query.filter_by(idNumber=data['idNumber'],researchCenter=user['research_center_id']).all()
+    if 'hospitalNumber' in data:
+        patients = Patient.query.filter_by(hospitalNumber=data['hospitalNumber'],researchCenter=user['research_center_id']).all()
+    if 'patientName' in data:
+        patients = Patient.query.filter_by(patientName=data['patientName'],
+                                          researchCenter=user['research_center_id']).all()
+    if patients:
+        data = []
+        for patient in patients:
+            if g.user.user_id in patients.account:
+                raise PostError(msg='已经存在样本，无法创建')
+            else:
+                data.append(patient)
+        return Success(data=data)
+
+    model_data = {
+                'account': [user['id']],
+                'researchCenter': user['research_center_id'],
+                'idNumber':data.get('idNumber'),
+                'hospitalNumber':data.get('hospitalNumber'),
+                'patientName':data.get('patientName')
+            }
+    json2db(model_data,Patient)
+    return Success()
+
+
+@api.route('/<int:pid>/add_account',methods=['POST'])
+@auth.login_required
+def sample_add_account(pid):
+    patient = Patient.query.get_or_404(pid)
+    with db.auto_commit():
+        account = [id for id in patient.account]
+        account.append(g.user.user_id)
+        patient.account = list(set(account))
+
     return Success()
 
 
