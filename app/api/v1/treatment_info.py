@@ -140,7 +140,7 @@ def get_patient_follInfo():
     tomorrow = today + td(days=3)
     patients = Patient.query.filter(Patient.nextFollowupTime >= today, Patient.nextFollowupTime <= tomorrow,Patient.is_delete == 0,Patient.finishFollowup == 0).order_by(Patient.nextFollowupTime.asc()).all()
     new_patients = filter(lambda patient: True if patient.account and id in patient.account else False, patients)
-    return Success(data=list(new_patients) if list(new_patients) else [])
+    return Success(data=list(new_patients) if new_patients else [])
 
 
 # 关闭随访提醒（完成随访）(通过用户id以及下次随访时间来查询）
