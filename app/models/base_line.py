@@ -17,7 +17,7 @@ class Patient(Base):
     _researchCenter = Column(String(20), comment='研究中心,多个以逗号分隔,格式为(,17,23,)')
     researchCenter = Column(Integer, comment='研究中心,多个以逗号分隔,格式为(,17,23,)')
 
-    idNumber = Column(String(18), comment='身份证号', unique=True)
+    idNumber = Column(String(18), comment='身份证号')
     hospitalNumber = Column(String(256), comment='住院号') #长度
     patientName = Column(String(100), comment='姓名')
     gender = Column(SmallInteger, comment='性别')      #格式问题
