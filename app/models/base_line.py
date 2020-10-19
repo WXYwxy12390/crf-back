@@ -234,12 +234,12 @@ class Patient(Base):
         return None
 
     def filter_patDia(self,items):
-        ini_dia_pro = IniDiaPro.query.filter_by(pid=self.id).first()
-        if ini_dia_pro is None or ini_dia_pro.patDia is None:
+
+        pat_dia = self.get_pat_dia()
+        if pat_dia is None:
             return None
-        cur_patDia = ini_dia_pro.patDia.split(',')
         for item in items:
-            if item not in cur_patDia:
+            if item not in pat_dia['radio']:
                 return None
         return self
 

@@ -51,6 +51,7 @@ def get_sample_all():
 
     if data and len(data) > 0:
         patients = Patient.search(patients,data)
+        total = len(patients)
 
     res = [patient.get_fotmat_info() for patient in patients]
     #res = sorted(res, key=lambda re: re['update_time'], reverse=True)
@@ -80,7 +81,7 @@ def add_sample():
     if patients:
         data = []
         for patient in patients:
-            if g.user.user_id in patients.account:
+            if g.user.user_id in patient.account:
                 raise PostError(msg='已经存在样本，无法创建')
             else:
                 data.append(patient)

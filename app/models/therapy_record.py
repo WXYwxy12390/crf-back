@@ -155,7 +155,7 @@ class Surgery(Base):
     proDes = Column(String(40), comment='进展描述')
     isRepBio  = Column(Boolean, comment='是否重复活检')
     # bioMet = Column(JSON, comment='活检方式')  # 长度
-    bioMet = Column(String(40), comment='活检方式')  # 长度
+    bioMet = Column(JSON, comment='活检方式')  # 长度
     matPart = Column(String(40), comment='取材部位')
     specNum = Column(Integer, comment='标本库流水号')
 
@@ -180,10 +180,10 @@ class Radiotherapy(Base):
     dosUnit = Column(Boolean, comment='剂量单位,0: Gy, 1:cGy')
     splTim = Column(Integer, comment='分割次数')
     method = Column(String(5), comment='分割次数单位')
-    isRepBio  = Column(Boolean, comment='是否重复活检')
+    isRepBio = Column(Boolean, comment='是否重复活检')
 
     # bioMet = Column(JSON, comment='活检方式')  # 长度
-    bioMet = Column(String(40), comment='活检方式')  # 长度
+    bioMet = Column(JSON, comment='活检方式')  # 长度
 
     matPart = Column(String(40), comment='取材部位')
     specNum = Column(Integer, comment='标本库流水号')
