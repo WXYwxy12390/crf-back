@@ -52,11 +52,13 @@ class Patient(Base):
 
     @classmethod
     def search(cls,patients,search_data):
+        #病理诊断
         if 'patDia' in search_data:
             patients = [patient for patient in patients if patient.filter_patDia(search_data['patDia'])]
+        #转移部位
         if 'traSite' in search_data:
             patients = [patient for patient in patients if patient.filter_traSite(search_data['traSite'])]
-        #病理诊断，病理分期，转移部位
+        #病理分期
         if 'patStage' in search_data:
             condition = Patient.condition_iniDiaPro(patients, search_data)
             items = IniDiaPro.query.filter(condition).all()
@@ -228,6 +230,8 @@ class Patient(Base):
 
         items = OneToFive.query.filter_by(pid=self.id).all()
         for item in items:
+            if item.treSolu is None:
+                continue
             had_treSolu = item.treSolu.split(',')
             if treSolu in had_treSolu:
                 return self
@@ -248,7 +252,7 @@ class Patient(Base):
         ini_dia_pro = IniDiaPro.query.filter_by(pid=self.id).first()
         if ini_dia_pro is None or ini_dia_pro.traSite is None:
             return None
-        cur_traSite = ini_dia_pro.traSite.split(',')
+        cur_traSite = ini_dia_pro.traSite.get('radio')
         for item in items:
             if item not in cur_traSite:
                 return None
