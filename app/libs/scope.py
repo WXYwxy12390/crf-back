@@ -114,6 +114,10 @@ class CheckCRF(Scope):
 class CheckAllCrf(Scope):
     forbidden = []
 
+#统计分析
+class Analysis(Scope):
+    forbidden = []
+
 
 
 

@@ -330,7 +330,7 @@ class IniDiaPro(Base):
     speSite = Column(String(30), comment='标本部位') #长度
     firVisDate = Column(Date, comment='初诊日期')
     patReDate = Column(Date, comment='病理报告日期')
-    patNum = Column(Integer, comment='病理号') # 改为字符串
+    patNum = Column(String(255), comment='病理号') # 改为字符串
 
     patDia = Column(JSON, comment='病理诊断,多个以逗号分隔')
     _patDia = Column(String(10000), comment='病理诊断,多个以逗号分隔')

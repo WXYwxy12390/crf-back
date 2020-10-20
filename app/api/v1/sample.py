@@ -28,34 +28,26 @@ def get_sample_all():
     data = request.get_json()
     page = int(args['page'])
     limit = int(args['limit'])
-    pagination = None
-    total = 0
     patients = []
     if 'OperateAllCRF' in g.user.scopes:
-        pagination = Patient.query.filter_by().order_by(Patient.update_time.desc()).paginate(page,limit)
-        total = pagination.total
-        patients = pagination.items
+        patients = Patient.query.filter_by().order_by(Patient.update_time.desc()).all()
     elif 'CheckCenterCRF' in g.user.scopes:
         centers = ResearchCenterSpider().search_by_uid_project(current_app.config['PROJECT_ID'],g.user.user_id)['data']
         center_ids = [center['id'] for center in centers]
-        pagination = Patient.query.filter(Patient.is_delete==0,Patient.researchCenter.in_(center_ids)
-                                        ).order_by(Patient.update_time.desc()).paginate(page,limit)
-        total = pagination.total
-        patients = pagination.items
+        patients = Patient.query.filter(Patient.is_delete==0,Patient.researchCenter.in_(center_ids)
+                                        ).order_by(Patient.update_time.desc()).all()
     else:
         items = Patient.query.filter(Patient.is_delete==0).order_by(Patient.update_time.desc()).all()
         for item in items:
             if item.account and g.user.user_id in item.account:
                     patients.append(item)
-        total = len(patients)
 
     if data and len(data) > 0:
         patients = Patient.search(patients,data)
-        total = len(patients)
 
-    res = [patient.get_fotmat_info() for patient in patients]
-    #res = sorted(res, key=lambda re: re['update_time'], reverse=True)
 
+    res, total = get_paging(patients, page, limit)
+    res = [patient.get_fotmat_info() for patient in res]
     data = {
         "code": 200,
         "msg": "获取样本成功",
