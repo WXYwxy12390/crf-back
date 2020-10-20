@@ -243,7 +243,7 @@ class Patient(Base):
         if pat_dia is None:
             return None
         for item in items:
-            if item not in pat_dia['radio']:
+            if pat_dia.get('radio') and item not in pat_dia.get('radio'):
                 return None
         return self
 
