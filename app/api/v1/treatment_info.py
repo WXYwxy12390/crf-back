@@ -1,6 +1,6 @@
 from datetime import timedelta as td, datetime
 
-from flask import request, g
+from flask import request, g,current_app
 
 from app.libs.decorator import edit_need_auth
 from app.libs.error import Success
@@ -11,6 +11,7 @@ from app.models.base_line import Patient
 from app.models.crf_info import FollInfo
 from app.models.cycle import Signs, SideEffect
 from app.models.therapy_record import TreRec
+from app.spider.research_center import ResearchCenterSpider
 from app.utils.date import str2date
 
 api = Redprint('treatment_info')
@@ -134,13 +135,26 @@ def add_patient_follInfo(pid):
 @api.route('/patient/follInfo', methods=['GET'])
 @auth.login_required
 def get_patient_follInfo():
-    id = g.user.user_id
+    # id = g.user.user_id
     today = datetime.today().__format__("%Y-%m-%d")
     today = datetime.strptime(today, "%Y-%m-%d")
     tomorrow = today + td(days=3)
-    patients = Patient.query.filter(Patient.nextFollowupTime >= today, Patient.nextFollowupTime <= tomorrow,Patient.is_delete == 0,Patient.finishFollowup == 0).order_by(Patient.nextFollowupTime.asc()).all()
-    new_patients = filter(lambda patient: True if patient.account and id in patient.account else False, patients)
-    return Success(data=list(new_patients) if new_patients else [])
+
+    patients = []
+    if 'OperateAllCRF' in g.user.scopes:
+        patients = Patient.query.filter(Patient.nextFollowupTime >= today, Patient.nextFollowupTime <= tomorrow,Patient.is_delete == 0,Patient.finishFollowup == 0).order_by(Patient.nextFollowupTime.asc()).all()
+    elif 'CheckCenterCRF' in g.user.scopes:
+        centers = ResearchCenterSpider().search_by_uid_project(current_app.config['PROJECT_ID'], g.user.user_id)['data']
+        center_ids = [center['id'] for center in centers]
+        patients = Patient.query.filter(Patient.nextFollowupTime >= today, Patient.nextFollowupTime <= tomorrow,Patient.is_delete == 0,Patient.finishFollowup == 0,Patient.researchCenter.in_(center_ids)).order_by(Patient.nextFollowupTime.asc()).all()
+    else:
+        items = Patient.query.filter(Patient.nextFollowupTime >= today, Patient.nextFollowupTime <= tomorrow,Patient.is_delete == 0,Patient.finishFollowup == 0).order_by(Patient.nextFollowupTime.asc()).all()
+        for item in items:
+            if item.account and g.user.user_id in item.account:
+                patients.append(item)
+    # patients = Patient.query.filter(Patient.nextFollowupTime >= today, Patient.nextFollowupTime <= tomorrow,Patient.is_delete == 0,Patient.finishFollowup == 0).order_by(Patient.nextFollowupTime.asc()).all()
+    # new_patients = filter(lambda patient: True if patient.account and id in patient.account else False, patients)
+    return Success(data=patients if patients else [])
 
 
 # 关闭随访提醒（完成随访）(通过用户id以及下次随访时间来查询）
