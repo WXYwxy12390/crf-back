@@ -56,10 +56,10 @@ def add_signs(pid, treNum):
     return Success()
 
 
-@api.route('/signs/<int:sign_id>', methods=['DELETE'])
+@api.route('/signs/<int:pid>/<int:sign_id>', methods=['DELETE'])
 @auth.login_required
 @edit_need_auth
-def del_signs(sign_id):
+def del_signs(pid,sign_id):
     sign = Signs.query.filter_by(id=sign_id).all()
     delete_array(sign)
     return Success()
@@ -84,10 +84,10 @@ def add_side_effect(pid, treNum):
     return Success()
 
 
-@api.route('/side_effect/<int:se_id>', methods=['DELETE'])
+@api.route('/side_effect/<int:pid>/<int:se_id>', methods=['DELETE'])
 @auth.login_required
 @edit_need_auth
-def del_side_effect(se_id):
+def del_side_effect(pid,se_id):
     side_effect = SideEffect.query.filter_by(id=se_id).all()
     delete_array(side_effect)
     return Success()
@@ -111,9 +111,9 @@ def add_follInfo(pid):
     return Success()
 
 
-@api.route('/follInfo/<int:fid>', methods=['DELETE'])
+@api.route('/follInfo/<int:pid>/<int:fid>', methods=['DELETE'])
 @auth.login_required
-def del_follInfo(fid):
+def del_follInfo(pid,fid):
     follInfo = FollInfo.query.filter_by(id=fid).all()
     delete_array(follInfo)
     return Success()
