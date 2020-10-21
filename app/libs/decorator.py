@@ -66,9 +66,9 @@ def update_time(func):
     @wraps(func)
     def call(*args, **kwargs):
         out = func(*args, **kwargs)
-        pid = kwargs.get('sample_id')
+        pid = kwargs.get('pid')
         if pid is None :
-            raise ParameterException(msg='log无sample_id')
+            raise ParameterException(msg='未传pid')
         else:
             patient = Patient.query.get_or_404(pid)
             with db.auto_commit():
