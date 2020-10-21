@@ -12,7 +12,7 @@ from app.libs.error import Success
 from app.libs.error_code import PostError
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
-from app.models import json2db, db, delete_array
+from app.models import json2db, db, delete_array, json2db_add
 from app.models.base_line import Patient
 from app.spider.research_center import ResearchCenterSpider
 from app.spider.user_info import UserInfo
@@ -70,13 +70,17 @@ def add_sample():
     if 'patientName' in data:
         patients = Patient.query.filter_by(patientName=data['patientName'],
                                           researchCenter=user['research_center_id']).all()
+    data = {
+        "status":0,
+        "pid":None,
+        "samples": []
+    }
     if patients:
-        data = []
+        data['status'] = 2
         for patient in patients:
+            data['samples'].append(patient)
             if g.user.user_id in patient.account:
-                raise PostError(msg='已经存在样本，无法创建')
-            else:
-                data.append(patient)
+                data['status'] = -1
         return Success(data=data)
 
     model_data = {
@@ -87,8 +91,9 @@ def add_sample():
                 'patientName':data.get('patientName'),
                 'birthday':data.get('birthday')
             }
-    json2db(model_data,Patient)
-    return Success()
+    patient = json2db_add(model_data,Patient)
+    data['pid'] = patient.id
+    return Success(data=data)
 
 
 @api.route('/<int:pid>/add_account',methods=['POST'])

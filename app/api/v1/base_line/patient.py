@@ -22,15 +22,15 @@ def get_patient(id):
 @edit_need_auth
 def add_patient(pid):
     data = request.get_json()
-    user = UserInfo().search_by_uid(g.user.user_id)['data']
+    patient = Patient.query.get_or_404(pid)
     if 'idNumber' in data:
         patient = Patient.query.filter(Patient.is_delete == 0, Patient.idNumber == data['idNumber'],
-                                       Patient.id != pid, Patient.researchCenter == user['research_center_id']).first()
+                                       Patient.id != pid, Patient.researchCenter == patient.researchCenter).first()
         if patient:
             raise ParameterException(msg='已经存在相同身份证号码。')
     if 'hospitalNumber' in data:
         patient = Patient.query.filter(Patient.is_delete == 0, Patient.hospitalNumber == data['hospitalNumber'],
-                                       Patient.id != pid, Patient.researchCenter == user['research_center_id']).first()
+                                       Patient.id != pid, Patient.researchCenter == patient.researchCenter).first()
         if patient:
             raise ParameterException(msg='已经存在相同住院号。')
     json2db(data, Patient)
