@@ -30,7 +30,7 @@ def migrate_hormone_drug():
                     'type':1,
                     'drug_name':hormone.get('drugName'),
                     'drug_dose':hormone.get('drugDose'),
-                    'use_time':hormone.get('duration')
+                    'use_time':hormone.get('duration') if hormone.get('duration') !='/' else None
                 },DrugHistory)
 
         for item in drug_items:
@@ -42,7 +42,7 @@ def migrate_hormone_drug():
                     'type':0,
                     'drug_name':drug.get('drugName'),
                     'drug_dose':drug.get('drugDose'),
-                    'use_time':drug.get('duration')
+                    'use_time':drug.get('duration') if drug.get('duration') !='/' else None
                 },DrugHistory)
     return 'ok'
 
@@ -52,10 +52,10 @@ def migrate_gender():
     patients = Patient.query.filter_by().all()
     with db.auto_commit():
         for patient in patients:
-            if patient.gender == '1':
-                patient._gender = 1
-            elif patient.gender == '0':
-                patient._gender = 0
+            if patient._gender == '1':
+                patient.gender = 1
+            elif patient._gender == '0':
+                patient.gender = 0
 
     return 'ok'
 
@@ -65,15 +65,15 @@ def migrate_past_history():
     items = PastHis.query.filter_by().all()
     with db.auto_commit():
         for item in items:
-            # if item.basDisHis:
-            #     strs = item.basDisHis.split(',')
-            #     item._basDisHis = generate_value(strs)
-            if item.infDisHis:
-                item._infDisHis = generate_value(item.infDisHis)
-            if item.tumHis:
-                item._tumHis = generate_value(item.tumHis)
-            if item.tumFamHis:
-                item._tumFamHis = generate_value(item.tumFamHis)
+            if item._basDisHis:
+                strs = item._basDisHis.split(',')
+                item.basDisHis = generate_value(strs)
+            # if item._infDisHis:
+            #     item.infDisHis = generate_value(item._infDisHis)
+            # if item._tumHis:
+            #     item.tumHis = generate_value(item._tumHis)
+            # if item._tumFamHis:
+            #     item.tumFamHis = generate_value(item._tumFamHis)
 
     return 'ok'
 

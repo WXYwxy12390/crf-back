@@ -49,7 +49,7 @@ class Immunohis(Base):
     VEGFC = Column(Integer, comment='VEGF-C')
     Villin = Column(Integer, comment='Villin')
     Villinco = Column(Integer, comment='Villin')
-    other = Column(String(50), comment='其他')      #长度
+    other = Column(String(2048), comment='其他')      #长度
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
     def keys(self):
@@ -76,17 +76,17 @@ class MoleDetec(Base):
     ROS1 = Column(Integer, comment='ROS1(0-阴性,1-阳性,2-无)')
     RET = Column(Integer, comment='RET(0-阴性,1-阳性,2-无)')
     UGT1A1 = Column(Integer, comment='UGT1A1(0-阴性,1-阳性,2-无)')
-    ALKSam = Column(String(20), comment='ALK检测样本')  #下面的文本都要改
-    BIMSam = Column(String(20), comment='BIM检测样本')
-    BRAFSam = Column(String(20), comment='BRAF检测样本')
-    cMETSam = Column(String(20), comment='cMET检测样本')
-    EGFRSam = Column(String(20), comment='EGFR检测样本')
-    HER_2Sam = Column(String(20), comment='HER-2检测样本')
-    KRASSam = Column(String(20), comment='KRAS检测样本')
-    PIK3CASam = Column(String(20), comment='PIK3CA检测样本')
-    ROS1Sam = Column(String(20), comment='ROS1检测样本')
-    RETSam = Column(String(20), comment='RET检测样本')
-    UGT1A1Sam = Column(String(20), comment='UGT1A1检测样本')
+    ALKSam = Column(String(255), comment='ALK检测样本')  #下面的文本都要改
+    BIMSam = Column(String(255), comment='BIM检测样本')
+    BRAFSam = Column(String(255), comment='BRAF检测样本')
+    cMETSam = Column(String(255), comment='cMET检测样本')
+    EGFRSam = Column(String(255), comment='EGFR检测样本')
+    HER_2Sam = Column(String(255), comment='HER-2检测样本')
+    KRASSam = Column(String(255), comment='KRAS检测样本')
+    PIK3CASam = Column(String(255), comment='PIK3CA检测样本')
+    ROS1Sam = Column(String(255), comment='ROS1检测样本')
+    RETSam = Column(String(255), comment='RET检测样本')
+    UGT1A1Sam = Column(String(255), comment='UGT1A1检测样本')
     ALKDetMed = Column(Integer, comment='ALK检测方法(1-ARMS,2-FISH,3-NGS)')
     BIMDetMed = Column(Integer, comment='BIM检测方法(1-ARMS,2-FISH,3-NGS)')
     BRAFDetMed = Column(Integer, comment='BRAF检测方法(1-ARMS,2-FISH,3-NGS)')
@@ -98,21 +98,22 @@ class MoleDetec(Base):
     ROS1DetMed = Column(Integer, comment='ROS1检测方法(1-ARMS,2-FISH,3-NGS)')
     RETDetMed = Column(Integer, comment='RET检测方法(1-ARMS,2-FISH,3-NGS)')
     UGT1A1DetMed = Column(Integer, comment='UGT1A1检测方法(1-ARMS,2-FISH,3-NGS)')
-    ALKDesc = Column(String(30), comment='ALK结果描述')
-    BIMDesc = Column(String(30), comment='BIM结果描述')
-    BRAFDesc = Column(String(30), comment='BRAF结果描述')
-    cMETDesc = Column(String(30), comment='cMET结果描述')
-    EGFRDesc = Column(String(30), comment='EGFR结果描述')
-    HER_2Desc = Column(String(30), comment='HER-2结果描述')
-    KRASDesc = Column(String(30), comment='KRAS结果描述')
-    PIK3CADesc = Column(String(30), comment='PIK3CA结果描述')
-    ROS1Desc = Column(String(30), comment='ROS1结果描述')
-    RETDesc = Column(String(30), comment='RET结果描述')
-    UGT1A1Desc = Column(String(30), comment='UGT1A1结果描述')  #长度
+    ALKDesc = Column(String(255), comment='ALK结果描述')
+    BIMDesc = Column(String(255), comment='BIM结果描述')
+    BRAFDesc = Column(String(255), comment='BRAF结果描述')
+    cMETDesc = Column(String(255), comment='cMET结果描述')
+    EGFRDesc = Column(String(255), comment='EGFR结果描述')
+    HER_2Desc = Column(String(255), comment='HER-2结果描述')
+    KRASDesc = Column(String(255), comment='KRAS结果描述')
+    PIK3CADesc = Column(String(255), comment='PIK3CA结果描述')
+    ROS1Desc = Column(String(255), comment='ROS1结果描述')
+    RETDesc = Column(String(255), comment='RET结果描述')
+    UGT1A1Desc = Column(String(255), comment='UGT1A1结果描述')  #长度
     path = Column(String(200), comment='报告文件路径')
     MSI = Column(Integer, comment='MSI 0-MSS,1-MSIH,2-MSIL')
+    other = Column(String(255))
     PDL1 = Column(Integer, comment='PD-L1表达 0-未测,1-不详,2->50%,3-1%-50%,4-<1%,5-阴性')
-    PDL1KT = Column(String(20), comment='PDL1抗体') #长度
+    PDL1KT = Column(String(255), comment='PDL1抗体') #长度
     TMB = Column(String(20), comment='TMB') #???
 
     def keys(self):
@@ -120,7 +121,7 @@ class MoleDetec(Base):
                 'PIK3CA', 'ROS1', 'RET', 'UGT1A1', 'ALKSam', 'BIMSam','BRAFSam','cMETSam', 'EGFRSam', 'HER_2Sam', 'KRASSam', 'PIK3CASam', 'ROS1Sam',
                 'RETSam', 'UGT1A1Sam', 'ALKDetMed', 'BIMDetMed', 'BRAFDetMed', 'cMETDetMed','EGFRDetMed', 'HER_2DetMed', 'KRASDetMed', 'PIK3CADetMed', 'ROS1DetMed',
                 'RETDetMed', 'UGT1A1DetMed','ALKDesc', 'BIMDesc', 'BRAFDesc', 'cMETDesc', 'EGFRDesc', 'HER_2Desc','KRASDesc','PIK3CADesc',
-                'ROS1Desc','RETDesc','UGT1A1Desc','path','MSI','PDL1','PDL1KT','TMB']
+                'ROS1Desc','RETDesc','UGT1A1Desc','path','MSI','other','PDL1','PDL1KT','TMB']
 
 
 
@@ -135,7 +136,7 @@ class Signs(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
     treNum = Column(Integer, comment='number,对应病人的某一条治疗记录')
-    symName = Column(String(60), comment='症状名称')
+    symName = Column(String(255), comment='症状名称')
     begDate = Column(DateTime, comment='开始日期')
     isExe = Column(Integer, comment='目前是否存在')
     endDate = Column(DateTime, comment='结束日期')
@@ -149,13 +150,13 @@ class SideEffect(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
     treNum = Column(Integer, comment='number,对应病人的某一条治疗记录')
-    sidReaName = Column(String(60), comment='副反应名称')
-    sidReaNameOther = Column(String(2048),comment='副反应其他名称')
+    sidReaName = Column(String(255), comment='副反应名称')
+    #sidReaNameOther = Column(String(2048),comment='副反应其他名称') #随访数据库好像没有这字段了
     sidRecCla = Column(Integer, comment='副反应分级')
-    begDate = Column(DateTime, comment='开始日期')
+    begDate = Column(Date, comment='开始日期')
     isExe = Column(Integer, comment='目前是否存在')
-    treatment = Column(String(60), comment='治疗情况')
-    endDate = Column(DateTime, comment='结束日期')
+    treatment = Column(String(2048), comment='治疗情况')
+    endDate = Column(Date, comment='结束日期')
 
     def keys(self):
-        return ['id', 'pid', 'treNum', 'sidReaName', 'sidRecCla', 'begDate', 'isExe','treatment','endDate','sidReaNameOther']
+        return ['id', 'pid', 'treNum', 'sidReaName', 'sidRecCla', 'begDate', 'isExe','treatment','endDate']

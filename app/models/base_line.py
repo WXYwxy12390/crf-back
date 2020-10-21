@@ -10,7 +10,7 @@ from app.utils.date import get_birth_date_by_id_card, get_age_by_birth, str2date
 class Patient(Base):
     __tablename__ = 'patient'
     id = Column(Integer, primary_key=True, autoincrement=True, comment='病人id')
-    patNumber = Column(String(20), comment='编号')  #长度
+    patNumber = Column(String(255), comment='编号')  #长度
     _account = Column(String(40), comment='录入人,多个以逗号分隔,格式为(,17,23,)')
     account = Column(JSON, comment='录入人,多个以逗号分隔,格式为(,17,23,)')
 
@@ -18,9 +18,10 @@ class Patient(Base):
     researchCenter = Column(Integer, comment='研究中心,多个以逗号分隔,格式为(,17,23,)')
 
     idNumber = Column(String(18), comment='身份证号')
-    hospitalNumber = Column(String(256), comment='住院号') #长度
+    hospitalNumber = Column(String(255), comment='住院号') #长度
     patientName = Column(String(100), comment='姓名')
     gender = Column(SmallInteger, comment='性别')      #格式问题
+    _gender = Column(String(2), comment='性别')  # 格式问题
     birthday = Column(Date, comment='出生日期')
     phoneNumber1 = Column(String(20), comment='电话号码1')  #长度
     phoneNumber2 = Column(String(20), comment='电话号码2')  #长度
@@ -31,7 +32,7 @@ class Patient(Base):
     def keys(self):
         return ['id','patNumber','account','researchCenter','idNumber','hospitalNumber',
                     'patientName','gender','birthday','phoneNumber1','phoneNumber2','updateTime','nextFollowupTime','finishFollowup','update_time',
-                    '_researchCenter','_account']
+                    '_researchCenter','_account','_gender']
 
     def get_fotmat_info(self):
 
@@ -331,7 +332,7 @@ class IniDiaPro(Base):
     _bioMet = Column(String(40), comment='活检方式,多个以逗号分隔') #长度
 
     pleInv = Column(Boolean, comment='是否胸膜侵犯')
-    speSite = Column(String(30), comment='标本部位') #长度
+    speSite = Column(String(255), comment='标本部位') #长度
     firVisDate = Column(Date, comment='初诊日期')
     patReDate = Column(Date, comment='病理报告日期')
     patNum = Column(String(255), comment='病理号') # 改为字符串
@@ -341,9 +342,9 @@ class IniDiaPro(Base):
     _patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
 
     mitIma = Column(Integer, comment='核分裂像')
-    comCar = Column(String(100), comment='复合性癌') #长度
+    comCar = Column(String(255), comment='复合性癌') #长度
     necArea = Column(Float, comment='坏死面积')
-    massSize = Column(String(100), comment='肿块大小')
+    massSize = Column(String(255), comment='肿块大小')
     Ki67 = Column(Float, comment='Ki67')
 
     traSite = Column(JSON, comment='转移部位')  #长度

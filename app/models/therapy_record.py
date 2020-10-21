@@ -14,12 +14,12 @@ class TreRec(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
     treNum = Column(Integer, comment='1-n，表示对应第x条治疗记录')
-    trement = Column(String(30), comment='几线治疗（手术、放疗、其他、1-5）(one,two,three,four,five,surgery,radiotherapy,other)')
+    trement = Column(String(255), comment='几线治疗（手术、放疗、其他、1-5）(one,two,three,four,five,surgery,radiotherapy,other)')
     date = Column(DateTime, comment='结束日期')
     beEffEvaDate = Column(Date, comment='最佳疗效评估日期')
-    beEffEva = Column(String(10), comment='最佳疗效评估')
+    beEffEva = Column(String(255), comment='最佳疗效评估')
     proDate = Column(DateTime, comment='进展日期')
-    proDes = Column(String(60), comment='进展描述')  # text
+    proDes = Column(String(2048), comment='进展描述')  # text
 
     def keys(self):
         return ['id','treNum','trement','date','beEffEvaDate','beEffEva','proDate','proDes']
@@ -102,13 +102,13 @@ class OneToFive(Base):
     isRepBio  = Column(Boolean, comment='是否重复活检')
     bioMet = Column(JSON, comment='活检方式')   #长度
     _bioMet = Column(String(40), comment='活检方式')  # 长度
-    matPart = Column(String(40), comment='取材部位') #长度
+    matPart = Column(String(255), comment='取材部位') #长度
     specNum = Column(Integer, comment='标本库流水号')  #类型 改为字符串
     patDia = Column(JSON, comment='病理诊断结果')
     patDiaRes = Column(Text(10000), comment='病理诊断结果')
     patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
     #patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
-    note = Column(String(60), comment='备注')
+    note = Column(String(2048), comment='备注')
 
     def keys(self):
         return ['id','pid','treNum','isTre','clinTri','treSolu','spePlan','begDate',
@@ -122,14 +122,14 @@ class DetailTrePlan(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
     treNum = Column(Integer, comment='0对应初诊信息、1-n表示对应第x条治疗记录')
-    treSolu = Column(String(20), comment='治疗方案,Chemotherapy/TargetedTherapy/ImmunityTherapy/AntivascularTherapy/Other')
-    treSche = Column(String(50),comment='药物方案')    #长度
+    treSolu = Column(String(255), comment='治疗方案,Chemotherapy/TargetedTherapy/ImmunityTherapy/AntivascularTherapy/Other')
+    treSche = Column(String(255),comment='药物方案')    #长度
     currPeriod = Column(Integer, comment='当前周期')
-    treatName = Column(String(20), comment='治疗名称') #长度
+    treatName = Column(String(255), comment='治疗名称') #长度
     begDate = Column(Date, comment='开始时间')
     endDate = Column(Date, comment='结束时间')
     drugs = Column(JSON, comment='药物使用情况, {drugName:{drugDosa: ,duration: },...}')
-    note = Column(String(500), comment='药物使用备注')  #长度
+    note = Column(String(2048), comment='药物使用备注')  #长度
 
     def keys(self):
         return ['id','treSolu','treSche','currPeriod','treatName','begDate','endDate','drugs','note']
@@ -152,18 +152,18 @@ class Surgery(Base):
     posAdjChem = Column(Boolean, comment='术后辅助化疗')
     isPro = Column(Boolean, comment='是否进展')
     proDate = Column(Date, comment='进展日期')
-    proDes = Column(String(40), comment='进展描述')
+    proDes = Column(String(2048), comment='进展描述')
     isRepBio  = Column(Boolean, comment='是否重复活检')
     # bioMet = Column(JSON, comment='活检方式')  # 长度
     bioMet = Column(JSON, comment='活检方式')  # 长度
-    matPart = Column(String(40), comment='取材部位')
+    matPart = Column(String(255), comment='取材部位')
     specNum = Column(Integer, comment='标本库流水号')
 
     patDia = Column(JSON, comment='病理诊断结果')
     def keys(self):
         return ['id','pid','treNum','surSco','lymDis','cleGro','surDate','posAdjChem','isPro','proDate','proDes',
                 'isRepBio','bioMet','matPart','specNum','patDia',
-                '_surSco',]
+                '_surSco','_lymDis']
 #放疗表
 class Radiotherapy(Base):
     __tablename__ = 'radiotherapy'
@@ -179,18 +179,18 @@ class Radiotherapy(Base):
     radDose = Column(Float, comment='放射剂量')
     dosUnit = Column(Boolean, comment='剂量单位,0: Gy, 1:cGy')
     splTim = Column(Integer, comment='分割次数')
-    method = Column(String(5), comment='分割次数单位')
+    method = Column(String(255), comment='分割次数单位')
     isRepBio = Column(Boolean, comment='是否重复活检')
 
     # bioMet = Column(JSON, comment='活检方式')  # 长度
     bioMet = Column(JSON, comment='活检方式')  # 长度
 
-    matPart = Column(String(40), comment='取材部位')
+    matPart = Column(String(255), comment='取材部位')
     specNum = Column(Integer, comment='标本库流水号')
     patDia = Column(JSON, comment='病理诊断结果')
 
     def keys(self):
-        return ['id','pid','treNum','begDate','endDate','radSite','radDose','dosUnit','splTim','method',
+        return ['id','pid','treNum','begDate','endDate','radSite','radDose','dosUnit','splTim','method','_radSite',
                 'isRepBio','bioMet','matPart','specNum','patDia']
 
 
