@@ -9,8 +9,8 @@ from app.utils.file import StaticFile
 api = Redprint('file')
 
 
-@api.route('/<string:folder>/<int:id>')
-def get_file(folder,id):
+@api.route('/<string:folder>/<int:pid>/<int:id>')
+def get_file(folder,pid,id):
 
     path = StaticFile(folder).get_file_info(id)
     data = {
@@ -21,19 +21,19 @@ def get_file(folder,id):
     return jsonify(data)
 
 
-@api.route('/<string:folder>/<int:id>', methods=['POST'])
+@api.route('/<string:folder>/<int:pid>/<int:id>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
-def add_file(folder, id):
+def add_file(folder,pid, id):
     file = request.files['file']  # 获取到用户上传的文件对象file
     StaticFile(folder).add_file(id, file)
     return Success()
 
 
-@api.route('/<string:folder>/<int:id>', methods=['DELETE'])
+@api.route('/<string:folder>/<int:pid>/<int:id>', methods=['DELETE'])
 @auth.login_required
 @edit_need_auth
-def del_file(folder, id):
+def del_file(folder,pid, id):
     filename = request.get_json()['filename']
     static_file = StaticFile(folder)
     static_file.delete_file(id, filename)
