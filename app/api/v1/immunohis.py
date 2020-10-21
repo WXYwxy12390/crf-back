@@ -1,6 +1,6 @@
 from flask import request
 
-from app.libs.decorator import edit_need_auth
+from app.libs.decorator import edit_need_auth, update_time
 from app.libs.error import Success
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
@@ -19,6 +19,7 @@ def get_immunohis(pid, treNum):
 @api.route('/<int:pid>/<int:treNum>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def add_immunohis(pid, treNum):
     data = request.get_json()
     data['pid'] = pid

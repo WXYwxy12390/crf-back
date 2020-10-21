@@ -2,7 +2,7 @@ from datetime import timedelta as td, datetime
 
 from flask import request, g,current_app
 
-from app.libs.decorator import edit_need_auth
+from app.libs.decorator import edit_need_auth, update_time
 from app.libs.error import Success
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
@@ -27,6 +27,7 @@ def get_treatment_evaluation(pid, treNum, trement):
 @api.route('/evaluation/<int:pid>/<int:treNum>/<string:trement>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def add_treatment_evaluation(pid, treNum, trement):
     data = request.get_json()
     data['pid'] = pid
@@ -46,6 +47,7 @@ def get_signs(pid, treNum):
 @api.route('/signs/<int:pid>/<int:treNum>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def add_signs(pid, treNum):
     data = request.get_json()
     print(data)
@@ -59,6 +61,7 @@ def add_signs(pid, treNum):
 @api.route('/signs/<int:pid>/<int:sign_id>', methods=['DELETE'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def del_signs(pid,sign_id):
     sign = Signs.query.filter_by(id=sign_id).all()
     delete_array(sign)
@@ -75,6 +78,7 @@ def get_side_effect(pid, treNum):
 @api.route('/side_effect/<int:pid>/<int:treNum>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def add_side_effect(pid, treNum):
     data = request.get_json()
     for _data in data['data']:
@@ -87,6 +91,7 @@ def add_side_effect(pid, treNum):
 @api.route('/side_effect/<int:pid>/<int:se_id>', methods=['DELETE'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def del_side_effect(pid,se_id):
     side_effect = SideEffect.query.filter_by(id=se_id).all()
     delete_array(side_effect)
@@ -103,6 +108,7 @@ def get_follInfo(pid):
 @api.route('/follInfo/<int:pid>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def add_follInfo(pid):
     data = request.get_json()
     for _data in data['data']:
@@ -113,6 +119,7 @@ def add_follInfo(pid):
 
 @api.route('/follInfo/<int:pid>/<int:fid>', methods=['DELETE'])
 @auth.login_required
+@update_time
 def del_follInfo(pid,fid):
     follInfo = FollInfo.query.filter_by(id=fid).all()
     delete_array(follInfo)
@@ -123,6 +130,7 @@ def del_follInfo(pid,fid):
 @api.route('/patient/follInfo/<int:pid>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def add_patient_follInfo(pid):
     data = request.get_json()
     data['id'] = pid
@@ -161,6 +169,7 @@ def get_patient_follInfo():
 @api.route('/patient/follInfo/<int:pid>/<string:nextFollowupTime>', methods=['PUT'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def update_patient_follInfo(pid, nextFollowupTime):
     patients = Patient.query.filter_by(id=pid, finishFollowup=0,
                                        nextFollowupTime=datetime.strptime(nextFollowupTime, "%Y-%m-%d")).all()

@@ -6,7 +6,7 @@
 
 from flask import request
 
-from app.libs.decorator import edit_need_auth
+from app.libs.decorator import edit_need_auth, update_time
 from app.libs.error import Success
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
@@ -28,6 +28,7 @@ def get_therapy_record(pid,treNum):
 @api.route('/<int:pid>/<int:treNum>',methods=['POST'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def add_therapy_record(pid,treNum):
     data = request.get_json()
     if 'parent' in data:
@@ -64,6 +65,7 @@ def get_therapy_plan(pid,treNum):
 @api.route('/therapy_plan/<int:pid>/<int:treNum>',methods=['POST'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def add_therapy_plan(pid,treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -75,6 +77,7 @@ def add_therapy_plan(pid,treNum):
 @api.route('/therapy_plan/<int:pid>/<int:treNum>',methods=['DELETE'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def del_therapy_plan(pid,treNum):
     data = request.get_json()
     items = DetailTrePlan.query.filter(DetailTrePlan.is_delete==0,DetailTrePlan.id.in_(data['ids'])).all()

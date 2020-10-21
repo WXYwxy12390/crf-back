@@ -5,7 +5,7 @@
 """
 from flask import request
 
-from app.libs.decorator import edit_need_auth
+from app.libs.decorator import edit_need_auth, update_time
 from app.libs.error import Success
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
@@ -25,6 +25,7 @@ def get_blood_routine(pid, treNum):
 @api.route('/blood_routine/<int:pid>/<int:treNum>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def add_blood_routine(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -43,6 +44,7 @@ def get_blood_bio(pid, treNum):
 @api.route('/blood_bio/<int:pid>/<int:treNum>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def add_blood_bio(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -61,6 +63,7 @@ def get_thyroid(pid, treNum):
 @api.route('/thyroid/<int:pid>/<int:treNum>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def add_thyroid(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -79,6 +82,7 @@ def get_coagulation(pid, treNum):
 @api.route('/coagulation/<int:pid>/<int:treNum>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def add_coagulation(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -97,6 +101,7 @@ def get_myocardialEnzyme(pid, treNum):
 @api.route('/myocardialEnzyme/<int:pid>/<int:treNum>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def add_myocardialEnzyme(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -114,6 +119,7 @@ def get_cytokines(pid, treNum):
 @api.route('/cytokines/<int:pid>/<int:treNum>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def add_cytokines(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -131,6 +137,7 @@ def get_lymSubsets(pid, treNum):
 @api.route('/lymSubsets/<int:pid>/<int:treNum>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def add_lymSubsets(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -148,6 +155,7 @@ def get_urine_routine(pid, treNum):
 @api.route('/urine_routine/<int:pid>/<int:treNum>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def add_urine_routine(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -165,6 +173,7 @@ def get_tumor_marker(pid, treNum):
 @api.route('/tumor_marker/<int:pid>/<int:treNum>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
+@update_time
 def add_tumor_marker(pid, treNum):
     data = request.get_json()
     data['pid'] = pid

@@ -1,3 +1,4 @@
+from datetime import datetime
 from functools import wraps
 
 from flask import request, g
@@ -61,7 +62,19 @@ def edit_need_auth(func):
 
     return wrapper
 
-
+def update_time(func):
+    @wraps(func)
+    def call(*args, **kwargs):
+        out = func(*args, **kwargs)
+        pid = kwargs.get('sample_id')
+        if pid is None :
+            raise ParameterException(msg='log无sample_id')
+        else:
+            patient = Patient.query.get_or_404(pid)
+            with db.auto_commit():
+                patient.update_time = int(datetime.now().timestamp())
+        return out
+    return call
 
 def generate_modify_content(endpoint,cycle_number):
     pre_fix = '访视'
