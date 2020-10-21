@@ -70,18 +70,18 @@ def add_sample():
     if 'patientName' in data:
         patients = Patient.query.filter_by(patientName=data['patientName'],
                                           researchCenter=user['research_center_id']).all()
-    data = {
+    return_data = {
         "status":0,
         "pid":None,
         "samples": []
     }
     if patients:
-        data['status'] = 2
+        return_data['status'] = 1
         for patient in patients:
-            data['samples'].append(patient)
+            return_data['samples'].append(patient)
             if g.user.user_id in patient.account:
-                data['status'] = -1
-        return Success(data=data)
+                return_data['status'] = -1
+        return Success(data=return_data)
 
     model_data = {
                 'account': [user['id']],
@@ -92,8 +92,8 @@ def add_sample():
                 'birthday':data.get('birthday')
             }
     patient = json2db_add(model_data,Patient)
-    data['pid'] = patient.id
-    return Success(data=data)
+    return_data['pid'] = patient.id
+    return Success(data=return_data)
 
 
 @api.route('/<int:pid>/add_account',methods=['POST'])
