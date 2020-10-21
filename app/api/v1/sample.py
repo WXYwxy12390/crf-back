@@ -84,7 +84,8 @@ def add_sample():
                 'researchCenter': user['research_center_id'],
                 'idNumber':data.get('idNumber'),
                 'hospitalNumber':data.get('hospitalNumber'),
-                'patientName':data.get('patientName')
+                'patientName':data.get('patientName'),
+                'birthday':data.get('birthday')
             }
     json2db(model_data,Patient)
     return Success()

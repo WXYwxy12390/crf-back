@@ -301,7 +301,7 @@ class DrugHistory(Base):
     type = Column(SmallInteger,comment='type=1,激素史，type = 0，其他药物史')
     drug_name = Column(String(255))
     drug_dose = Column(String(255))
-    use_time = Column(Integer)
+    use_time = Column(Float)
 
     def keys(self):
         return ['id','drug_name','drug_dose','use_time']

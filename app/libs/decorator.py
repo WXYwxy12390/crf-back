@@ -72,7 +72,7 @@ def update_time(func):
         else:
             patient = Patient.query.get_or_404(pid)
             with db.auto_commit():
-                patient.update_time = int(datetime.now().timestamp())
+                patient.update_time = datetime.now()
         return out
     return call
 

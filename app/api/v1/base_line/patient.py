@@ -32,6 +32,6 @@ def add_patient(pid):
         patient = Patient.query.filter(Patient.is_delete == 0, Patient.hospitalNumber == data['hospitalNumber'],
                                        Patient.id != pid, Patient.researchCenter == user['research_center_id']).first()
         if patient:
-            raise ParameterException(msg='已经存在相同身份证号码。')
+            raise ParameterException(msg='已经存在相同住院号。')
     json2db(data, Patient)
     return Success()
