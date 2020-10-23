@@ -24,14 +24,14 @@ def add_patient(pid):
     data = request.get_json()
     patient = Patient.query.get_or_404(pid)
     if 'idNumber' in data:
-        patient = Patient.query.filter(Patient.is_delete == 0, Patient.idNumber == data['idNumber'],
+        item = Patient.query.filter(Patient.is_delete == 0, Patient.idNumber == data['idNumber'],
                                        Patient.id != pid, Patient.researchCenter == patient.researchCenter).first()
-        if patient:
+        if item:
             raise ParameterException(msg='已经存在相同身份证号码。')
-    if 'hospitalNumber' in data:
-        patient = Patient.query.filter(Patient.is_delete == 0, Patient.hospitalNumber == data['hospitalNumber'],
+    if 'hospitalNumber' in data and patient.hospitalNumber is not None:
+        item = Patient.query.filter(Patient.is_delete == 0, Patient.hospitalNumber == data['hospitalNumber'],
                                        Patient.id != pid, Patient.researchCenter == patient.researchCenter).first()
-        if patient:
+        if item:
             raise ParameterException(msg='已经存在相同住院号。')
     json2db(data, Patient)
     return Success()

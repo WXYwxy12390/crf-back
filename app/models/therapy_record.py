@@ -103,7 +103,7 @@ class OneToFive(Base):
     bioMet = Column(JSON, comment='活检方式')   #长度
     _bioMet = Column(String(40), comment='活检方式')  # 长度
     matPart = Column(String(255), comment='取材部位') #长度
-    specNum = Column(Integer, comment='标本库流水号')  #类型 改为字符串
+    specNum = Column(String(255), comment='标本库流水号')  #类型 改为字符串
     patDia = Column(JSON, comment='病理诊断结果')
     patDiaRes = Column(Text(10000), comment='病理诊断结果')
     patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
@@ -157,7 +157,7 @@ class Surgery(Base):
     # bioMet = Column(JSON, comment='活检方式')  # 长度
     bioMet = Column(JSON, comment='活检方式')  # 长度
     matPart = Column(String(255), comment='取材部位')
-    specNum = Column(Integer, comment='标本库流水号')
+    specNum = Column(String(255), comment='标本库流水号')
 
     patDia = Column(JSON, comment='病理诊断结果')
     def keys(self):
@@ -186,7 +186,7 @@ class Radiotherapy(Base):
     bioMet = Column(JSON, comment='活检方式')  # 长度
 
     matPart = Column(String(255), comment='取材部位')
-    specNum = Column(Integer, comment='标本库流水号')
+    specNum = Column(String(255), comment='标本库流水号')
     patDia = Column(JSON, comment='病理诊断结果')
 
     def keys(self):
