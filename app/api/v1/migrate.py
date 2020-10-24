@@ -1,8 +1,16 @@
-from flask import jsonify
+import os
+import shutil
+
+from flask import jsonify, current_app
 
 from app.libs.redprint import Redprint
 from app.models import db, json2db
 from app.models.base_line import Patient, PastHis, DrugHistory, IniDiaPro
+from app.models.crf_info import FollInfo
+from app.models.cycle import Immunohis, MoleDetec
+from app.models.lab_inspectation import BloodRoutine, BloodBio, Thyroid, Coagulation, MyocardialEnzyme, Cytokines, \
+    LymSubsets, UrineRoutine, TumorMarker
+from app.models.other_inspect import Lung, OtherExams, ImageExams
 from app.models.therapy_record import Surgery, Radiotherapy, OneToFive
 
 api = Redprint('migrate')
@@ -161,6 +169,35 @@ def migrate_patDia():
                     item.patDia['other'] = item.patDiaOthers
     return 'ok'
 
+@api.route('/file',methods = ['GET'])
+def migrate_file():
+    #实验室检查
+    migrate_file_from_old(BloodRoutine,'blood_routine')
+    migrate_file_from_old(BloodBio, 'blood_bio')
+    migrate_file_from_old(Thyroid, 'thyroid')
+    migrate_file_from_old(Coagulation, 'coagulation')
+    migrate_file_from_old(MyocardialEnzyme, 'myocardial_enzyme')
+    migrate_file_from_old(Cytokines, 'cytokines')
+    migrate_file_from_old(LymSubsets, 'lymSubsets')
+    migrate_file_from_old(UrineRoutine, 'urineRoutine')
+    migrate_file_from_old(TumorMarker, 'tumorMarker')
+
+    # #其他检查
+    migrate_file_from_old(Lung, 'lung')
+    migrate_file_from_12_lead_ecg(OtherExams, '12_lead_ecg')
+    migrate_file_from_ucg(OtherExams, 'UCG')
+    migrate_file_from_path(ImageExams, 'image_exams')
+    #
+    # #免疫组化
+    migrate_file_from_old(Immunohis, 'immunohis')
+    #
+    # #分子检查
+    migrate_file_from_path(MoleDetec, 'moleDetec')
+    #
+    # #随访信息
+    migrate_file_from_saveFile(FollInfo, 'follInfo')
+    return 'ok'
+
 def generate_value(str):
     if type(str) is list:
         strs = str
@@ -209,3 +246,73 @@ def generate_value_with_radio_list(str,radio_list):
             data['other'] += strs[i]
             i = i + 1
     return data
+
+
+def migrate_file_from_old(model,file_folder):
+    items = model.query.filter(model.is_delete == 0, model.filePath != None,
+                                      model.filePath != '').all()
+    for item in items:
+        file_list = item.filePath.split(',')
+        folder = current_app.static_folder + '/' + file_folder + '/' + str(item.id)
+        for file_path in file_list:
+            filename = file_path.split('/')[2]
+            dstfile = folder + '/' + filename
+            srcfile = current_app.static_folder + '/' + file_path
+            mycopyfile(srcfile, dstfile)
+
+def migrate_file_from_12_lead_ecg(model,file_folder):
+    items = model.query.filter(model.is_delete == 0, model.ECGPath != None,
+                                      model.ECGPath != '').all()
+    for item in items:
+        file_list = item.ECGPath.split(',')
+        folder = current_app.static_folder + '/' + file_folder + '/' + str(item.id)
+        for file_path in file_list:
+            filename = file_path.split('/')[2]
+            dstfile = folder + '/' + filename
+            srcfile = current_app.static_folder + '/' + file_path
+            mycopyfile(srcfile, dstfile)
+
+def migrate_file_from_ucg(model,file_folder):
+    items = model.query.filter(model.is_delete == 0, model.UCGPath != None,
+                                      model.UCGPath != '').all()
+    for item in items:
+        file_list = item.UCGPath.split(',')
+        folder = current_app.static_folder + '/' + file_folder + '/' + str(item.id)
+        for file_path in file_list:
+            filename = file_path.split('/')[2]
+            dstfile = folder + '/' + filename
+            srcfile = current_app.static_folder + '/' + file_path
+            mycopyfile(srcfile, dstfile)
+
+def migrate_file_from_path(model,file_folder):
+    items = model.query.filter(model.is_delete == 0, model.path != None,
+                                      model.path != '').all()
+    for item in items:
+        file_list = item.path.split(',')
+        folder = current_app.static_folder + '/' + file_folder + '/' + str(item.id)
+        for file_path in file_list:
+            filename = file_path.split('/')[2]
+            dstfile = folder + '/' + filename
+            srcfile = current_app.static_folder + '/' + file_path
+            mycopyfile(srcfile, dstfile)
+
+def migrate_file_from_saveFile(model,file_folder):
+    items = model.query.filter(model.is_delete == 0, model.savFilPath != None,
+                                      model.savFilPath != '').all()
+    for item in items:
+        file_list = item.savFilPath.split(',')
+        folder = current_app.static_folder + '/' + file_folder + '/' + str(item.id)
+        for file_path in file_list:
+            filename = file_path.split('/')[2]
+            dstfile = folder + '/' + filename
+            srcfile = current_app.static_folder + '/' + file_path
+            mycopyfile(srcfile, dstfile)
+
+def mycopyfile(srcfile,dstfile):
+    if not os.path.isfile(srcfile):
+        print("%s not exist!"%(srcfile))
+    else:
+        fpath,fname=os.path.split(dstfile)    #分离文件名和路径
+        if not os.path.exists(fpath):
+            os.makedirs(fpath)                #创建路径
+        shutil.copyfile(srcfile,dstfile)      #复制文件

@@ -79,7 +79,7 @@ class BloodRoutine(Base):
         return ['id', 'pid', 'treNum', 'samplingTime', 'RBC', 'HGb', 'HCT', 'MCV', 'MCH', 'MCHC', 'RDWCV',
                 'RDWSD', 'WBC', 'GRAN_', 'LYM_', 'EOS_', 'MID_', 'BASO_','PLT','LYM','MID','GRAN','EOS','BASO',
                 'NEUT', 'RBCMea', 'HGbMea', 'HCTMea',
-                'MCVMea', 'MCHMea', 'MCHCMea', 'WBCMea', 'GRAN_Mea', 'LYM_Mea', 'EOS_Mea', 'MID_Mea', 'BASO_Mea',
+                'MCVMea', 'MCHMea', 'MCHCMea','RDWCVMea','RDWSDMea', 'WBCMea', 'GRAN_Mea', 'LYM_Mea', 'EOS_Mea', 'MID_Mea', 'BASO_Mea',
                 'PLTMea', 'LYMMea', 'MIDMea', 'GRANMea', 'EOSMea', 'BASOMea', 'NEUTMea', 'RBCNote', 'HGbNote',
                 'HCTNote','MCVNote', 'MCHNote', 'MCHCNote', 'RDWCVNote', 'RDWSDNote', 'WBCNote', 'GRAN_Note', 'LYM_Note',
                 'EOS_Note','MID_Note', 'BASO_Note', 'PLTNote', 'LYMNote', 'MIDNote', 'GRANNote', 'EOSNote', 'BASONote',
@@ -226,19 +226,19 @@ class Coagulation(Base):
     TTMea = Column(Integer, comment='凝血酶时间临床意义判定')
     FIBMea = Column(Integer, comment='纤维蛋白原浓度临床意义判定')
     INRMea = Column(Integer, comment='国际标准化比值临床意义判定')
-    D_dimer_Mea = Column(Integer, comment='D-二聚体临床意义判定')
+    D_dimerMea = Column(Integer, comment='D-二聚体临床意义判定')
     PTNote = Column(Text(10000), comment='凝血酶原时间备注')
     APTTNote = Column(Text(10000), comment='活化部分凝血酶时间备注')
     TTNote = Column(Text(10000), comment='凝血酶时间备注')
     FIBNote = Column(Text(10000), comment='纤维蛋白原浓度备注')
     INRNote = Column(Text(10000), comment='国际标准化比值备注')
-    D_dimer_Note = Column(Text(10000), comment='D-二聚体备注')
+    D_dimerNote = Column(Text(10000), comment='D-二聚体备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'PT', 'APTT', 'TT', 'FIB', 'INR', 'D_dimer', 'PTMea',
-                'APTTMea', 'TTMea', 'FIBMea','INRMea', 'D_dimer_Mea', 'PTNote', 'APTTNote', 'TTNote', 'FIBNote',
-                'INRNote', 'D_dimer_Note', 'filePath']
+                'APTTMea', 'TTMea', 'FIBMea','INRMea', 'D_dimerMea', 'PTNote', 'APTTNote', 'TTNote', 'FIBNote',
+                'INRNote', 'D_dimerNote', 'filePath']
 
 # 心肌酶谱表
 class MyocardialEnzyme(Base):
