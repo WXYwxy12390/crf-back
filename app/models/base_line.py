@@ -104,15 +104,15 @@ class Patient(Base):
                 continue
             if trement in ['one','two','three','four','five','other']:
                 item = OneToFive.query.filter_by(pid=self.id,treNum=tre_rec.treNum).first()
-                if item and item.patDia:
+                if item and item.patDia and item.patDia.get('radio') != []:
                     return item.patDia
             elif trement == 'surgery':
                 item = Surgery.query.filter_by(pid=self.id,treNum=tre_rec.treNum).first()
-                if item and item.patDia:
+                if item and item.patDia and item.patDia.get('radio') != []:
                     return item.patDia
-            elif trement == 'radiotherapy':
+            elif trement == 'radiotherapy' :
                 item = Radiotherapy.query.filter_by(pid=self.id,treNum=tre_rec.treNum).first()
-                if item and item.patDia:
+                if item and item.patDia and item.patDia.get('radio') != []:
                     return item.patDia
 
 
