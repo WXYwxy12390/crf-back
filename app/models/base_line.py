@@ -341,7 +341,7 @@ class IniDiaPro(Base):
     _patDia = Column(String(10000), comment='病理诊断,多个以逗号分隔')
     _patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
 
-    mitIma = Column(Integer, comment='核分裂像')
+    mitIma = Column(String(255), comment='核分裂像')
     comCar = Column(String(255), comment='复合性癌') #长度
     necArea = Column(Float, comment='坏死面积')
     massSize = Column(String(255), comment='肿块大小')
@@ -350,7 +350,7 @@ class IniDiaPro(Base):
     traSite = Column(JSON, comment='转移部位')  #长度
     _traSite = Column(String(100), comment='转移部位')  # 长度
 
-    TSize = Column(Float, comment='TSize')           #文本
+    TSize = Column(String(255), comment='TSize')           #文本
     stage = Column(String(30), comment='分期情况')    #格式问题
     cStage = Column(JSON, comment='c分期TNM,以逗号分隔,格式为(1,2,3或1,,2)')
     cliStage = Column(String(30), comment='临床分期')
