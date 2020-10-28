@@ -210,8 +210,8 @@ class Patient(Base):
     @staticmethod
     def condition_moleDetec(pids,search_data):
         condtion = and_(MoleDetec.is_delete==0,MoleDetec.pid.in_(pids))
-        if 'PDL1_1' in search_data and 'PDl1_2' in search_data:
-            condtion = and_(condtion, MoleDetec.PDL1 >= search_data['PDL1_1'],MoleDetec.PDL1 <= search_data['PDl1_2'])
+        if 'PDL1_1' in search_data and 'PDL1_2' in search_data:
+            condtion = and_(condtion, MoleDetec.PDL1 >= search_data['PDL1_1'],MoleDetec.PDL1 <= search_data['PDL1_2'])
         if 'TMB1' in search_data and 'TMB2' in search_data:
             condtion = and_(condtion,MoleDetec.TMB >= search_data['TMB1'], MoleDetec.TMB <= search_data['TMB2'])
 
