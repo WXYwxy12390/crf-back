@@ -43,10 +43,9 @@ def get_sample_all():
                     patients.append(item)
 
     if data and len(data) > 0:
-        patients = Patient.search(patients,data)
-
-
-    res, total = get_paging(patients, page, limit)
+        res,total = Patient.search(patients,data,page,limit)
+    else:
+        res, total = get_paging(patients, page, limit)
     res = [patient.get_fotmat_info() for patient in res]
     data = {
         "code": 200,

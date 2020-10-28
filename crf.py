@@ -1,3 +1,4 @@
+from flask_sqlalchemy import get_debug_queries
 from werkzeug.exceptions import HTTPException
 
 from app import create_app
@@ -5,6 +6,16 @@ from app.libs.error import APIException
 from app.libs.error_code import ServerError
 
 app = create_app()
+@app.after_request
+def after_request(response):
+    for query in get_debug_queries():
+        if query.duration >= app.config['FLASKY_DB_QUERY_TIMEOUT']:
+                 # query.statement：查询的sql
+                 # query.duration： 耗时
+                 # 打印超时sql和时间
+         print('----慢sql-----\t\nsql:\t\n {sql} \n\t耗时:{duration}'.format(sql=query.statement,duration=query.duration))
+    return response
+
 
 #利用AOP思想统一处理异常
 #flask提供的处理全局异常

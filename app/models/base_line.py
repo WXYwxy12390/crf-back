@@ -1,6 +1,8 @@
+import time
+
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime, SmallInteger, and_
 
-from app.models.base import Base
+from app.models.base import Base, db
 # 病人基本信息表
 from app.models.cycle import MoleDetec
 from app.models.therapy_record import TreRec, OneToFive, Surgery, Radiotherapy
@@ -35,7 +37,7 @@ class Patient(Base):
                     '_researchCenter','_account','_gender']
 
     def get_fotmat_info(self):
-
+        pat_dia = Patient.get_pat_dia([self.id])
         data = {
             'id':self.id,
             'patNumber':self.patNumber,
@@ -45,92 +47,131 @@ class Patient(Base):
             'phoneNumber':self.phoneNumber1,
             'gender':self.gender,
             'age':get_age_by_birth(get_birth_date_by_id_card(self.idNumber)),
-            'patDia':self.get_pat_dia(),
+            'patDia': pat_dia[self.id] if pat_dia else None,
             'update_time':self.update_time,
             'research_center_id':self.researchCenter
         }
         return data
 
     @classmethod
-    def search(cls,patients,search_data):
-        #病理诊断
-        if 'patDia' in search_data:
-            patients = [patient for patient in patients if patient.filter_patDia(search_data['patDia'])]
-        #转移部位
-        if 'traSite' in search_data:
-            patients = [patient for patient in patients if patient.filter_traSite(search_data['traSite'])]
-        #病理分期
-        if 'patStage' in search_data:
-            condition = Patient.condition_iniDiaPro(patients, search_data)
-            items = IniDiaPro.query.filter(condition).all()
-            pids = [item.pid for item in items]
-            patients = Patient.query.filter(Patient.id.in_(pids)).all()
-        #基因突变位点
-        if 'genes' in search_data:
-            patients = [patient for patient in patients if patient.filter_genes(search_data['genes'])]
+    def search(cls,patients,search_data,page,limit):
+        pids = [patient.id for patient in patients]
+        #与patient表查询相关的。
         if 'patientName' in search_data or 'patNumber' in search_data \
                 or 'idNumber' in search_data or 'hospitalNumber' in search_data or 'gender' in search_data:
-            condition = Patient.condition_patient(patients,search_data)
+            condition = Patient.condition_patient(pids,search_data)
             patients = Patient.query.filter(condition).all()
-        #吸烟，饮酒，激素
-        if 'smoke' in search_data or 'drink' in search_data or 'hormone' in search_data:
-            condition = Patient.condition_past_his(patients, search_data)
-            past_histories = PastHis.query.filter(condition).all()
-            pids = [past_history.pid for past_history in past_histories]
-            patients = Patient.query.filter(Patient.id.in_(pids)).all()
+            pids = [patient.id for patient in patients]
         if 'age1' in search_data and 'age2' in search_data:
             patients = [patient for patient in patients if patient.filter_age(search_data['age1'],search_data['age2'])]
+            pids = [patient.id for patient in patients]
 
-        if 'PDL1' in search_data and 'PDL2' in search_data:
-            patients = [patient for patient in patients if patient.filter_PDL(search_data['PDL1'],search_data['PDL2'])]
-
-        if 'TMB1' in search_data and 'TMB2' in search_data:
-            patients = [patient for patient in patients if patient.filter_TMB(search_data['TMB1'],search_data['TMB2'])]
+        #过滤pdl1，tmb
+        if 'PDL1' in search_data and 'PDL2' in search_data or 'TMB1' in search_data and 'TMB2' in search_data:
+            condition = Patient.condition_moleDetec(pids,search_data)
+            items = MoleDetec.query.filter(condition).all()
+            pids = [item.pid for item in items]
 
         #治疗方式
         if 'therapy_method' in search_data:
-            patients = [patient for patient in patients if patient.filter_theapy_method(search_data['therapy_method'])]
+            pids = Patient.filter_theapy_method(pids,search_data['therapy_method'])
+
+        #基因突变位点
+        if 'genes' in search_data:
+            pids = Patient.filter_genes(pids,search_data['genes'])
+
+        #吸烟，饮酒，激素
+        if 'smoke' in search_data or 'drink' in search_data or 'hormone' in search_data:
+            condition = Patient.condition_past_his(pids, search_data)
+            past_histories = PastHis.query.filter(condition).all()
+            pids = [past_history.pid for past_history in past_histories]
 
 
-        return patients
+        #病理分期
+        if 'cliStage' in search_data or 'patStage' in search_data:
+            condition = Patient.condition_iniDiaPro(pids, search_data)
+            items = IniDiaPro.query.filter(condition).all()
+            pids = [item.pid for item in items]
 
-    #获取样本中最新的病例诊断
-    def get_pat_dia(self):
-        tre_recs = TreRec.query.filter_by(pid=self.id).order_by(TreRec.treNum.desc()).all()
+        #病理诊断
+        if 'patDia' in search_data:
+            pids = Patient.filter_patDia(pids,search_data['patDia'])
+        #转移部位 IniDiaPro
+        if 'traSite' in search_data:
+            pids = Patient.filter_traSite(pids,search_data['traSite'])
+
+        pagination = Patient.query.filter(Patient.is_delete == 0, Patient.id.in_(pids)).order_by(Patient.update_time.desc()).paginate(page=page,per_page=limit)
+
+        return pagination.items,pagination.total
+
+    #获取一组样本中最新的病例诊断
+    @classmethod
+    def get_pat_dia(cls,pids):
+        #把所有的治疗记录拿到，并按照pid进行分组
+        tre_recs = TreRec.query.filter(TreRec.is_delete==0,TreRec.pid.in_(pids)).group_by(TreRec.pid).all()
+
+        dict = {}
 
         for tre_rec in tre_recs:
-            trement = tre_rec.trement
-            if trement is None:
-                continue
-            if trement in ['one','two','three','four','five','other']:
-                item = OneToFive.query.filter_by(pid=self.id,treNum=tre_rec.treNum).first()
-                if item and item.patDia and item.patDia.get('radio') != []:
-                    return item.patDia
-            elif trement == 'surgery':
-                item = Surgery.query.filter_by(pid=self.id,treNum=tre_rec.treNum).first()
-                if item and item.patDia and item.patDia.get('radio') != []:
-                    return item.patDia
-            elif trement == 'radiotherapy' :
-                item = Radiotherapy.query.filter_by(pid=self.id,treNum=tre_rec.treNum).first()
-                if item and item.patDia and item.patDia.get('radio') != []:
-                    return item.patDia
+            if dict.get(tre_rec.pid) is None:
+                dict[tre_rec.pid] = []
+            dict[tre_rec.pid].append(tre_rec)
+        data = {}
 
+        oneToFives = OneToFive.query.filter(OneToFive.is_delete==0,OneToFive.pid.in_(pids)).all()
+        surgerys = Surgery.query.filter(Surgery.is_delete==0,Surgery.pid.in_(pids)).all()
+        radiotherapys = Radiotherapy.query.filter(Radiotherapy.is_delete==0,Radiotherapy.pid.in_(pids)).all()
+        oneToFive_map = Patient.getMap(oneToFives)
+        surgery_map = Patient.getMap(surgerys)
+        radiotherapy_map = Patient.getMap(radiotherapys)
 
-        ini_dia_pro = IniDiaPro.query.filter_by(pid=self.id).first()
-        return ini_dia_pro.patDia if ini_dia_pro else None
+        for pid,tre_recs in dict.items():
+            tre_recs = sorted(tre_recs,key=lambda tre_rec:tre_rec.treNum,reverse=True)
+            treNum = tre_rec.treNum
 
+            for tre_rec in tre_recs:
+                trement = tre_rec.trement
+                if trement is None:
+                    continue
+                if trement in ['one','two','three','four','five','other']:
+                    if oneToFive_map.get(pid) is None:
+                        continue
 
+                    item = oneToFive_map.get(pid).get(treNum)
 
+                    if item and item.patDia and item.patDia.get('radio') != []:
+                        data[pid] = item.patDia
+                elif trement == 'surgery':
+                    if surgery_map.get(pid) is None:
+                        continue
+                    item = surgery_map[pid][tre_rec.treNum]
+                    if item and item.patDia and item.patDia.get('radio') != []:
+                        data[pid] = item.patDia
 
+                elif trement == 'radiotherapy':
+                    if radiotherapy_map.get(pid) is None:
+                        continue
+                    item = radiotherapy_map[pid][tre_rec.treNum]
+                    if item and item.patDia and item.patDia.get('radio') != []:
+                        data[pid] = item.patDia
 
+        return data if data != {} else None
 
-
+    @classmethod
+    def getMap(cls,model_items):
+        dict = {}
+        for model_item in model_items:
+            pid = model_item.pid
+            if dict.get(pid) is None:
+                dict[pid] = {}
+            dict[pid][model_item.treNum] = model_item
+        return dict
 
     @staticmethod
-    def condition_patient(patients, data):
-        pids = [patient.id for patient in patients]
+    def condition_patient(pids, data):
+
         # 这里必须用and_连起来两个条件，否则会被当作元组
-        condtion = and_( Patient.id.in_(pids))
+        condtion = and_(Patient.is_delete == 0, Patient.id.in_(pids))
         if 'patientName' in data:
             condtion = and_(condtion, Patient.patientName.like('%' + data['patientName'] + '%'))
         if 'patNumber' in data:
@@ -145,9 +186,9 @@ class Patient(Base):
         return condtion
 
     @staticmethod
-    def condition_past_his(patients,data):
-        pids = [patient.id for patient in patients]
-        condtion = and_(PastHis.pid.in_(pids))
+    def condition_past_his(pids,data):
+
+        condtion = and_(PastHis.is_delete == 0, PastHis.pid.in_(pids))
         if 'smoke' in data:
             condtion = and_(condtion, PastHis.smoke == data['smoke'])
         if 'drink' in data:
@@ -157,45 +198,75 @@ class Patient(Base):
         return condtion
 
     @staticmethod
-    def condition_iniDiaPro(patients,data):
-        pids = [patient.id for patient in patients]
-        condtion = and_(IniDiaPro.pid.in_(pids))
+    def condition_iniDiaPro(pids,data):
+
+        condtion = and_(IniDiaPro.is_delete == 0,IniDiaPro.pid.in_(pids))
         if 'patStage' in data:
             condtion = and_(condtion, IniDiaPro.patStage == data['patStage'])
+        if 'cliStage' in data:
+            condtion = and_(condtion, IniDiaPro.cliStage == data['cliStage'])
         return condtion
 
+    @staticmethod
+    def condition_moleDetec(pids,search_data):
+        condtion = and_(MoleDetec.is_delete==0,MoleDetec.pid.in_(pids))
+        if 'PDL1' in search_data and 'PDl2' in search_data:
+            condtion = and_(condtion, MoleDetec.PDL1 >= search_data['PDL1'],MoleDetec.PDL1 <= search_data['PDL2'])
+        if 'TMB1' in search_data and 'TMB2' in search_data:
+            condtion = and_(condtion,MoleDetec.TMB >= search_data['TMB1'], MoleDetec.TMB <= search_data['TMB2'])
+
+        return condtion
+
+
+
     #过滤基因突变
-    def filter_genes(self,genes):
-        mole_detecs = MoleDetec.query.filter_by(pid=self.id).all()
-        gene_record = []
+    @classmethod
+    def filter_genes(cls,pids,genes):
+        mole_detecs = MoleDetec.query.filter(MoleDetec.is_delete == 0, MoleDetec.pid.in_(pids)).all()
+        mole_detec_map = {}
         for mole_detec in mole_detecs:
-            if mole_detec.ALK == 1:
-                gene_record.append('ALK')
-            if mole_detec.BIM == 1:
-                gene_record.append('BIM')
-            if mole_detec.BRAF == 1:
-                gene_record.append('BRAF')
-            if mole_detec.cMET == 1:
-                gene_record.append('cMET')
-            if mole_detec.EGFR == 1:
-                gene_record.append('EGFR')
-            if mole_detec.HER_2 == 1:
-                gene_record.append('HER_2')
-            if mole_detec.KRAS == 1:
-                gene_record.append('KRAS')
-            if mole_detec.PIK3CA == 1:
-                gene_record.append('PIK3CA')
-            if mole_detec.ROS1 == 1:
-                gene_record.append('ROS1')
-            if mole_detec.RET == 1:
-                gene_record.append('RET')
-            if mole_detec.UGT1A1 == 1:
-                gene_record.append('UGT1A1')
-        gene_record = list(set(gene_record)) #去重
-        for gene in genes:
-            if gene not in gene_record:
-                return None
-        return self
+            pid = mole_detec.pid
+            if mole_detec_map.get(pid) is None:
+                mole_detec_map[pid] = []
+            mole_detec_map[pid].append(mole_detec)
+
+        res = []
+        for pid,mole_detecs in mole_detec_map.items():
+            gene_record = set()
+            for mole_detec in mole_detecs:
+                if mole_detec.ALK == 1:
+                    gene_record.add('ALK')
+                if mole_detec.BIM == 1:
+                    gene_record.add('BIM')
+                if mole_detec.BRAF == 1:
+                    gene_record.add('BRAF')
+                if mole_detec.cMET == 1:
+                    gene_record.add('cMET')
+                if mole_detec.EGFR == 1:
+                    gene_record.add('EGFR')
+                if mole_detec.HER_2 == 1:
+                    gene_record.add('HER_2')
+                if mole_detec.KRAS == 1:
+                    gene_record.add('KRAS')
+                if mole_detec.PIK3CA == 1:
+                    gene_record.add('PIK3CA')
+                if mole_detec.ROS1 == 1:
+                    gene_record.add('ROS1')
+                if mole_detec.RET == 1:
+                    gene_record.add('RET')
+                if mole_detec.UGT1A1 == 1:
+                    gene_record.add('UGT1A1')
+                if len(gene_record) == 11:
+                    break
+            gene_record = list(gene_record) #去重
+            flag = True
+            for gene in genes:
+                if gene not in gene_record:
+                    flag = False
+                    break
+            if flag:
+                res.append(pid)
+        return res
 
     def filter_age(self,age1,age2):
         if self.idNumber is None or self.idNumber == "":
@@ -206,58 +277,80 @@ class Patient(Base):
             return None
         return self
 
-    def filter_PDL(self,PDL1,PDL2):
-        mole_detecs = MoleDetec.query.filter_by(pid=self.id).all()
-        for mole_detec in mole_detecs:
-            if mole_detec.PDL1 and mole_detec.PDL1 >= PDL1 and mole_detec.PDL1 <= PDL2:
-                return self
-        return None
+    # @classmethod
+    # def filter_PDL(cls,pids,PDL_val1,PDL_val2):
+    #     mole_detecs = MoleDetec.query.filter(MoleDetec.is_delete==0,MoleDetec.pid.in_(pids),
+    #                                          MoleDetec.PDL1 >= PDL_val1,MoleDetec.PDL1 <= PDL_val2).all()
+    #     data = [mole_detec.pid for mole_detec in mole_detecs]
+    #     return data
+    # @classmethod
+    # def filter_TMB(cls,pids,TMB1,TMB2):
+    #     mole_detecs = MoleDetec.query.filter(MoleDetec.is_delete == 0, MoleDetec.pid.in_(pids),
+    #                                          MoleDetec.TMB >= TMB1, MoleDetec.TMB <= TMB2).all()
+    #     data = [mole_detec.pid for mole_detec in mole_detecs]
+    #     return data
 
-    def filter_TMB(self,TMB1,TMB2):
-        mole_detecs = MoleDetec.query.filter_by(pid=self.id).all()
-        for mole_detec in mole_detecs:
-            if mole_detec.TMB and float(mole_detec.TMB) >= TMB1 and float(mole_detec.TMB) <= TMB2:
-                return self
-        return None
-
-    def filter_theapy_method(self,method):
+    @classmethod
+    def filter_theapy_method(cls,pids,method):
         trement = method.get('trement')
         treSolu = method.get('treSolu')
+
         if trement is None:
             return None
-        tre_recs = TreRec.query.filter_by(pid=self.id,trement=trement).all()
+        tre_recs = TreRec.query.filter(TreRec.is_delete == 0,TreRec.pid.in_(pids), TreRec.trement == trement).all()
+        pids = [tre_rec.pid for tre_rec in tre_recs]
         if treSolu is None:
-            return None if tre_recs == [] else self
+            return pids
 
-        items = OneToFive.query.filter_by(pid=self.id).all()
+
+        #只有1-5线，和其他，中有详细治疗。
+        items = OneToFive.query.filter(OneToFive.is_delete==0,OneToFive.pid.in_(pids)).all()
+        tre_rec_map = {}
         for item in items:
             if item.treSolu is None:
                 continue
-            had_treSolu = item.treSolu.split(',')
-            if treSolu in had_treSolu:
-                return self
-        return None
+            pid = item.pid
+            if tre_rec_map.get(pid) is None:
+                tre_rec_map[pid] = []
+            tre_rec_map[pid].extend(item.treSolu.split(','))
+        res = []
+        for pid,treSolus in tre_rec_map.items():
+            if treSolu in treSolus:
+                res.append(pid)
 
-    def filter_patDia(self,items):
+        return list(set(res))
 
-        pat_dia = self.get_pat_dia()
-        if pat_dia is None:
-            return None
-        for item in items:
-            if pat_dia.get('radio') and item not in pat_dia.get('radio'):
-                return None
-        return self
+    @classmethod
+    def filter_patDia(cls,pids,items):
 
+        pat_dia = Patient.get_pat_dia(pids)
+        data = []
+        for pid,pat_dia in pat_dia.items():
+            flag = False
+            for item in items:
+                if pat_dia.get('radio') and item not in pat_dia.get('radio'):
+                    flag = True
+                    break
+            if flag:
+                data.append(pid)
+        return data
 
-    def filter_traSite(self,items):
-        ini_dia_pro = IniDiaPro.query.filter_by(pid=self.id).first()
-        if ini_dia_pro is None or ini_dia_pro.traSite is None:
-            return None
-        cur_traSite = ini_dia_pro.traSite.get('radio')
-        for item in items:
-            if item not in cur_traSite:
-                return None
-        return self
+    @classmethod
+    def filter_traSite(cls, pids, items):
+
+        ini_dia_pros = IniDiaPro.query.filter(IniDiaPro.pid.in_(pids)).all()
+
+        patient_ids = []
+        for ini_dia_pro in ini_dia_pros:
+            if ini_dia_pro.traSite is None:
+                continue
+            radio = ini_dia_pro.traSite.get('radio')
+            for item in items:
+                if item not in radio:
+                    break
+            patient_ids.append(ini_dia_pro.pid)
+
+        return patient_ids
 
 
 # 病人既往史表
@@ -317,7 +410,7 @@ class DrugHistory(Base):
 class IniDiaPro(Base):
     __tablename__ = 'iniDiaPro'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    pid = Column(Integer, comment='病人id')
+    pid = Column(Integer, comment='病人id',index=True)
     PSScore = Column(Integer, comment='首诊PS评分0-4')
 
     cliniManifest = Column(JSON, comment='临床表现,多个以逗号分隔')  # 长度
