@@ -67,7 +67,7 @@ class Patient(Base):
             pids = [patient.id for patient in patients]
 
         #过滤pdl1，tmb
-        if 'PDL1' in search_data and 'PDL2' in search_data or 'TMB1' in search_data and 'TMB2' in search_data:
+        if 'PDL1_1' in search_data and 'PDL1_2' in search_data or 'TMB1' in search_data and 'TMB2' in search_data:
             condition = Patient.condition_moleDetec(pids,search_data)
             items = MoleDetec.query.filter(condition).all()
             pids = [item.pid for item in items]
@@ -99,7 +99,7 @@ class Patient(Base):
         #转移部位 IniDiaPro
         if 'traSite' in search_data:
             pids = Patient.filter_traSite(pids,search_data['traSite'])
-
+        pids = list(set(pids))
         pagination = Patient.query.filter(Patient.is_delete == 0, Patient.id.in_(pids)).order_by(Patient.update_time.desc()).paginate(page=page,per_page=limit)
 
         return pagination.items,pagination.total
@@ -210,8 +210,8 @@ class Patient(Base):
     @staticmethod
     def condition_moleDetec(pids,search_data):
         condtion = and_(MoleDetec.is_delete==0,MoleDetec.pid.in_(pids))
-        if 'PDL1' in search_data and 'PDl2' in search_data:
-            condtion = and_(condtion, MoleDetec.PDL1 >= search_data['PDL1'],MoleDetec.PDL1 <= search_data['PDL2'])
+        if 'PDL1_1' in search_data and 'PDl1_2' in search_data:
+            condtion = and_(condtion, MoleDetec.PDL1 >= search_data['PDL1_1'],MoleDetec.PDL1 <= search_data['PDl1_2'])
         if 'TMB1' in search_data and 'TMB2' in search_data:
             condtion = and_(condtion,MoleDetec.TMB >= search_data['TMB1'], MoleDetec.TMB <= search_data['TMB2'])
 
