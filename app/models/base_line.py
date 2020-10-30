@@ -127,26 +127,27 @@ class Patient(Base):
 
         for pid,tre_recs in dict.items():
             tre_recs = sorted(tre_recs,key=lambda tre_rec:tre_rec.treNum,reverse=True)
-            treNum = tre_rec.treNum
+
 
             for tre_rec in tre_recs:
                 trement = tre_rec.trement
+                treNum = tre_rec.treNum
                 if trement is None:
                     continue
                 if trement in ['one','two','three','four','five','other']:
                     if oneToFive_map.get(pid) is None:
                         continue
-
                     item = oneToFive_map.get(pid).get(treNum)
-
                     if item and item.patDia and item.patDia.get('radio') != []:
                         data[pid] = item.patDia
+                        break
                 elif trement == 'surgery':
                     if surgery_map.get(pid) is None:
                         continue
                     item = surgery_map[pid][tre_rec.treNum]
                     if item and item.patDia and item.patDia.get('radio') != []:
                         data[pid] = item.patDia
+                        break
 
                 elif trement == 'radiotherapy':
                     if radiotherapy_map.get(pid) is None:
@@ -154,6 +155,7 @@ class Patient(Base):
                     item = radiotherapy_map[pid][tre_rec.treNum]
                     if item and item.patDia and item.patDia.get('radio') != []:
                         data[pid] = item.patDia
+                        break
 
         return data if data != {} else None
 
@@ -326,10 +328,10 @@ class Patient(Base):
         pat_dia = Patient.get_pat_dia(pids)
         data = []
         for pid,pat_dia in pat_dia.items():
-            flag = False
+            flag = True
             for item in items:
                 if pat_dia.get('radio') and item not in pat_dia.get('radio'):
-                    flag = True
+                    flag = False
                     break
             if flag:
                 data.append(pid)
@@ -345,10 +347,13 @@ class Patient(Base):
             if ini_dia_pro.traSite is None:
                 continue
             radio = ini_dia_pro.traSite.get('radio')
+            flag = True
             for item in items:
                 if item not in radio:
+                    flag = False
                     break
-            patient_ids.append(ini_dia_pro.pid)
+            if flag:
+                patient_ids.append(ini_dia_pro.pid)
 
         return patient_ids
 
