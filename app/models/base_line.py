@@ -108,7 +108,7 @@ class Patient(Base):
     @classmethod
     def get_pat_dia(cls,pids):
         #把所有的治疗记录拿到，并按照pid进行分组
-        tre_recs = TreRec.query.filter(TreRec.is_delete==0,TreRec.pid.in_(pids)).group_by(TreRec.pid).all()
+        tre_recs = TreRec.query.filter(TreRec.is_delete==0,TreRec.pid.in_(pids)).all()
 
         dict = {}
 
