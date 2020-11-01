@@ -112,7 +112,7 @@ class MoleDetec(Base):
     path = Column(String(200), comment='报告文件路径')
     MSI = Column(Integer, comment='MSI 0-MSS,1-MSIH,2-MSIL')
     other = Column(Text)
-    PDL1 = Column(Integer, comment='PD-L1表达 0-未测,1-不详,2->50%,3-1%-50%,4-<1%,5-阴性')
+    PDL1 = Column(Float, comment='PD-L1表达 0-未测,1-不详,2->50%,3-1%-50%,4-<1%,5-阴性')
     PDL1KT = Column(String(255), comment='PDL1抗体') #长度
     TMB = Column(String(20), comment='TMB') #???
 
