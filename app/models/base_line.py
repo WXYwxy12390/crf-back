@@ -343,8 +343,15 @@ class Patient(Base):
         data = []
         for pid,pat_dia in pat_dia.items():
             flag = True
+            radio = pat_dia.get('radio')
+            if radio is None or radio == []:
+                continue
             for item in items:
-                if pat_dia.get('radio') and item not in pat_dia.get('radio'):
+                is_start = False
+                for radio_item in radio:
+                    if radio_item.startswith(item):
+                        is_start = True
+                if is_start == False:
                     flag = False
                     break
             if flag:
