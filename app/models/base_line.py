@@ -121,41 +121,55 @@ class Patient(Base):
         oneToFives = OneToFive.query.filter(OneToFive.is_delete==0,OneToFive.pid.in_(pids)).all()
         surgerys = Surgery.query.filter(Surgery.is_delete==0,Surgery.pid.in_(pids)).all()
         radiotherapys = Radiotherapy.query.filter(Radiotherapy.is_delete==0,Radiotherapy.pid.in_(pids)).all()
+        iniDiapros = IniDiaPro.query.filter(IniDiaPro.is_delete==0,IniDiaPro.pid.in_(pids)).all()
+
+
         oneToFive_map = Patient.getMap(oneToFives)
         surgery_map = Patient.getMap(surgerys)
         radiotherapy_map = Patient.getMap(radiotherapys)
 
+        iniDiapro_map = {}
+        for item in iniDiapros:
+            pid = item.pid
+            if item and item.patDia and item.patDia.get('radio') != []:
+                iniDiapro_map[pid] = item.patDia
+
+
         for pid,tre_recs in dict.items():
             tre_recs = sorted(tre_recs,key=lambda tre_rec:tre_rec.treNum,reverse=True)
-
-
+            flag = True
             for tre_rec in tre_recs:
                 trement = tre_rec.trement
                 treNum = tre_rec.treNum
+
                 if trement is None:
                     continue
                 if trement in ['one','two','three','four','five','other']:
-                    if oneToFive_map.get(pid) is None:
+                    if oneToFive_map.get(pid) is None or oneToFive_map[pid].get(tre_rec.treNum) is None:
                         continue
                     item = oneToFive_map.get(pid).get(treNum)
                     if item and item.patDia and item.patDia.get('radio') != []:
                         data[pid] = item.patDia
+                        flag = False
                         break
                 elif trement == 'surgery':
-                    if surgery_map.get(pid) is None:
+                    if surgery_map.get(pid) is None or surgery_map[pid].get(tre_rec.treNum) is None:
                         continue
                     item = surgery_map[pid][tre_rec.treNum]
                     if item and item.patDia and item.patDia.get('radio') != []:
                         data[pid] = item.patDia
+                        flag = False
                         break
-
                 elif trement == 'radiotherapy':
-                    if radiotherapy_map.get(pid) is None:
+                    if radiotherapy_map.get(pid) is None or radiotherapy_map[pid].get(tre_rec.treNum) is None:
                         continue
                     item = radiotherapy_map[pid][tre_rec.treNum]
                     if item and item.patDia and item.patDia.get('radio') != []:
                         data[pid] = item.patDia
+                        flag = False
                         break
+            if flag and pid in iniDiapro_map:
+                data[pid] = iniDiapro_map.get(pid)
 
         return data if data != {} else None
 
