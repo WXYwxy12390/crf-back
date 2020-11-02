@@ -247,6 +247,32 @@ def generate_value_with_radio_list(str,radio_list):
             i = i + 1
     return data
 
+@api.route('/gene')
+def migrate_gene():
+    olds = MoleDetec.query.filter(MoleDetec.is_delete==0,MoleDetec.update_time > "2020-10-22 01:24:00",MoleDetec.create_time == "2020-10-22 01:23:59").all()
+    news = MoleDetec.query.filter(MoleDetec.is_delete==0,MoleDetec.create_time>"2020-10-22 01:23:59").all()
+    item_list = ['ALK','BIM','BRAF','cMET','EGFR','HER_2','KRAS','PIK3CA','ROS1','RET','UGT1A1']
+    for old in olds:
+        change(old,item_list)
+    for new in news:
+        change(new,item_list)
+    return 'ok'
+
+def change(model_item,items):
+    with db.auto_commit():
+        for item in items:
+            value = getattr(model_item, item)
+            if value is None:
+                continue
+            if value == 1:
+                setattr(model_item, item, 0)
+            elif value == 0:
+                setattr(model_item, item, 2)
+            elif value == 2:
+                setattr(model_item, item, 1)
+
+
+
 
 def migrate_file_from_old(model,file_folder):
     items = model.query.filter(model.is_delete == 0, model.filePath != None,
@@ -296,6 +322,9 @@ def migrate_file_from_path(model,file_folder):
             srcfile = current_app.static_folder + '/' + file_path
             mycopyfile(srcfile, dstfile)
 
+
+
+
 def migrate_file_from_saveFile(model,file_folder):
     items = model.query.filter(model.is_delete == 0, model.savFilPath != None,
                                       model.savFilPath != '').all()
@@ -316,3 +345,5 @@ def mycopyfile(srcfile,dstfile):
         if not os.path.exists(fpath):
             os.makedirs(fpath)                #创建路径
         shutil.copyfile(srcfile,dstfile)      #复制文件
+
+
