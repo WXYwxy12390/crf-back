@@ -137,7 +137,6 @@ class Patient(Base):
 
         for pid,tre_recs in dict.items():
             tre_recs = sorted(tre_recs,key=lambda tre_rec:tre_rec.treNum,reverse=True)
-            flag = True
             for tre_rec in tre_recs:
                 trement = tre_rec.trement
                 treNum = tre_rec.treNum
@@ -150,7 +149,6 @@ class Patient(Base):
                     item = oneToFive_map.get(pid).get(treNum)
                     if item and item.patDia and item.patDia.get('radio') != []:
                         data[pid] = item.patDia
-                        flag = False
                         break
                 elif trement == 'surgery':
                     if surgery_map.get(pid) is None or surgery_map[pid].get(tre_rec.treNum) is None:
@@ -158,7 +156,6 @@ class Patient(Base):
                     item = surgery_map[pid][tre_rec.treNum]
                     if item and item.patDia and item.patDia.get('radio') != []:
                         data[pid] = item.patDia
-                        flag = False
                         break
                 elif trement == 'radiotherapy':
                     if radiotherapy_map.get(pid) is None or radiotherapy_map[pid].get(tre_rec.treNum) is None:
@@ -166,11 +163,10 @@ class Patient(Base):
                     item = radiotherapy_map[pid][tre_rec.treNum]
                     if item and item.patDia and item.patDia.get('radio') != []:
                         data[pid] = item.patDia
-                        flag = False
                         break
-            if flag and pid in iniDiapro_map:
+        for pid,item in iniDiapro_map.items():
+            if pid not in data:
                 data[pid] = iniDiapro_map.get(pid)
-
         return data if data != {} else None
 
     @classmethod
