@@ -447,7 +447,7 @@ class IniDiaPro(Base):
     _bioMet = Column(String(40), comment='活检方式,多个以逗号分隔') #长度
 
     pleInv = Column(Boolean, comment='是否胸膜侵犯')
-    speSite = Column(String(255), comment='标本部位') #长度
+    speSite = Column(String(255), comment='标本部位')
     firVisDate = Column(Date, comment='初诊日期')
     patReDate = Column(Date, comment='病理报告日期')
     patNum = Column(String(255), comment='病理号') # 改为字符串

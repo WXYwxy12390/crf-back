@@ -16,6 +16,7 @@ from app.models import json2db, db, delete_array, json2db_add
 from app.models.base_line import Patient
 from app.spider.research_center import ResearchCenterSpider
 from app.spider.user_info import UserInfo
+from app.utils.export import Export
 from app.utils.paging import get_paging
 
 api = Redprint('sample')
@@ -41,7 +42,7 @@ def get_sample_all():
         for item in items:
             if item.account and g.user.user_id in item.account:
                     patients.append(item)
-
+    all_pids = [patient.id for patient in patients]
     if data and len(data) > 0:
         res,total = Patient.search(patients,data,page,limit)
     else:
@@ -51,7 +52,8 @@ def get_sample_all():
         "code": 200,
         "msg": "获取样本成功",
         "data": res,
-        "total": total
+        "total": total,
+        "all_pids":all_pids
     }
     return jsonify(data)
 
@@ -114,3 +116,10 @@ def del_sample():
     patients = Patient.query.filter(Patient.is_delete==0,Patient.id.in_(data['ids'])).all()
     delete_array(patients)
     return Success()
+
+
+@api.route('/export',methods=['POST'])
+def export():
+    data = request.get_json()
+    pids = data.get('pids')
+    return Export(pids).work()
