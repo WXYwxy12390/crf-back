@@ -436,7 +436,7 @@ class Export:
         if surgery is None or surgery.posAdjChem == False:
             return data
         if tre_plans:
-            tre_plans = sorted(tre_plans, key=lambda item: item.currPeriod)
+            tre_plans = sorted(tre_plans, key=lambda item: item.currPeriod if item.currPeriod is not None else -1) #TODO bug?
         else:
             tre_plans = []
         data[0] = self.filter_none(surgery.surDate)                                             #手术时间
@@ -630,7 +630,8 @@ class Export:
         side_effects = sorted(side_effects,key= lambda item:item.id)
         data = []
         for side_effect in side_effects:
-            data.append(side_effect.sidReaName)
+            if side_effect.sidReaName:
+                data.append(side_effect.sidReaName)
         return ','.join(data)
 
     # 获取疗效评估
