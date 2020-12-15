@@ -403,11 +403,13 @@ class Export:
             return data
         mole_detec = mole_detecs.get(treNum)
         pdl1_val = '/'
-        if mole_detec.PDL1:
+        tmb_val = '/'
+        if mole_detec and mole_detec.PDL1:
             pdl1_val = str(mole_detec.PDL1) + '%'
+            tmb_val = self.filter_none(mole_detec.TMB)
             if mole_detec.PDL1KT:
                 pdl1_val += ',抗体：' + str(mole_detec.PDL1KT)
-        tmb_val = self.filter_none(mole_detec.TMB)
+
         data[0] = pdl1_val
         data[1] = tmb_val
         return data
@@ -419,7 +421,7 @@ class Export:
             return self._get_surgery_info(pid,treNum)
         for i in range(1,tre_recs.get('total')+1):
             tre_rec = tre_recs.get(i)
-            if tre_rec.trement == 'surgery':
+            if tre_rec and tre_rec.trement == 'surgery':
                 treNum = tre_rec.treNum
                 break
         return self._get_surgery_info(pid,treNum)
@@ -457,7 +459,7 @@ class Export:
             return self._get_radio_info(pid,treNum)
         for i in range(1,tre_recs.get('total')+1):
             tre_rec = tre_recs.get(i)
-            if tre_rec.trement == 'radiotherapy':
+            if tre_rec and tre_rec.trement == 'radiotherapy':
                 treNum = tre_rec.treNum
                 break
         return self._get_radio_info(pid,treNum)
@@ -587,7 +589,7 @@ class Export:
             if item != "0-5":
                 data.append(self.patDia_map.get(item))
             else:
-                data.append("其他：" + patDia.get('other'))
+                data.append("其他：" + str(patDia.get('other')))
         return ','.join(data)
 
     # 获取某一分子检测的阳性基因
