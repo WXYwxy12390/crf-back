@@ -18,11 +18,11 @@ class Export:
     base_info_header = ['编号','身份证号' ,'姓名' , '性别' ,'出生日期','年龄','电话号码','PS评分']
     diagonse_header = ['吸烟史','饮酒史','初诊日期', '活检方式', '标本部位', '病理报告日期', '病理号',
         '病理诊断','c分期T','c分期N','c分期M', '临床分期','p分期T','p分期N','p分期M','病理分期', '转移部位']
-    gene_header = ['阳性基因']
-    immune_header = ['PD-L1表达水平','TMB']
-    surger_therapy_header = ['手术时间','手术范围','术后病理','病理号','病理诊断','术后辅助化疗','辅助治疗开始时间','辅助治疗结束时间','副反应']
-    nth_therapy_header = ['治疗方案','开始日期','结束日期','疗效评估','副反应','进展日期','进展描述']
-    radio_therapy_header = ['放疗部位','放疗剂量',	'分割次数','放疗开始时间','放疗结束时间','疗效评价','副反应']
+    # gene_header = ['阳性基因','PD-L1表达水平','TMB']
+    # immune_header = []
+    surger_therapy_header = ['手术时间','手术范围','术后病理','病理号','病理诊断','术后辅助化疗','辅助治疗开始时间','辅助治疗结束时间','副反应','阳性基因','PD-L1表达水平','TMB']
+    nth_therapy_header = ['治疗方案','开始日期','结束日期','疗效评估','副反应','进展日期','进展描述','阳性基因','PD-L1表达水平','TMB']
+    radio_therapy_header = ['放疗部位','放疗剂量',	'分割次数','放疗开始时间','放疗结束时间','疗效评价','副反应','阳性基因','PD-L1表达水平','TMB']
     survival_header = ['生存状态','死亡时间','最后一次随访日期']
 
     # 缓存数据
@@ -143,21 +143,21 @@ class Export:
         self.header_array = []
         self.header_array.append(self.base_info_header)
         self.header_array.append(self.diagonse_header)
-        self.header_array.append(self.gene_header)
-        self.header_array.append(self.immune_header)
+        # self.header_array.append(self.gene_header)
+        # self.header_array.append(self.immune_header)
         self.header_array.append(self.surger_therapy_header)
         self.header_array.append(self.radio_therapy_header)
         self.header_array.append(self.survival_header)
         for item in self.header_array:
             self.header.extend(item)
         for i in range(1,6):
-            self.header += self.nth_therapy_header
+            self.header += [str(i) + "线" + item for item in self.nth_therapy_header]
 
     def work(self):
         wb = Workbook()
         ws = wb.active
         ws.title = '导出样本数据'
-        self.add_first_row(ws)
+        # self.add_first_row(ws)
         ws.append(self.header)
 
         for pid in self.pids:
@@ -206,8 +206,8 @@ class Export:
         row_data = []
         row_data.extend(self.get_base_info(pid))
         row_data.extend(self.get_diagnose_info(pid))
-        row_data.append(self.get_gene_info(pid, 0))
-        row_data.extend(self.get_immune_index(pid, 0))
+        # row_data.append(self.get_gene_info(pid, 0))
+        # row_data.extend(self.get_immune_index(pid, 0))
         row_data.extend(self.get_surgery(pid))
         row_data.extend(self.get_radio(pid))
         row_data.extend(self.get_survival_info(pid))
@@ -450,6 +450,12 @@ class Export:
         data[6] = self.filter_none(tre_plans[0],'begDate')  if tre_plans != [] else '/'         #辅助治疗开始时间
         data[7] = self.filter_none(tre_plans[-1],'endDate') if tre_plans != [] else '/'         #辅助治疗结束时间
         data[8] = self.get_side_effect(pid,treNum)                                              #副反应
+        data[9] = self.get_gene_info(pid, treNum)                                               #阳性基因
+
+        immune_array = self.get_immune_index(pid, treNum)
+        data[10] = immune_array[0]
+        data[11] = immune_array[1]
+
         return data
 
     def get_radio(self,pid):
@@ -481,6 +487,12 @@ class Export:
         data[4] = self.filter_none(radio.endDate)                     #放疗结束时间
         data[5] = self.get_effect_evaluation(pid,treNum)              #疗效评价
         data[6] = self.get_side_effect(pid,treNum)                    #副反应
+        data[7] = self.get_gene_info(pid, treNum)                     #阳性基因
+
+        immune_array = self.get_immune_index(pid, treNum)
+        data[8] = immune_array[0]                                     #pdl1
+        data[9] = immune_array[1]                                     #tmb
+
         return data
 
     def get_radio_dose(self,value,unit):
@@ -678,6 +690,12 @@ class Export:
         data[4] = self.get_side_effect(pid,treNum)       #副反应
         data[5] = self.filter_none(treRec,"proDate")    #进展日期
         data[6] =  self.filter_none(treRec,"proDes")    #进展描述
+        data[7] = self.get_gene_info(pid, treNum)  # 阳性基因
+
+        immune_array = self.get_immune_index(pid, treNum)
+        data[8] = immune_array[0]       #pdl1
+        data[9] = immune_array[1]       #tmb
+
         return data
 
     #获取1到5线到治疗方案
