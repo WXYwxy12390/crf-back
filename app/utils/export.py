@@ -134,7 +134,9 @@ class Export:
             "0-5": "其他"
             }  #病理诊断map
     detail_therapy_map = {"Chemotherapy":"化疗","TargetedTherapy":"靶向治疗","ImmunityTherapy":"免疫治疗","AntivascularTherapy":"抗血管治疗"}
-    beEffEva_map = {"1":"PD-进展","2":"SD-稳定","3":"PR-部分缓解","4":"CR-完全缓解","5":"术后未发现新病灶"}
+    beEffEva_map = {"1":"PD-进展","2":"SD-稳定","3":"PR-部分缓解","4":"CR-完全缓解","5":"术后未发现新病灶",
+                    "PD-进展": "PD-进展","SD-稳定":"SD-稳定","PR-部分缓解":"PR-部分缓解","CR-完全缓解":"CR-完全缓解","术后未发现新病灶":"术后未发现新病灶"
+                    } #因为这里数据库里存对数据很乱
     def __init__(self, pids):
 
         self.pids = pids
