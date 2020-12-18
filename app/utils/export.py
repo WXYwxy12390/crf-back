@@ -134,7 +134,7 @@ class Export:
             "0-5": "其他"
             }  #病理诊断map
     detail_therapy_map = {"Chemotherapy":"化疗","TargetedTherapy":"靶向治疗","ImmunityTherapy":"免疫治疗","AntivascularTherapy":"抗血管治疗"}
-
+    beEffEva_map = {"1":"PD-进展","2":"SD-稳定","3":"PR-部分缓解","4":"CR-完全缓解","5":"术后未发现新病灶"}
     def __init__(self, pids):
 
         self.pids = pids
@@ -656,7 +656,7 @@ class Export:
         tre_rec = tre_rec_dict.get(treNum)
         if tre_rec is None:
             return '/'
-        value = tre_rec.beEffEva
+        value = self.beEffEva_map.get(tre_rec.beEffEva)
         return value if value else '/'
 
     # 获取一线到五线到信息
