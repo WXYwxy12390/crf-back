@@ -133,7 +133,7 @@ class Export:
             "0-4": "转移性肿瘤",
             "0-5": "其他"
             }  #病理诊断map
-    detail_therapy_map = {"Chemotherapy":"化疗","TargetedTherapy":"靶向治疗","ImmunityTherapy":"免疫治疗","AntivascularTherapy":"抗血管治疗"}
+    detail_therapy_map = {"Chemotherapy":"化疗","TargetedTherapy":"靶向治疗","ImmunityTherapy":"免疫治疗","AntivascularTherapy":"抗血管治疗"} #详细治疗的map
     beEffEva_map = {"1":"PD-进展","2":"SD-稳定","3":"PR-部分缓解","4":"CR-完全缓解","5":"术后未发现新病灶",
                     "PD-进展": "PD-进展","SD-稳定":"SD-稳定","PR-部分缓解":"PR-部分缓解","CR-完全缓解":"CR-完全缓解","术后未发现新病灶":"术后未发现新病灶"
                     } #因为这里数据库里存对数据很乱
@@ -228,6 +228,7 @@ class Export:
         radio_array = Radiotherapy.query.filter(Radiotherapy.pid.in_(self.pids),Radiotherapy.is_delete==0).all()
         side_effect_array = SideEffect.query.filter(SideEffect.pid.in_(self.pids),SideEffect.is_delete==0).all()
         follinfo_array = FollInfo.query.filter(FollInfo.pid.in_(self.pids), FollInfo.is_delete == 0).all()
+        # one_to_five_array = OneToFive.query.filter(OneToFive.pid.in_(self.pids),OneToFive.is_delete==0).all()
         self.add_buffer('Patient', self.classify_by_pid(patient_array))
         self.add_buffer('IniDiaPro', self.classify_by_pid(iniDiaPro_array))
         self.add_buffer('PastHis', self.classify_by_pid(pastHis_array))
@@ -255,7 +256,7 @@ class Export:
             pid = tre_rec.pid
             if data.get(pid) is None:
                 data[pid] = {}
-            if tre_rec.trement in ["one","two","three","four","five"]:
+            if tre_rec.trement in ["one","two","three","four","five",'other']:
                 if one_to_five_dict.get(pid):
                     item = one_to_five_dict.get(pid).get(tre_rec.treNum)
                     if item:
@@ -437,7 +438,7 @@ class Export:
             return data
         surgery = surgery_dict.get(treNum)
         tre_plans = tre_plan_dict.get(treNum)
-        if surgery is None or surgery.posAdjChem == False:
+        if surgery is None:
             return data
         if tre_plans:
             tre_plans = sorted(tre_plans, key=lambda item: item.currPeriod if item.currPeriod is not None else -1) #TODO bug?
@@ -449,7 +450,7 @@ class Export:
         data[3] = self.filter_none(self.change_bool_to_yes_or_no(surgery.specNum))              #病理号
         data[4] = self.format_patDia(surgery)                                                   #病理诊断
         data[5] = self.filter_none(self.change_bool_to_yes_or_no(tre_plans != []))              #术后辅助化疗
-        data[6] = self.filter_none(tre_plans[0],'begDate')  if tre_plans != [] else '/'         #辅助治疗开始时间
+        data[6] = self.filter_none(tre_plans[0],'begDate') if tre_plans != [] else '/'         #辅助治疗开始时间
         data[7] = self.filter_none(tre_plans[-1],'endDate') if tre_plans != [] else '/'         #辅助治疗结束时间
         data[8] = self.get_side_effect(pid,treNum)                                              #副反应
         data[9] = self.get_gene_info(pid, treNum)                                               #阳性基因
@@ -691,7 +692,7 @@ class Export:
         data[3] = self.get_effect_evaluation(pid,treNum) #疗效评估
         data[4] = self.get_side_effect(pid,treNum)       #副反应
         data[5] = self.filter_none(treRec,"proDate")    #进展日期
-        data[6] =  self.filter_none(treRec,"proDes")    #进展描述
+        data[6] = self.filter_none(treRec,"proDes")    #进展描述
         data[7] = self.get_gene_info(pid, treNum)  # 阳性基因
 
         immune_array = self.get_immune_index(pid, treNum)
@@ -706,11 +707,17 @@ class Export:
         if treRec_dict is None:
             return '/'
         tre_rec = treRec_dict.get(treNum)
-        if tre_rec is None:
+        if tre_rec is None or tre_rec.trement is None:
             return '/'
-        if tre_rec.trement is None:
+        if tre_rec.trement not in ['one','two','three','four','five','other']:
             return '/'
-        therapy_plans = tre_rec.trement.split(',')
+        one_to_five_dict = self.buffer.get('OneToFive').get(pid)
+        if one_to_five_dict is None:
+            return '/'
+        one_to_five = one_to_five_dict.get(tre_rec.trement)
+        if one_to_five is None or one_to_five.treSolu is None:
+            return '/'
+        therapy_plans = one_to_five.treSolu.split(',')
         data = []
         for plan in therapy_plans:
             temp = self.detail_therapy_map.get(plan)
