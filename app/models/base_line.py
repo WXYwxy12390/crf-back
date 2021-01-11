@@ -307,13 +307,11 @@ class Patient(Base):
         trement = method.get('trement')
         treSolu = method.get('treSolu')
 
-        if trement is None:
-            return None
-        tre_recs = TreRec.query.filter(TreRec.is_delete == 0,TreRec.pid.in_(pids), TreRec.trement == trement).all()
-        pids = [tre_rec.pid for tre_rec in tre_recs]
+        if trement:
+            tre_recs = TreRec.query.filter(TreRec.is_delete == 0,TreRec.pid.in_(pids), TreRec.trement == trement).all()
+            pids = [tre_rec.pid for tre_rec in tre_recs]
         if treSolu is None:
             return pids
-
 
         #只有1-5线，和其他，中有详细治疗。
         items = OneToFive.query.filter(OneToFive.is_delete==0,OneToFive.pid.in_(pids)).all()
