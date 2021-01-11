@@ -133,7 +133,7 @@ class Export:
             "0-4": "转移性肿瘤",
             "0-5": "其他"
             }  #病理诊断map
-    detail_therapy_map = {"Chemotherapy":"化疗","TargetedTherapy":"靶向治疗","ImmunityTherapy":"免疫治疗","AntivascularTherapy":"抗血管治疗"} #详细治疗的map
+    detail_therapy_map = {"Chemotherapy":"化疗","TargetedTherapy":"靶向治疗","ImmunityTherapy":"免疫治疗","AntivascularTherapy":"抗血管治疗","Other":"其他"} #详细治疗的map
     beEffEva_map = {"1":"PD-进展","2":"SD-稳定","3":"PR-部分缓解","4":"CR-完全缓解","5":"术后未发现新病灶",
                     "PD-进展": "PD-进展","SD-稳定":"SD-稳定","PR-部分缓解":"PR-部分缓解","CR-完全缓解":"CR-完全缓解","术后未发现新病灶":"术后未发现新病灶"
                     } #因为这里数据库里存对数据很乱
@@ -701,15 +701,17 @@ class Export:
 
         return data
 
-    #获取1到5线到治疗方案
+    #获取1到5线的治疗方案
     def get_therapy_plan(self,pid,treNum):
+        if pid == 3378:
+            print('0k')
         treRec_dict = self.buffer.get('TreRec').get(pid)
         if treRec_dict is None:
             return '/'
         tre_rec = treRec_dict.get(treNum)
         if tre_rec is None or tre_rec.trement is None:
             return '/'
-        if tre_rec.trement not in ['one','two','three','four','five','other']:
+        if tre_rec.trement not in ['one','two','three','four','five','Other']:
             return '/'
         one_to_five_dict = self.buffer.get('OneToFive').get(pid)
         if one_to_five_dict is None:

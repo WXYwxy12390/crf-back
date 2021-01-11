@@ -44,7 +44,7 @@ class TreRec(Base):
         date2 = self.proDate
         if date1 and date2:
             with db.auto_commit():
-                months = (date1 - date2).days / 30
+                months = (date2 - date1).days / 30
                 time = str(round(months, 1)) + "月"
                 self.PFS_DFS = time
 
