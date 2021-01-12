@@ -16,14 +16,14 @@ class Export:
     header = []
 
     # 表头
-    base_info_header = ['编号','身份证号' ,'姓名' , '性别' ,'出生日期','年龄','电话号码','PS评分']
+    base_info_header = ['编号','身份证号' ,'姓名' , '性别' ,'出生日期','年龄','电话号码','PS评分','影像学检查']
     diagonse_header = ['吸烟史','饮酒史','初诊日期', '活检方式', '标本部位', '病理报告日期', '病理号',
         '病理诊断','c分期T','c分期N','c分期M', '临床分期','p分期T','p分期N','p分期M','病理分期', '转移部位']
     # gene_header = ['阳性基因','PD-L1表达水平','TMB']
     # immune_header = []
-    surger_therapy_header = ['手术时间','手术范围','术后病理','病理号','病理诊断','术后辅助化疗','辅助治疗开始时间','辅助治疗结束时间','副反应','阳性基因','PD-L1表达水平','TMB']
+    surger_therapy_header = ['手术时间','手术范围','术后病理','病理号','病理诊断','术后辅助化疗','辅助治疗开始时间','辅助治疗结束时间','副反应','阳性基因','PD-L1表达水平','TMB','影像学检查']
     nth_therapy_header = ['治疗方案','开始日期','结束日期','疗效评估','副反应','进展日期','进展描述','阳性基因','PD-L1表达水平','TMB','影像学检查']
-    radio_therapy_header = ['放疗部位','放疗剂量',	'分割次数','放疗开始时间','放疗结束时间','疗效评价','副反应','阳性基因','PD-L1表达水平','TMB']
+    radio_therapy_header = ['放疗部位','放疗剂量',	'分割次数','放疗开始时间','放疗结束时间','疗效评价','副反应','阳性基因','PD-L1表达水平','TMB','影像学检查']
     survival_header = ['生存状态','死亡时间','最后一次随访日期']
 
     # 缓存数据
@@ -354,6 +354,7 @@ class Export:
         data[7] = self.filter_none(init_pro,'PSScore') #PS评分
         if data[7] == -1: #远古时期的数据，-1代表空
             data[7] = '/'
+        data[8] = self.get_image_exams_methods(pid,0)
         return data
 
     # 诊断
@@ -461,7 +462,7 @@ class Export:
         immune_array = self.get_immune_index(pid, treNum)
         data[10] = immune_array[0]
         data[11] = immune_array[1]
-
+        data[12] = self.get_image_exams_methods(pid, treNum)
         return data
 
     def get_radio(self,pid):
@@ -498,7 +499,7 @@ class Export:
         immune_array = self.get_immune_index(pid, treNum)
         data[8] = immune_array[0]                                     #pdl1
         data[9] = immune_array[1]                                     #tmb
-
+        data[10] = self.get_image_exams_methods(pid, treNum)
         return data
 
     def get_radio_dose(self,value,unit):
