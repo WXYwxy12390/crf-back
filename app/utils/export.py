@@ -6,6 +6,7 @@ from openpyxl.writer.excel import save_virtual_workbook
 from app.models.base_line import Patient, IniDiaPro, PastHis
 from app.models.crf_info import FollInfo
 from app.models.cycle import MoleDetec, SideEffect
+from app.models.other_inspect import ImageExams
 from app.models.therapy_record import Surgery, TreRec, DetailTrePlan, Radiotherapy, OneToFive
 from app.utils.date import get_age_by_birth, get_birth_date_by_id_card
 
@@ -21,7 +22,7 @@ class Export:
     # gene_header = ['阳性基因','PD-L1表达水平','TMB']
     # immune_header = []
     surger_therapy_header = ['手术时间','手术范围','术后病理','病理号','病理诊断','术后辅助化疗','辅助治疗开始时间','辅助治疗结束时间','副反应','阳性基因','PD-L1表达水平','TMB']
-    nth_therapy_header = ['治疗方案','开始日期','结束日期','疗效评估','副反应','进展日期','进展描述','阳性基因','PD-L1表达水平','TMB']
+    nth_therapy_header = ['治疗方案','开始日期','结束日期','疗效评估','副反应','进展日期','进展描述','阳性基因','PD-L1表达水平','TMB','影像学检查']
     radio_therapy_header = ['放疗部位','放疗剂量',	'分割次数','放疗开始时间','放疗结束时间','疗效评价','副反应','阳性基因','PD-L1表达水平','TMB']
     survival_header = ['生存状态','死亡时间','最后一次随访日期']
 
@@ -229,6 +230,7 @@ class Export:
         side_effect_array = SideEffect.query.filter(SideEffect.pid.in_(self.pids),SideEffect.is_delete==0).all()
         follinfo_array = FollInfo.query.filter(FollInfo.pid.in_(self.pids), FollInfo.is_delete == 0).all()
         # one_to_five_array = OneToFive.query.filter(OneToFive.pid.in_(self.pids),OneToFive.is_delete==0).all()
+        imageExam_array = ImageExams.query.filter(ImageExams.pid.in_(self.pids),ImageExams.is_delete==0).all()
         self.add_buffer('Patient', self.classify_by_pid(patient_array))
         self.add_buffer('IniDiaPro', self.classify_by_pid(iniDiaPro_array))
         self.add_buffer('PastHis', self.classify_by_pid(pastHis_array))
@@ -240,6 +242,7 @@ class Export:
         self.add_buffer('SideEffect', self.array_classify_by_treNum(side_effect_array))
         self.add_buffer('FollInfo', self.array_classify_by_pid(follinfo_array))
         self.add_nth_therapy_buffer(treRec_array)
+        self.add_buffer('ImageExams', self.array_classify_by_treNum(imageExam_array))
 
     #传入tre_recs，找出oneToFive的
     def add_nth_therapy_buffer(self,tre_recs):
@@ -671,7 +674,6 @@ class Export:
         return data
 
     # 获取第几线治疗
-    #['治疗方案','开始日期','结束日期','疗效评估','副反应','进展日期','进展描述']
     def _get_nth_therapy(self,pid,nth):
         data = ['/'] * len(self.nth_therapy_header)
         one_to_five_dict = self.buffer.get('OneToFive').get(pid)
@@ -698,13 +700,11 @@ class Export:
         immune_array = self.get_immune_index(pid, treNum)
         data[8] = immune_array[0]       #pdl1
         data[9] = immune_array[1]       #tmb
-
+        data[10] = self.get_image_exams_methods(pid,treNum) #实验室检查的所有检查方法
         return data
 
     #获取1到5线的治疗方案
     def get_therapy_plan(self,pid,treNum):
-        if pid == 3378:
-            print('0k')
         treRec_dict = self.buffer.get('TreRec').get(pid)
         if treRec_dict is None:
             return '/'
@@ -728,3 +728,14 @@ class Export:
         if data == []:
             return '/'
         return ",".join(data)
+
+    #获取影像学检查的检查方法
+    def get_image_exams_methods(self,pid,treNum):
+        image_exams_dict = self.buffer.get('ImageExams').get(pid)
+        if image_exams_dict is None or image_exams_dict.get(treNum) is None:
+            return '/'
+        items = image_exams_dict.get(treNum)
+        data = [item.exmaMethod for item in items if item.exmaMethod]
+        return ','.join(data)
+
+
