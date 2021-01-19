@@ -1,7 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime
-
 from app.models.base import Base
-
 
 
 #胸部肿瘤科肺康复患者调查表

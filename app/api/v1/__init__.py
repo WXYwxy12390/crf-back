@@ -3,7 +3,7 @@ from app.api.v1 import user, client, token, immunohis, mole_detec, treatment_inf
 from app.api.v1.base_line import patient,past_history,first_diagnose
 from app.api.v1 import lab_inspectation,other_inspect
 from app.api.v1.record_info import record_info,therapy_record
-from app.api.v1 import sample,file,migrate
+from app.api.v1 import sample,file,migrate,export
 
 #把红图注册到蓝图下
 def create_blueprint_v1():
@@ -24,4 +24,7 @@ def create_blueprint_v1():
     treatment_info.api.register(bp_v1)
     file.api.register(bp_v1)
     migrate.api.register(bp_v1)
+
+    export.api.register(bp_v1)
+
     return bp_v1

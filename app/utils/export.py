@@ -21,9 +21,9 @@ class Export:
     # gene_header = ['阳性基因','PD-L1表达水平','TMB']
     # immune_header = []
     surger_therapy_header = ['手术时间','手术范围','术后病理','病理号','病理诊断','术后辅助化疗','辅助治疗开始时间','辅助治疗结束时间','副反应','阳性基因','PD-L1表达水平','TMB']
-    nth_therapy_header = ['治疗方案','开始日期','结束日期','疗效评估','副反应','进展日期','进展描述','阳性基因','PD-L1表达水平','TMB']
     radio_therapy_header = ['放疗部位','放疗剂量',	'分割次数','放疗开始时间','放疗结束时间','疗效评价','副反应','阳性基因','PD-L1表达水平','TMB']
     survival_header = ['生存状态','死亡时间','最后一次随访日期']
+    nth_therapy_header = ['治疗方案','开始日期','结束日期','疗效评估','副反应','进展日期','进展描述','阳性基因','PD-L1表达水平','TMB']
 
     # 缓存数据
     buffer = {}
@@ -150,6 +150,14 @@ class Export:
         self.header_array.append(self.surger_therapy_header)
         self.header_array.append(self.radio_therapy_header)
         self.header_array.append(self.survival_header)
+
+        self.base_info_chosen = []
+        '''self.diagnose_chosen = []
+        self.surger_therapy_chosen = []
+        self.radio_therapy_chosen = []
+        self.radio_therapy_chosen = []
+        self.survival_chosen = []'''
+
         for item in self.header_array:
             self.header.extend(item)
         for i in range(1,6):
@@ -165,7 +173,90 @@ class Export:
         for pid in self.pids:
             ws.append(self.get_row_data(pid))
 
-        # wb.save('my_excel_demo1.xls')
+        wb.save('my_excel_demo1.xls')
+        content = save_virtual_workbook(wb)
+        resp = make_response(content)
+        resp.headers["Content-Disposition"] = 'attachment; filename=samples.xlsx'
+        resp.headers['Content-Type'] = 'application/x-xlsx'
+        return resp
+
+    def work_new(self, chosen_headers=[]):
+        self.header = []
+        self.base_info_header = []
+
+        if 'patNumber' in chosen_headers:
+            self.base_info_header.append('编号')
+            self.base_info_chosen.append('patNumber')
+        if 'idNumber' in chosen_headers:
+            self.base_info_header.append('身份证号')
+            self.base_info_chosen.append('idNumber')
+        if 'patientName' in chosen_headers:
+            self.base_info_header.append('姓名')
+            self.base_info_chosen.append('patientName')
+        if 'gender' in chosen_headers:
+            self.base_info_header.append('性别')
+            self.base_info_chosen.append('gender')
+        if 'birthday' in chosen_headers:
+            self.base_info_header.append('出生日期')
+            self.base_info_chosen.append('birthday')
+        if 'age' in chosen_headers:
+            self.base_info_header.append('年龄')
+            self.base_info_chosen.append('age')
+        if 'phoneNumber' in chosen_headers:
+            self.base_info_header.append('电话号码')
+            self.base_info_chosen.append('phoneNumber')
+        if 'PSScore' in chosen_headers:
+            self.base_info_header.append('PS评分')
+            self.base_info_chosen.append('PSScore')
+
+        self.header.extend(self.base_info_header)
+        if 'diagnose' in chosen_headers:
+            self.header.extend(self.diagonse_header)
+        if 'surger_therapy' in chosen_headers:
+            self.header.extend(self.surger_therapy_header)
+        if 'radio_therapy' in chosen_headers:
+            self.header.extend(self.radio_therapy_header)
+        if 'survival' in chosen_headers:
+            self.header.extend(self.survival_header)
+        if 'one_to_five' in chosen_headers:
+            for i in range(1, 6):
+                self.header += [str(i) + "线" + item for item in self.nth_therapy_header]
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = '导出样本数据'
+        ws.append(self.header)
+        for pid in self.pids:
+            data = []
+            p = self.buffer.get('Patient').get(pid)
+            init_pro = self.buffer.get('IniDiaPro').get(pid)
+            for item in self.base_info_chosen:
+                if item == 'gender':
+                    data.append(self.gender_map.get(self.filter_none(p, item)))
+                elif item == 'PSScore':
+                    data.append(self.filter_none(init_pro, item))
+                elif item == 'age':
+                    age = get_age_by_birth(get_birth_date_by_id_card(getattr(p, 'idNumber')))
+                    data.append(age if age else '/')
+                elif item =='phoneNumber':
+                    data.append(self.filter_none(p, 'phoneNumber1'))
+                else:
+                    data.append(self.filter_none(p, item))
+
+            if 'diagnose' in chosen_headers:
+                data.extend(self.get_diagnose_info(pid))
+            if 'surger_therapy' in chosen_headers:
+                data.extend(self.get_surgery(pid))
+            if 'radio_therapy' in chosen_headers:
+                data.extend(self.get_radio(pid))
+            if 'survival' in chosen_headers:
+                data.extend(self.get_survival_info(pid))
+            if 'one_to_five' in chosen_headers:
+                data.extend(self.get_one_To_Five(pid))
+
+            ws.append(data)
+
+        wb.save('test.xls')
         content = save_virtual_workbook(wb)
         resp = make_response(content)
         resp.headers["Content-Disposition"] = 'attachment; filename=samples.xlsx'
@@ -335,8 +426,10 @@ class Export:
     def get_base_info(self,pid):
         cnt = len(self.base_info_header)
         data = ['/'] * cnt
+
         p = self.buffer.get('Patient').get(pid)
         if p is None:
+            print('p is none')
             return data
         init_pro = self.buffer.get('IniDiaPro').get(pid)
         data[0] = self.filter_none(p,'patNumber')
@@ -374,7 +467,6 @@ class Export:
         data[9] = c_stage_array[1]    #c分期N
         data[10] = c_stage_array[2]   #c分期M
         data[11] = self.filter_none(init_pro,'cliStage')  #c临床分期
-
         data[12] = p_stage_array[0]   #p分期T
         data[13] = p_stage_array[1]   #p分期N
         data[14] = p_stage_array[2]   #p分期M
