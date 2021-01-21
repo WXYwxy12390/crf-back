@@ -2,28 +2,51 @@ from flask import make_response
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 
+from app.models.therapy_record import TreRec
 from app.utils.date import get_birth_date_by_id_card, get_age_by_birth
 
 
 class Export:
+    lab_inspectation_table = ['BloodRoutine', 'BloodBio', 'Thyroid', 'Coagulation', 'MyocardialEnzyme',
+                              'Cytokines', 'LymSubsets', 'UrineRoutine', 'TumorMarker']
+    other_inspect_table = ['Lung', 'OtherExams', 'ImageExams']
+    header_map = {'patNumber': '编号', 'idNumber': '身份证号', 'patientName': '姓名', 'hospitalNumber': '住院号',
+                  'gender': '性别', 'birthday': '出生日期', 'age': '年龄', 'phoneNumber1': '电话号码1',
+                  'phoneNumber2': '电话号码2', 'updateTime': '更新时间', 'nextFollowupTime': '随访时间', 'finishFollowup': '是否完成随访',
+                  'basDisHis': '基础疾病史', 'infDisHis': '传染疾病史', 'tumor': '是否有肿瘤史', 'tumHis': '肿瘤史',
+                  'tumorFam': '是否有肿瘤家族史', 'tumFamHis': '肿瘤家族史', 'smoke': '是否吸烟', 'smokingHis': '吸烟史',
+                  'drink': '是否饮酒', 'drinkingHis': '饮酒史', 'hormone': '是否长期使用激素', 'hormoneUseHis': '激素使用史',
+                  'drug': '是否长期使用药物', 'drugUseHis': '药物使用史', 'PSScore': 'PS评分', 'cliniManifest': '临床表现',
+                  'videography': '影像学', 'part': '部位', 'bioMet': '活检方式', 'pleInv': '是否胸膜侵犯',
+                  'speSite': '标本部位', 'firVisDate': '初诊日期', 'patReDate': '病理报告日期', 'patNum': '病理号',
+                  'patDia': '病理诊断', 'mitIma': '核分裂像', 'comCar': '复合性癌', 'necArea': '坏死面积',
+                  'massSize': '肿块大小', 'Ki67': 'Ki67', 'traSite': '转移部位', 'TSize': 'TSize', 'stage': '分期情况',
+                  'cliStage': '临床分期', 'patStage': '病理分期', 'cRemark': 'cRemark', 'pRemark': 'pRemark',
+                  'samplingTime': '采样时间',
+                  'detectTime': '检测时间', 'FVC_exp': '用力肺活量(L)预期值', 'FEV1_FVC_exp': '用力呼气一秒率(%)预期值',
+                  'MEF_exp': '用力呼气中期流速(L/S)预期值', 'MEF25_exp': '25%用力呼气流速(L/S)预期值', 'MEF50_exp': '50%用力呼气流速(L/S)预期值',
+                  'MEF75_exp': '75%用力呼气流速(L/S)预期值', 'TLC_sb_exp': '肺总量(L)预期值', 'RV_exp': '残气容积(L)预期值',
+                  'RV_TLC_exp': '残气容积/肺总量比(%)预期值', 'VC_exp': '肺活量(L)预期值', 'DLCO_ex_exp': '无需屏气弥散(mL/mmHg/Mi)预期值',
+                  'DLCO_sb_exp': '肺一氧化碳弥散量(mL/mmHg/Mi)预期值', 'KCO_exp': '比弥散量预期值', 'FVC_best': '用力肺活量(L)最佳值',
+                  'FEV1_FVC_best': '用力呼气一秒率(%)最佳值', 'MEF_best': '用力呼气中期流速(L/S)最佳值', 'MEF25_best': '25%用力呼气流速(L/S)最佳值',
+                  'MEF50_best': '50%用力呼气流速(L/S)最佳值', 'MEF75_best': '75%用力呼气流速(L/S)最佳值', 'TLC_sb_best': '肺总量(L)最佳值',
+                  'RV_best': '残气容积(L)最佳值', 'RV_TLC_best': '残气容积/肺总量比(%)最佳值', 'VC_best': '肺活量(L)最佳值',
+                  'DLCO_ex_best': '无需屏气弥散(mL/mmHg/Mi)最佳值',
+                  'DLCO_sb_best': '肺一氧化碳弥散量(mL/mmHg/Mi)最佳值', 'KCO_best': '比弥散量最佳值', 'FVC_ratio': '用力肺活量(L)最佳值/预期值(%)',
+                  'FEV1_FVC_ratio': '用力呼气一秒率(%)最佳值/预期值(%)', 'MEF_ratio': '用力呼气中期流速(L/S)最佳值/预期值(%)',
+                  'MEF25_ratio': '25%用力呼气流速(L/S)最佳值/预期值(%)', 'MEF50_ratio': '50%用力呼气流速(L/S)最佳值/预期值(%)',
+                  'MEF75_ratio': '75%用力呼气流速(L/S)最佳值/预期值(%)', 'TLC_sb_ratio': '肺总量(L)最佳值/预期值(%)',
+                  'RV_ratio': '残气容积(L)最佳值/预期值(%)',
+                  'RV_TLC_ratio': '残气容积/肺总量比(%)最佳值/预期值(%)', 'VC_ratio': '肺活量(L)最佳值/预期值(%)',
+                  'DLCO_ex_ratio': '无需屏气弥散(mL/mmHg/Mi)最佳值/预期值(%)',
+                  'DLCO_sb_ratio': '肺一氧化碳弥散量(mL/mmHg/Mi)最佳值/预期值(%)', 'KCO_ratio': '比弥散量最佳值/预期值(%)',
+                  'ECGDetTime': '12导联心电图检测时间', 'ECGDesc': '12导联心电图结果描述', 'ECGPath': '12导联心电图报告路径',
+                  'UCGDetTime': '超声心动图检测时间', 'UCGDesc': '超声心动图结果描述', 'UCGPath': '超声心动图报告路径',
+                  'detectTime': '检测时间', 'examArea': '检查部位', 'exmaMethod': '检查方法', 'tumorLD': '肿瘤长径', 'tumorSD': '肿瘤短径',
+                  'tumorDesc': '肿瘤描述', 'path': '文件路径',
+                  'other': '其他', 'filePath': '文件路径', 'PDL1': 'PD-L1表达水平', 'PDL1KT': 'PDL1抗体'
 
-    header_map = {'patNumber': '编号', 'idNumber': '身份证号', 'patientName': '姓名',
-                 'gender': '性别', 'birthday': '出生年月', 'age': '年龄', 'phoneNumber1': '电话号码',
-                 'PSScore': 'PS评分', 'examMethod': '影像学检查','smokingHis': '吸烟史',
-                 'drinkingHis': '饮酒史', 'firVisDate': '初诊日期', 'bioMet': '活检方式',
-                 'speSite': '标本部位', 'patReDate': '病理报告日期', 'patNum': '病理号',
-                 'patDia': '病理诊断', 'cStage-T': 'c分期T', 'cStage-N': 'c分期N',
-                 'cStage-M': 'c分期M', 'cliStage': '临床分期', 'pStage-T': 'p分期T',
-                 'pStage-N': 'p分期N', 'pStage-M': 'p分期M', 'patStage': '病理分期',
-                 'traSite': '转移部位', 'surDate': '手术时间', 'surSco': '手术范围',
-                 'isRepBio': '术后病理', 'specNum': '病理号', 'posAdjChem': '术后辅助化疗',
-                 'surgery_begDate': '辅助治疗开始时间', 'surgery_endDate': '辅助治疗结束时间', 'sidReaName': '副反应',
-                 'positiveGene': '阳性基因', 'PDL1': 'PD-L1表达水平', 'TMB': 'TMB',
-                 'radSite': '放疗部位', 'radDose': '放疗剂量', 'splTim': '分割次数',
-                 'radio_begDate': '放疗开始时间', 'radio_endDate': '放疗结束时间',
-                 'beEffEva': '疗效评价', 'livSta': '生存状态', 'dieDate': '死亡时间',
-                 'date': '最后一次随访日期'
-                 }
+                  }
     patDia_map = {
         "0-0": "上皮型肿瘤",
         "0-0-0": "上皮型肿瘤-腺癌",
@@ -126,36 +149,39 @@ class Export:
         "0-5": "其他"
     }  # 病理诊断map
     gender_map = {0: "女", 1: "男", "/": "/"}
+    immunohis_map = {0: '-', 1: '±', 2: '+', 3: '++', 4: '+++'}
+    moleDetec_map = {0: '阴性', 1: '阳性', 2: '无'}
 
-    def __init__(self, pids, tables, columns):
-        self.buffer = []
+    def __init__(self, info, tables, columns):
         self.headers = []
-        self.pids = pids
+        self.info = info
         self.tables = tables
         self.columns = columns
+        i = 0
         for x in columns:
-            for y in x:
-                if y == 'cStage':
-                    self.headers.append('c分期T')
-                    self.headers.append('c分期N')
-                    self.headers.append('c分期M')
-                elif y == 'pStage':
-                    self.headers.append('p分期T')
-                    self.headers.append('p分期N')
-                    self.headers.append('p分期M')
-                else:
-                    self.headers.append(self.header_map.get(y))
-        self.init_buffer()
+            name = tables[i].__name__
+            if (name in self.lab_inspectation_table or
+                    name == 'Immunohis' or name == 'MoleDetec'):
+                for y in x:
+                    if (y == 'samplingTime' or y == 'other' or y == 'filePath' or
+                            y == 'PDL1' or y == 'PDL1KT'):
+                        self.headers.append(self.header_map.get(y))
+                    else:
+                        self.headers.append(y)
 
-    def init_buffer(self):
-        for obj_class_name in self.tables:
-            if obj_class_name.__name__ == 'Patient':
-                obj_array = obj_class_name.query.filter(obj_class_name.id.in_(self.pids),
-                                                        obj_class_name.is_delete == 0).all()
             else:
-                obj_array = obj_class_name.query.filter(obj_class_name.pid.in_(self.pids),
-                                                        obj_class_name.is_delete == 0).all()
-            self.buffer.append(self.classify_by_pid(obj_array))
+                for y in x:
+                    if y == 'cStage':
+                        self.headers.append('c分期T')
+                        self.headers.append('c分期N')
+                        self.headers.append('c分期M')
+                    elif y == 'pStage':
+                        self.headers.append('p分期T')
+                        self.headers.append('p分期N')
+                        self.headers.append('p分期M')
+                    else:
+                        self.headers.append(self.header_map.get(y))
+            i += 1
 
     def work(self):
         wb = Workbook()
@@ -163,41 +189,72 @@ class Export:
         ws.title = '导出样本数据'
         ws.append(self.headers)
 
-        for pid in self.pids:
+        for dic in self.info:
             row = []
             i = 0
-            for dic in self.buffer:
-                for strib in self.columns[i]:
-                    try:
-                        if strib == 'gender':
-                            temp = self.filter_none(dic[pid], strib)
-                            row.append(self.gender_map.get(temp))
-                        elif strib == 'age':
-                            temp = getattr(dic[pid], 'idNumber')
-                            age = get_age_by_birth(get_birth_date_by_id_card(temp))
-                            age = age if age else '/'
-                            row.append(age)
-                        elif strib == 'drinkingHis':
-                            temp = self.format_drink_history(dic[pid])
-                            row.append(temp)
-                        elif strib == 'smokingHis':
-                            temp = self.format_smoke_history(dic[pid])
-                            row.append(temp)
-                        elif strib == 'bioMet' or strib == 'traSite':
-                            temp = self.format_radio_data(dic[pid], strib)
-                            row.append(temp)
-                        elif strib == 'patDia':
-                            temp = self.format_patDia(dic[pid])
-                            row.append(temp)
-                        elif strib == 'cStage' or strib == 'pStage':
-                            stage_array = self.format_stage(dic[pid], strib)
+            pid = dic.get('pid')
+            treNum = dic.get('treNum')
+            for obj_class_name in self.tables:
+                name = obj_class_name.__name__
+                if name == 'Patient':
+                    obj_array = obj_class_name.query.filter(obj_class_name.id == pid,
+                                                            obj_class_name.is_delete == 0).all()
+                elif name == 'PastHis' or name == 'IniDiaPro':
+                    obj_array = obj_class_name.query.filter(obj_class_name.pid == pid,
+                                                            obj_class_name.is_delete == 0).all()
+                elif (name in self.lab_inspectation_table or name in self.other_inspect_table or
+                      name == 'Immunohis' or name == 'MoleDetec'):
+                    obj_array = obj_class_name.query.filter(obj_class_name.pid == pid,
+                                                            obj_class_name.treNum == treNum,
+                                                            obj_class_name.is_delete == 0).all()
+                if obj_array:
+                    obj = obj_array[0]
+                    for field in self.columns[i]:
+                        if field != 'age':
+                            x = getattr(obj, field)
+
+                        if name == 'Immunohis':
+                            value = self.filter_none(obj, field)
+                            value = self.immunohis_map.get(value)
+                        elif name == 'MoleDetec':
+                            value = self.filter_none(obj, field)
+                            value = self.moleDetec_map.get(value)
+                        elif field == 'gender':
+                            value = self.filter_none(obj, field)
+                            value = self.gender_map.get(value)
+                        elif field == 'age':
+                            idNumber = getattr(obj, 'idNumber')
+                            age = get_age_by_birth(get_birth_date_by_id_card(idNumber))
+                            value = age if age else '/'
+                        elif field == 'drinkingHis':
+                            value = self.format_drink_history(obj)
+                        elif field == 'smokingHis':
+                            value = self.format_smoke_history(obj)
+                        elif field == 'cStage' or field == 'pStage':
+                            stage_array = self.format_stage(obj, field)
                             row.extend(stage_array)
+                        elif (field == 'bioMet' or field == 'traSite' or
+                              field == 'basDisHis' or field == 'infDisHis' or
+                              field == 'tumHis' or field == 'tumFamHis' or
+                              field == 'cliniManifest' or field == 'part'):
+                            value = self.format_radio_data(obj, field)
+                        elif field == 'patDia':
+                            value = self.format_patDia(obj)
+                        elif type(x) == bool:
+                            value = self.filter_none(self.change_bool_to_yes_or_no(x))
+                        elif type(x) == dict:
+                            value = str(x) if x else '/'
+                        elif type(x) == list:
+                            value = str(x) if x else '/'
                         else:
-                            temp = self.filter_none(dic[pid], strib)
-                            row.append(temp)
-                    except KeyError:
-                        row.append("/")
-                        print("KeyError没有找到该键！")
+                            value = self.filter_none(obj, field)
+
+                        if field != 'cStage' and field != 'pStage':
+                            row.append(value)
+                else:
+                    for j in range(0, len(self.columns[i])):
+                        row.append('/')
+
                 i += 1
             ws.append(row)
 
@@ -208,25 +265,26 @@ class Export:
         resp.headers['Content-Type'] = 'application/x-xlsx'
         return resp
 
-    def classify_by_pid(self, items):
-        data = {}
-        for item in items:
-            if getattr(item, 'pid', None):
-                data[item.pid] = item
-            else:
-                data[item.id] = item
-        return data
 
-    def filter_none(self,data,item=None):
+
+
+
+
+    def change_bool_to_yes_or_no(self, bool_value):
+        if bool_value is None:
+            return '/'
+        return '是' if bool_value else '否'
+
+    def filter_none(self, data, item=None):
         if data is None:
             return '/'
         if item:
-            val = getattr(data,item)
+            val = getattr(data, item)
         else:
             val = data
         return val if val is not None else '/'
 
-    def format_smoke_history(self,object):
+    def format_smoke_history(self, object):
         if object is None:
             return '/'
         is_smoke = object.smoke
@@ -238,7 +296,7 @@ class Export:
             value = '无'
         return value
 
-    def format_drink_history(self,object):
+    def format_drink_history(self, object):
         if object is None:
             return '/'
         is_drink = object.drink
@@ -250,10 +308,10 @@ class Export:
             value = '无'
         return value
 
-    def format_radio_data(self,object,item):
+    def format_radio_data(self, object, item):
         if object is None:
             return '/'
-        data = getattr(object,item)
+        data = getattr(object, item)
         if data is None:
             return '/'
         radio = data.get('radio')
@@ -280,7 +338,7 @@ class Export:
         value = ['/'] * 3
         if object is None:
             return value
-        data = getattr(object,item)
+        data = getattr(object, item)
         if data is None or data == "":
             return value
         ret = data.split(',')

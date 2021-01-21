@@ -17,16 +17,16 @@ therapy_record_py = getattr(models_package, 'therapy_record')
 @api.route('', methods=['POST'])
 def export():
     data = request.get_json()
-    pids = data['pids']
+    info = data['info']
     tables = []
     columns = []
-    del data['pids']
+    del data['info']
     x = check_tables_and_columns(data)
     if x:
         print(x)
         tables = x[0]
         columns = x[1]
-        return Export(pids, tables, columns).work()
+        return Export(info, tables, columns).work()
     else:
         print('接收的表名或者字段名存在错误')
 
