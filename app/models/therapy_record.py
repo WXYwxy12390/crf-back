@@ -18,11 +18,11 @@ class TreRec(Base):
     date = Column(DateTime, comment='结束日期')
     beEffEvaDate = Column(Date, comment='最佳疗效评估日期')
     beEffEva = Column(String(255), comment='最佳疗效评估')
-    proDate = Column(DateTime, comment='进展日期')
+    proDate = Column(Date, comment='进展日期')
     proDes = Column(String(2048), comment='进展描述')  # text
-
+    PFS_DFS = Column(String(2048),comment='PFS/DFS')
     def keys(self):
-        return ['id','treNum','trement','date','beEffEvaDate','beEffEva','proDate','proDes']
+        return ['id','treNum','trement','date','beEffEvaDate','beEffEva','proDate','proDes','PFS_DFS']
 
     def get_parent(self):
         data = {
@@ -30,6 +30,24 @@ class TreRec(Base):
             'trement':self.trement
         }
         return data
+
+    def compute_FPS_DFS(self):
+        date1 = None
+        if self.trement == 'surgery':
+            surgery = Surgery.query.filter_by(pid=self.pid,treNum=self.treNum).first()
+            if surgery:
+                date1 = surgery.surDate
+        elif self.trement in ["one","two","three","four","five",'other']:
+            trePlan = DetailTrePlan.query.filter_by(pid=self.pid,treNum=self.treNum).order_by(DetailTrePlan.begDate).first()
+            if trePlan:
+                date1 = trePlan.begDate
+        date2 = self.proDate
+        if date1 and date2:
+            with db.auto_commit():
+                months = (date2 - date1).days / 30
+                time = str(round(months, 1)) + "月"
+                self.PFS_DFS = time
+
     def get_child(self):
         trement = self.trement
         if trement in ['one','two','three','four','five','other']:
@@ -71,13 +89,6 @@ class TreRec(Base):
             self.delete_in_cycle(MoleDetec)
             self.delete_in_cycle(Signs)
             self.delete_in_cycle(SideEffect)
-
-
-
-
-
-
-
 
     def delete_in_cycle(self,table):
 

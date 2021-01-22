@@ -6,6 +6,7 @@ from openpyxl.writer.excel import save_virtual_workbook
 from app.models.base_line import Patient, IniDiaPro, PastHis
 from app.models.crf_info import FollInfo
 from app.models.cycle import MoleDetec, SideEffect
+from app.models.other_inspect import ImageExams
 from app.models.therapy_record import Surgery, TreRec, DetailTrePlan, Radiotherapy, OneToFive
 from app.utils.date import get_age_by_birth, get_birth_date_by_id_card
 
@@ -15,15 +16,15 @@ class Export:
     header = []
 
     # 表头
-    base_info_header = ['编号','身份证号' ,'姓名' , '性别' ,'出生日期','年龄','电话号码','PS评分']
+    base_info_header = ['编号','身份证号' ,'姓名' , '性别' ,'出生日期','年龄','电话号码','PS评分','影像学检查']
     diagonse_header = ['吸烟史','饮酒史','初诊日期', '活检方式', '标本部位', '病理报告日期', '病理号',
         '病理诊断','c分期T','c分期N','c分期M', '临床分期','p分期T','p分期N','p分期M','病理分期', '转移部位']
     # gene_header = ['阳性基因','PD-L1表达水平','TMB']
     # immune_header = []
-    surger_therapy_header = ['手术时间','手术范围','术后病理','病理号','病理诊断','术后辅助化疗','辅助治疗开始时间','辅助治疗结束时间','副反应','阳性基因','PD-L1表达水平','TMB']
-    radio_therapy_header = ['放疗部位','放疗剂量',	'分割次数','放疗开始时间','放疗结束时间','疗效评价','副反应','阳性基因','PD-L1表达水平','TMB']
+    surger_therapy_header = ['手术时间','手术范围','术后病理','病理号','病理诊断','术后辅助化疗','辅助治疗开始时间','辅助治疗结束时间','副反应','阳性基因','PD-L1表达水平','TMB','影像学检查']
+    nth_therapy_header = ['治疗方案','开始日期','结束日期','疗效评估','副反应','进展日期','进展描述','阳性基因','PD-L1表达水平','TMB','影像学检查']
+    radio_therapy_header = ['放疗部位','放疗剂量',	'分割次数','放疗开始时间','放疗结束时间','疗效评价','副反应','阳性基因','PD-L1表达水平','TMB','影像学检查']
     survival_header = ['生存状态','死亡时间','最后一次随访日期']
-    nth_therapy_header = ['治疗方案','开始日期','结束日期','疗效评估','副反应','进展日期','进展描述','阳性基因','PD-L1表达水平','TMB']
 
     # 缓存数据
     buffer = {}
@@ -133,7 +134,7 @@ class Export:
             "0-4": "转移性肿瘤",
             "0-5": "其他"
             }  #病理诊断map
-    detail_therapy_map = {"Chemotherapy":"化疗","TargetedTherapy":"靶向治疗","ImmunityTherapy":"免疫治疗","AntivascularTherapy":"抗血管治疗"}
+    detail_therapy_map = {"Chemotherapy":"化疗","TargetedTherapy":"靶向治疗","ImmunityTherapy":"免疫治疗","AntivascularTherapy":"抗血管治疗","Other":"其他"} #详细治疗的map
     beEffEva_map = {"1":"PD-进展","2":"SD-稳定","3":"PR-部分缓解","4":"CR-完全缓解","5":"术后未发现新病灶",
                     "PD-进展": "PD-进展","SD-稳定":"SD-稳定","PR-部分缓解":"PR-部分缓解","CR-完全缓解":"CR-完全缓解","术后未发现新病灶":"术后未发现新病灶"
                     } #因为这里数据库里存对数据很乱
@@ -150,14 +151,6 @@ class Export:
         self.header_array.append(self.surger_therapy_header)
         self.header_array.append(self.radio_therapy_header)
         self.header_array.append(self.survival_header)
-
-        self.base_info_chosen = []
-        '''self.diagnose_chosen = []
-        self.surger_therapy_chosen = []
-        self.radio_therapy_chosen = []
-        self.radio_therapy_chosen = []
-        self.survival_chosen = []'''
-
         for item in self.header_array:
             self.header.extend(item)
         for i in range(1,6):
@@ -173,90 +166,7 @@ class Export:
         for pid in self.pids:
             ws.append(self.get_row_data(pid))
 
-        wb.save('my_excel_demo1.xls')
-        content = save_virtual_workbook(wb)
-        resp = make_response(content)
-        resp.headers["Content-Disposition"] = 'attachment; filename=samples.xlsx'
-        resp.headers['Content-Type'] = 'application/x-xlsx'
-        return resp
-
-    def work_new(self, chosen_headers=[]):
-        self.header = []
-        self.base_info_header = []
-
-        if 'patNumber' in chosen_headers:
-            self.base_info_header.append('编号')
-            self.base_info_chosen.append('patNumber')
-        if 'idNumber' in chosen_headers:
-            self.base_info_header.append('身份证号')
-            self.base_info_chosen.append('idNumber')
-        if 'patientName' in chosen_headers:
-            self.base_info_header.append('姓名')
-            self.base_info_chosen.append('patientName')
-        if 'gender' in chosen_headers:
-            self.base_info_header.append('性别')
-            self.base_info_chosen.append('gender')
-        if 'birthday' in chosen_headers:
-            self.base_info_header.append('出生日期')
-            self.base_info_chosen.append('birthday')
-        if 'age' in chosen_headers:
-            self.base_info_header.append('年龄')
-            self.base_info_chosen.append('age')
-        if 'phoneNumber' in chosen_headers:
-            self.base_info_header.append('电话号码')
-            self.base_info_chosen.append('phoneNumber')
-        if 'PSScore' in chosen_headers:
-            self.base_info_header.append('PS评分')
-            self.base_info_chosen.append('PSScore')
-
-        self.header.extend(self.base_info_header)
-        if 'diagnose' in chosen_headers:
-            self.header.extend(self.diagonse_header)
-        if 'surger_therapy' in chosen_headers:
-            self.header.extend(self.surger_therapy_header)
-        if 'radio_therapy' in chosen_headers:
-            self.header.extend(self.radio_therapy_header)
-        if 'survival' in chosen_headers:
-            self.header.extend(self.survival_header)
-        if 'one_to_five' in chosen_headers:
-            for i in range(1, 6):
-                self.header += [str(i) + "线" + item for item in self.nth_therapy_header]
-
-        wb = Workbook()
-        ws = wb.active
-        ws.title = '导出样本数据'
-        ws.append(self.header)
-        for pid in self.pids:
-            data = []
-            p = self.buffer.get('Patient').get(pid)
-            init_pro = self.buffer.get('IniDiaPro').get(pid)
-            for item in self.base_info_chosen:
-                if item == 'gender':
-                    data.append(self.gender_map.get(self.filter_none(p, item)))
-                elif item == 'PSScore':
-                    data.append(self.filter_none(init_pro, item))
-                elif item == 'age':
-                    age = get_age_by_birth(get_birth_date_by_id_card(getattr(p, 'idNumber')))
-                    data.append(age if age else '/')
-                elif item =='phoneNumber':
-                    data.append(self.filter_none(p, 'phoneNumber1'))
-                else:
-                    data.append(self.filter_none(p, item))
-
-            if 'diagnose' in chosen_headers:
-                data.extend(self.get_diagnose_info(pid))
-            if 'surger_therapy' in chosen_headers:
-                data.extend(self.get_surgery(pid))
-            if 'radio_therapy' in chosen_headers:
-                data.extend(self.get_radio(pid))
-            if 'survival' in chosen_headers:
-                data.extend(self.get_survival_info(pid))
-            if 'one_to_five' in chosen_headers:
-                data.extend(self.get_one_To_Five(pid))
-
-            ws.append(data)
-
-        wb.save('test.xls')
+        # wb.save('my_excel_demo1.xls')
         content = save_virtual_workbook(wb)
         resp = make_response(content)
         resp.headers["Content-Disposition"] = 'attachment; filename=samples.xlsx'
@@ -319,6 +229,8 @@ class Export:
         radio_array = Radiotherapy.query.filter(Radiotherapy.pid.in_(self.pids),Radiotherapy.is_delete==0).all()
         side_effect_array = SideEffect.query.filter(SideEffect.pid.in_(self.pids),SideEffect.is_delete==0).all()
         follinfo_array = FollInfo.query.filter(FollInfo.pid.in_(self.pids), FollInfo.is_delete == 0).all()
+        # one_to_five_array = OneToFive.query.filter(OneToFive.pid.in_(self.pids),OneToFive.is_delete==0).all()
+        imageExam_array = ImageExams.query.filter(ImageExams.pid.in_(self.pids),ImageExams.is_delete==0).all()
         self.add_buffer('Patient', self.classify_by_pid(patient_array))
         self.add_buffer('IniDiaPro', self.classify_by_pid(iniDiaPro_array))
         self.add_buffer('PastHis', self.classify_by_pid(pastHis_array))
@@ -330,6 +242,7 @@ class Export:
         self.add_buffer('SideEffect', self.array_classify_by_treNum(side_effect_array))
         self.add_buffer('FollInfo', self.array_classify_by_pid(follinfo_array))
         self.add_nth_therapy_buffer(treRec_array)
+        self.add_buffer('ImageExams', self.array_classify_by_treNum(imageExam_array))
 
     #传入tre_recs，找出oneToFive的
     def add_nth_therapy_buffer(self,tre_recs):
@@ -346,7 +259,7 @@ class Export:
             pid = tre_rec.pid
             if data.get(pid) is None:
                 data[pid] = {}
-            if tre_rec.trement in ["one","two","three","four","five"]:
+            if tre_rec.trement in ["one","two","three","four","five",'other']:
                 if one_to_five_dict.get(pid):
                     item = one_to_five_dict.get(pid).get(tre_rec.treNum)
                     if item:
@@ -426,10 +339,8 @@ class Export:
     def get_base_info(self,pid):
         cnt = len(self.base_info_header)
         data = ['/'] * cnt
-
         p = self.buffer.get('Patient').get(pid)
         if p is None:
-            print('p is none')
             return data
         init_pro = self.buffer.get('IniDiaPro').get(pid)
         data[0] = self.filter_none(p,'patNumber')
@@ -443,6 +354,7 @@ class Export:
         data[7] = self.filter_none(init_pro,'PSScore') #PS评分
         if data[7] == -1: #远古时期的数据，-1代表空
             data[7] = '/'
+        data[8] = self.get_image_exams_methods(pid,0)
         return data
 
     # 诊断
@@ -467,6 +379,7 @@ class Export:
         data[9] = c_stage_array[1]    #c分期N
         data[10] = c_stage_array[2]   #c分期M
         data[11] = self.filter_none(init_pro,'cliStage')  #c临床分期
+
         data[12] = p_stage_array[0]   #p分期T
         data[13] = p_stage_array[1]   #p分期N
         data[14] = p_stage_array[2]   #p分期M
@@ -529,7 +442,7 @@ class Export:
             return data
         surgery = surgery_dict.get(treNum)
         tre_plans = tre_plan_dict.get(treNum)
-        if surgery is None or surgery.posAdjChem == False:
+        if surgery is None:
             return data
         if tre_plans:
             tre_plans = sorted(tre_plans, key=lambda item: item.currPeriod if item.currPeriod is not None else -1) #TODO bug?
@@ -541,7 +454,7 @@ class Export:
         data[3] = self.filter_none(self.change_bool_to_yes_or_no(surgery.specNum))              #病理号
         data[4] = self.format_patDia(surgery)                                                   #病理诊断
         data[5] = self.filter_none(self.change_bool_to_yes_or_no(tre_plans != []))              #术后辅助化疗
-        data[6] = self.filter_none(tre_plans[0],'begDate')  if tre_plans != [] else '/'         #辅助治疗开始时间
+        data[6] = self.filter_none(tre_plans[0],'begDate') if tre_plans != [] else '/'         #辅助治疗开始时间
         data[7] = self.filter_none(tre_plans[-1],'endDate') if tre_plans != [] else '/'         #辅助治疗结束时间
         data[8] = self.get_side_effect(pid,treNum)                                              #副反应
         data[9] = self.get_gene_info(pid, treNum)                                               #阳性基因
@@ -549,7 +462,7 @@ class Export:
         immune_array = self.get_immune_index(pid, treNum)
         data[10] = immune_array[0]
         data[11] = immune_array[1]
-
+        data[12] = self.get_image_exams_methods(pid, treNum)
         return data
 
     def get_radio(self,pid):
@@ -586,7 +499,7 @@ class Export:
         immune_array = self.get_immune_index(pid, treNum)
         data[8] = immune_array[0]                                     #pdl1
         data[9] = immune_array[1]                                     #tmb
-
+        data[10] = self.get_image_exams_methods(pid, treNum)
         return data
 
     def get_radio_dose(self,value,unit):
@@ -762,7 +675,6 @@ class Export:
         return data
 
     # 获取第几线治疗
-    #['治疗方案','开始日期','结束日期','疗效评估','副反应','进展日期','进展描述']
     def _get_nth_therapy(self,pid,nth):
         data = ['/'] * len(self.nth_therapy_header)
         one_to_five_dict = self.buffer.get('OneToFive').get(pid)
@@ -783,26 +695,32 @@ class Export:
         data[3] = self.get_effect_evaluation(pid,treNum) #疗效评估
         data[4] = self.get_side_effect(pid,treNum)       #副反应
         data[5] = self.filter_none(treRec,"proDate")    #进展日期
-        data[6] =  self.filter_none(treRec,"proDes")    #进展描述
+        data[6] = self.filter_none(treRec,"proDes")    #进展描述
         data[7] = self.get_gene_info(pid, treNum)  # 阳性基因
 
         immune_array = self.get_immune_index(pid, treNum)
         data[8] = immune_array[0]       #pdl1
         data[9] = immune_array[1]       #tmb
-
+        data[10] = self.get_image_exams_methods(pid,treNum) #实验室检查的所有检查方法
         return data
 
-    #获取1到5线到治疗方案
+    #获取1到5线的治疗方案
     def get_therapy_plan(self,pid,treNum):
         treRec_dict = self.buffer.get('TreRec').get(pid)
         if treRec_dict is None:
             return '/'
         tre_rec = treRec_dict.get(treNum)
-        if tre_rec is None:
+        if tre_rec is None or tre_rec.trement is None:
             return '/'
-        if tre_rec.trement is None:
+        if tre_rec.trement not in ['one','two','three','four','five','Other']:
             return '/'
-        therapy_plans = tre_rec.trement.split(',')
+        one_to_five_dict = self.buffer.get('OneToFive').get(pid)
+        if one_to_five_dict is None:
+            return '/'
+        one_to_five = one_to_five_dict.get(tre_rec.trement)
+        if one_to_five is None or one_to_five.treSolu is None:
+            return '/'
+        therapy_plans = one_to_five.treSolu.split(',')
         data = []
         for plan in therapy_plans:
             temp = self.detail_therapy_map.get(plan)
@@ -811,3 +729,13 @@ class Export:
         if data == []:
             return '/'
         return ",".join(data)
+
+    #获取影像学检查的检查方法
+    def get_image_exams_methods(self,pid,treNum):
+        image_exams_dict = self.buffer.get('ImageExams').get(pid)
+        if image_exams_dict is None or image_exams_dict.get(treNum) is None:
+            return '/'
+        items = image_exams_dict.get(treNum)
+        data = [item.exmaMethod for item in items if item.exmaMethod]
+        return ','.join(data)
+

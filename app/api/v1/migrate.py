@@ -202,6 +202,20 @@ def migrate_file():
     migrate_file_from_saveFile(FollInfo, 'follInfo')
     return 'ok'
 
+@api.route('/1_11')
+def migrate_1_11():
+    ini_items = IniDiaPro.query.filter_by().all()
+    ini_dict = {}
+    for item in ini_items:
+        ini_dict[item.pid] = item
+    items = Immunohis.query.filter_by(treNum=0).all()
+    with db.auto_commit():
+        for item in items:
+            if ini_dict.get(item.pid):
+                item.Ki67 = ini_dict.get(item.pid).Ki67
+
+    return 'ok'
+
 
 def generate_value(str):
     if type(str) is list:

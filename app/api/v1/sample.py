@@ -127,9 +127,3 @@ def export():
     return Export(pids).work()
 
 
-@api.route('/export_new', methods=['POST'])
-def export_new():
-    data = request.get_json()
-    pids = data.get('pids')
-    chosen_headers = data.get('chosen_headers')
-    return Export(pids).work_new(chosen_headers)
