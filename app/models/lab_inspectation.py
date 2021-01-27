@@ -75,6 +75,16 @@ class BloodRoutine(Base):
     NEUTNote = Column(Text(10000), comment='中性淋巴比值备注')
     filePath = Column(Text(10000), comment='文件路径，多个以逗号分隔')
 
+    # 和导出功能有关
+    export_header_map = {'samplingTime':'血常规检查时间','RBC':'RBC','HGb':'HGb','HCT':'HCT','MCV':'MCV',
+                         'MCH':'MCH','MCHC':'MCHC','RDWCV':'RDWCV','RDWSD':'RDWSD','WBC':'WBC',
+                         'GRAN_':'GRAN#','LYM_':'LYM#','EOS_':'EOS#','MID_':'MID#','BASO_':'BASO#',
+                         'PLT':'PLT','LYM':'LYM','MID':'MID','GRAN':'GRAN','EOS':'EOS','BASO':'BASO',
+                         'NEUT':'NEUT'}
+    unit_map = {'RBC':'×10^12/L','HGb':'G/L','HCT':'%','MCV':'FL','MCH':'PG','MCHC':'G/L',
+                         'RDWCV':'%','RDWSD':'FL','WBC':'×10^9/L','GRAN_':'×10^9/L','LYM_':'×10^9/L',
+                         'EOS_':'×10^9/L','MID_':'×10^9/L','BASO_':'×10^9/L','PLT':'×10^9/L','LYM':'%',
+                         'MID':'%','GRAN':'%','EOS':'%','BASO':'%','NEUT':'%'}
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'RBC', 'HGb', 'HCT', 'MCV', 'MCH', 'MCHC', 'RDWCV',
                 'RDWSD', 'WBC', 'GRAN_', 'LYM_', 'EOS_', 'MID_', 'BASO_','PLT','LYM','MID','GRAN','EOS','BASO',
@@ -85,6 +95,43 @@ class BloodRoutine(Base):
                 'EOS_Note','MID_Note', 'BASO_Note', 'PLTNote', 'LYMNote', 'MIDNote', 'GRANNote', 'EOSNote', 'BASONote',
                 'NEUTNote','filePath']
 
+    # 和导出功能有关
+    def get_export_row(self, columns, buffer, pid, treNum):
+        Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
+
+        row = []
+        if buffer.get('BloodRoutine').get(pid) is None:
+            for column in columns:
+                if column == 'samplingTime':
+                    row.append('/')
+                else:
+                    row.extend(['/', '/', '/'])
+            return row
+        obj = buffer.get('BloodRoutine').get(pid).get(treNum)
+        for column in columns:
+            x = getattr(obj, column)
+            if column == 'samplingTime':
+                value = self.filter_none(obj, column)
+                row.append(value)
+            else:
+                value = self.filter_none(obj, column)
+                value_Mea = Mea_map.get(self.filter_none(obj, column+'Mea'))
+                value_Note = self.filter_none(obj, column+'Note')
+                row.extend([value, value_Mea, value_Note])
+        return row
+
+    # 和导出功能有关，得到导出的表的中文抬头
+    def get_export_header(self, columns, buffer):
+        header = []
+        for column in columns:
+            if column == 'samplingTime':
+                header.append(self.export_header_map.get(column))
+            else:
+                header.append(self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')')
+                header.append(self.export_header_map.get(column) + '临床意义判断')
+                header.append(self.export_header_map.get(column) + '备注')
+
+        return header
 
 
 # 血生化表
@@ -174,6 +221,56 @@ class BloodBio(Base):
     PNote = Column(Text(10000), comment='磷备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    # 和导出功能有关
+    export_header_map = {'samplingTime':'血生化检查时间','TP':'TP','ALB':'ALB','GLO':'GLO','ALT':'ALT',
+                         'AST':'AST','LDH':'LDH','GGT':'GGT','TBIL':'TBIL','DBIL':'DBIL','IBIL':'IBIL',
+                         'GLU':'GLU','TC':'TC','LDL':'LDL','HDL':'HDL','TG':'TG','UREA':'UREA',
+                         'ALP':'ALP','CREA':'CREA','UA':'UA','CO2':'CO2','K':'K','Na':'Na',
+                         'Cl':'Cl','Ca':'Ca','Mg':'Mg','P':'P'}
+    unit_map = {'TP':'g/L','ALB':'g/L','GLO':'g/L','ALT':'U/L',
+                'AST':'U/L','LDH':'U/L','GGT':'U/L','TBIL':'μmol/L','DBIL':'μmol/L','IBIL':'μmol/L',
+                'GLU':'mmol/L','TC':'mmol/L','LDL':'mmol/L','HDL':'mmol/L','TG':'mmol/L','UREA':'mmol/L',
+                'ALP':'U/L','CREA':'μmol/L','UA':'μmol/L','CO2':'mmol/L','K':'mmol/L','Na':'mmol/L',
+                'Cl':'mmol/L','Ca':'mmol/L','Mg':'mmol/L','P':'mmol/L'}
+
+    # 和导出功能有关
+    def get_export_row(self, columns, buffer, pid, treNum):
+        Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
+
+        row = []
+        if buffer.get('BloodBio').get(pid) is None:
+            for column in columns:
+                if column == 'samplingTime':
+                    row.append('/')
+                else:
+                    row.extend(['/', '/', '/'])
+            return row
+        obj = buffer.get('BloodBio').get(pid).get(treNum)
+        for column in columns:
+            x = getattr(obj, column)
+            if column == 'samplingTime':
+                value = self.filter_none(obj, column)
+                row.append(value)
+            else:
+                value = self.filter_none(obj, column)
+                value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
+                value_Note = self.filter_none(obj, column + 'Note')
+                row.extend([value, value_Mea, value_Note])
+        return row
+
+    # 和导出功能有关，得到导出的表的中文抬头
+    def get_export_header(self, columns, buffer):
+        header = []
+        for column in columns:
+            if column == 'samplingTime':
+                header.append(self.export_header_map.get(column))
+            else:
+                header.append(self.export_header_map.get(column) + '测定值(' +self.unit_map.get(column) + ')')
+                header.append(self.export_header_map.get(column) + '临床意义判断')
+                header.append(self.export_header_map.get(column) + '备注')
+
+        return header
+
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'TP', 'ALB', 'GLO', 'ALT', 'AST', 'LDH', 'GGT',
                 'TBIL', 'DBIL', 'IBIL', 'GLU', 'TC', 'LDL', 'hDL', 'TG', 'UREA', 'ALP', 'CREA',
@@ -203,6 +300,48 @@ class Thyroid(Base):
     FT4Note = Column(Text(10000), comment='游离甲状腺素备注')
     TSHNote = Column(Text(10000), comment='促甲状腺激素备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
+
+    # 和导出功能有关
+    export_header_map = {'samplingTime':'甲状腺功能检查时间', 'FT3':'FT3', 'FT4':'FT4','TSH':'TSH'}
+
+    unit_map = {'FT3':'pmol/L', 'FT4':'pmol/L','TSH':'UIU/ML'}
+
+    # 和导出功能有关
+    def get_export_row(self, columns, buffer, pid, treNum):
+        Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
+
+        row = []
+        if buffer.get('Thyroid').get(pid) is None:
+            for column in columns:
+                if column == 'samplingTime':
+                    row.append('/')
+                else:
+                    row.extend(['/', '/', '/'])
+            return row
+        obj = buffer.get('Thyroid').get(pid).get(treNum)
+        for column in columns:
+            x = getattr(obj, column)
+            if column == 'samplingTime':
+                value = self.filter_none(obj, column)
+                row.append(value)
+            else:
+                value = self.filter_none(obj, column)
+                value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
+                value_Note = self.filter_none(obj, column + 'Note')
+                row.extend([value, value_Mea, value_Note])
+        return row
+
+    # 和导出功能有关，得到导出的表的中文抬头
+    def get_export_header(self, columns, buffer):
+        header = []
+        for column in columns:
+            if column == 'samplingTime':
+                header.append(self.export_header_map.get(column))
+            else:
+                header.append(self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')')
+                header.append(self.export_header_map.get(column) + '临床意义判断')
+                header.append(self.export_header_map.get(column) + '备注')
+        return header
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'FT3', 'FT4', 'TSH', 'FT3Mea', 'FT4Mea', 'TSHMea', 'FT3Note',
@@ -234,6 +373,50 @@ class Coagulation(Base):
     INRNote = Column(Text(10000), comment='国际标准化比值备注')
     D_dimerNote = Column(Text(10000), comment='D-二聚体备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
+
+    # 和导出功能有关
+    export_header_map = {'samplingTime': '凝血功能检查时间','PT':'PT','APTT':'APTT','TT':'TT',
+                         'FIB':'FIB','INR':'INR','D_dimer':'D-dimer'}
+    unit_map = {'PT':'s','APTT':'s','TT':'s','FIB':'mg/dL',
+                'INR':'/','D_dimer':'mg/L'}
+
+    # 和导出功能有关
+    def get_export_row(self, columns, buffer, pid, treNum):
+        Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
+
+        row = []
+        if buffer.get('Coagulation').get(pid) is None:
+            for column in columns:
+                if column == 'samplingTime':
+                    row.append('/')
+                else:
+                    row.extend(['/', '/', '/'])
+            return row
+        obj = buffer.get('Coagulation').get(pid).get(treNum)
+        for column in columns:
+            x = getattr(obj, column)
+            if column == 'samplingTime':
+                value = self.filter_none(obj, column)
+                row.append(value)
+            else:
+                value = self.filter_none(obj, column)
+                value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
+                value_Note = self.filter_none(obj, column + 'Note')
+                row.extend([value, value_Mea, value_Note])
+        return row
+
+    # 和导出功能有关，得到导出的表的中文抬头
+    def get_export_header(self, columns, buffer):
+        header = []
+        for column in columns:
+            if column == 'samplingTime':
+                header.append(self.export_header_map.get(column))
+            else:
+                header.append(self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')')
+                header.append(self.export_header_map.get(column) + '临床意义判断')
+                header.append(self.export_header_map.get(column) + '备注')
+        return header
+
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'PT', 'APTT', 'TT', 'FIB', 'INR', 'D_dimer', 'PTMea',
@@ -273,6 +456,50 @@ class MyocardialEnzyme(Base):
     NT_proBNPNote = Column(Text(10000), comment='氨基末端脑钠肽前体备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    # 和导出功能有关
+    export_header_map = {'samplingTime':'心肌酶谱检查时间','LDH':'LDH','CK':'CK','CK_MB':'CK-MB',
+                         'cTnI':'cTnI','cTnT':'cTnT','MYO':'MYO','BNP':'BNP','NT_proBNP':'NT-proBNP'}
+    unit_map = {'LDH':'U/L','CK':'U/L','CK_MB':'U/L','cTnI':'U/L',
+                'cTnT':'U/L','MYO':'U/L','BNP':'U/L','NT_proBNP':'U/L'}
+
+    # 和导出功能有关
+    def get_export_row(self, columns, buffer, pid, treNum):
+        Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
+
+        row = []
+        if buffer.get('MyocardialEnzyme').get(pid) is None:
+            for column in columns:
+                if column == 'samplingTime':
+                    row.append('/')
+                else:
+                    row.extend(['/', '/', '/'])
+            return row
+        obj = buffer.get('MyocardialEnzyme').get(pid).get(treNum)
+        for column in columns:
+            x = getattr(obj, column)
+            if column == 'samplingTime':
+                value = self.filter_none(obj, column)
+                row.append(value)
+            else:
+                value = self.filter_none(obj, column)
+                value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
+                value_Note = self.filter_none(obj, column + 'Note')
+                row.extend([value, value_Mea, value_Note])
+        return row
+
+    # 和导出功能有关，得到导出的表的中文抬头
+    def get_export_header(self, columns, buffer):
+        header = []
+        for column in columns:
+            if column == 'samplingTime':
+                header.append(self.export_header_map.get(column))
+            else:
+                header.append(self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')')
+                header.append(self.export_header_map.get(column) + '临床意义判断')
+                header.append(self.export_header_map.get(column) + '备注')
+        return header
+
+
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'LDH', 'CK', 'CK_MB', 'cTnI', 'cTnT', 'MYO', 'BNP',
                 'NT_proBNP', 'LDHMea', 'CKMea','CK_MBMea', 'cTnIMea', 'cTnTMea', 'MYOMea', 'BNPMea', 'NT_proBNPMea',
@@ -305,6 +532,50 @@ class Cytokines(Base):
     IL_8Note = Column(Text(10000), comment='白介素8备注')
     IL_10Note = Column(Text(10000), comment='白介素10备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
+
+    # 和导出功能有关
+    export_header_map = {'samplingTime':'细胞因子检查时间','TNF_a':'TNF-alpha','IL_1b':'IL-1beta',
+                         'IL_2R':'IL-2R','IL_6':'IL-6','IL_8':'IL-8','IL_10':'IL-10'}
+
+    unit_map = {'TNF_a':'pg/ml','IL_1b':'pg/ml','IL_2R':'U/L',
+                'IL_6':'pg/ml','IL_8':'pg/ml','IL_10':'pg/ml'}
+
+    # 和导出功能有关
+    def get_export_row(self, columns, buffer, pid, treNum):
+        Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
+
+        row = []
+        if buffer.get('Cytokines').get(pid) is None:
+            for column in columns:
+                if column == 'samplingTime':
+                    row.append('/')
+                else:
+                    row.extend(['/', '/', '/'])
+            return row
+        obj = buffer.get('Cytokines').get(pid).get(treNum)
+        for column in columns:
+            x = getattr(obj, column)
+            if column == 'samplingTime':
+                value = self.filter_none(obj, column)
+                row.append(value)
+            else:
+                value = self.filter_none(obj, column)
+                value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
+                value_Note = self.filter_none(obj, column + 'Note')
+                row.extend([value, value_Mea, value_Note])
+        return row
+
+    # 和导出功能有关，得到导出的表的中文抬头
+    def get_export_header(self, columns, buffer):
+        header = []
+        for column in columns:
+            if column == 'samplingTime':
+                header.append(self.export_header_map.get(column))
+            else:
+                header.append(self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')')
+                header.append(self.export_header_map.get(column) + '临床意义判断')
+                header.append(self.export_header_map.get(column) + '备注')
+        return header
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'TNF_a', 'IL_1b', 'IL_2R', 'IL_6', 'IL_8', 'IL_10', 'TNF_aMea',
@@ -402,6 +673,61 @@ class LymSubsets(Base):
     CD4_CD25_CD127lowNote = Column(Text(10000), comment='CD4+CD25+CD127low备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    # 和导出功能有关
+    export_header_map = {'samplingTime':'淋巴细胞亚群检查时间','CD19_':'CD19#','CD3_':'CD3#','CD4_':'CD4#',
+                         'CD8_':'CD8#','CD16_56':'CD1656','LYMPH_':'LYMPH###','CD19':'CD19',
+                         'CD3':'CD3','CD4':'CD4','CD8':'CD8','CD4CD8':'CD4/CD8','CD56':'CD56',
+                         'CD3_CD8__':'CD3CD8#','CD3_CD8_':'CD3CD8','CD3_CD4__':'CD3CD4#',
+                         'CD3_CD4_':'CD3CD4','CD3_CD16_56_':'CD3-CD(1656)#','CD3_CD16_56':'CD3-CD(1656)',
+                         'CD3_CD19__':'CD3-CD19#','CD3_CD19_':'CD3-CD19','CD8_CD28_':'CD8CD28',
+                         'CD20_':'CD20','HLA_DR_':'HLA-DR','CD3_HLA_DR1':'CD3/HLA-DR','CD3_HLA_DR2':'CD3/HLA-DR-',
+                         'CD3_HLA_DR3':'CD3-/HLA-DR','CD4_CD25_CD127low':'CD4CD25CD127low'}
+    unit_map = {'CD19_':'cells/uL','CD3_':'cells/uL','CD4_':'cells/uL','CD8_':'cells/uL','CD16_56':'cells/uL',
+                'LYMPH_':'cells/uL','CD19':'%',
+                'CD3':'%','CD4':'%','CD8':'%','CD4CD8':'/','CD56':'%',
+                'CD3_CD8__':'cells/uL','CD3_CD8_':'%','CD3_CD4__':'cells/uL',
+                'CD3_CD4_':'%','CD3_CD16_56_':'cells/uL','CD3_CD16_56':'%',
+                'CD3_CD19__':'cells/uL','CD3_CD19_':'%','CD8_CD28_':'%',
+                'CD20_':'%','HLA_DR_':'%','CD3_HLA_DR1':'%','CD3_HLA_DR2':'%',
+                'CD3_HLA_DR3':'%','CD4_CD25_CD127low':'%'}
+
+    # 和导出功能有关
+    def get_export_row(self, columns, buffer, pid, treNum):
+        Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
+
+        row = []
+        if buffer.get('LymSubsets').get(pid) is None:
+            for column in columns:
+                if column == 'samplingTime':
+                    row.append('/')
+                else:
+                    row.extend(['/', '/', '/'])
+            return row
+        obj = buffer.get('LymSubsets').get(pid).get(treNum)
+        for column in columns:
+            x = getattr(obj, column)
+            if column == 'samplingTime':
+                value = self.filter_none(obj, column)
+                row.append(value)
+            else:
+                value = self.filter_none(obj, column)
+                value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
+                value_Note = self.filter_none(obj, column + 'Note')
+                row.extend([value, value_Mea, value_Note])
+        return row
+
+    # 和导出功能有关，得到导出的表的中文抬头
+    def get_export_header(self, columns, buffer):
+        header = []
+        for column in columns:
+            if column == 'samplingTime':
+                header.append(self.export_header_map.get(column))
+            else:
+                header.append(self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')')
+                header.append(self.export_header_map.get(column) + '临床意义判断')
+                header.append(self.export_header_map.get(column) + '备注')
+        return header
+
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'CD19_', 'CD3_', 'CD4_', 'CD8_', 'CD16_56', 'LYMPH_', 'CD19',
                 'CD3', 'CD4', 'CD8', 'CD4CD8', 'CD56', 'CD3_CD8__', 'CD3_CD8_', 'CD3_CD4__', 'CD3_CD4_', 'CD3_CD16_56_', 'CD3_CD16_56',
@@ -462,6 +788,48 @@ class UrineRoutine(Base):
     CLANote = Column(Text(10000), comment='尿透明度备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    # 和导出功能有关
+    export_header_map = {'samplingTime':'尿常规检查时间','UPH':'UPH','UGLU':'UGLU','LEU':'LEU',
+                         'ERY':'ERY','NIT':'NIT','BIL':'BIL','USG':'USG','KET':'KET',
+                         'BLD':'BLD','PRO':'PRO','UBG':'UBG','COL':'COL','CLA':'CLA'}
+
+    # 和导出功能有关
+    def get_export_row(self, columns, buffer, pid, treNum):
+        Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
+
+        row = []
+        if buffer.get('UrineRoutine').get(pid) is None:
+            for column in columns:
+                if column == 'samplingTime':
+                    row.append('/')
+                else:
+                    row.extend(['/', '/', '/'])
+            return row
+        obj = buffer.get('UrineRoutine').get(pid).get(treNum)
+        for column in columns:
+            x = getattr(obj, column)
+            if column == 'samplingTime':
+                value = self.filter_none(obj, column)
+                row.append(value)
+            else:
+                value = self.filter_none(obj, column)
+                value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
+                value_Note = self.filter_none(obj, column + 'Note')
+                row.extend([value, value_Mea, value_Note])
+        return row
+
+    # 和导出功能有关，得到导出的表的中文抬头
+    def get_export_header(self, columns, buffer):
+        header = []
+        for column in columns:
+            if column == 'samplingTime':
+                header.append(self.export_header_map.get(column))
+            else:
+                header.append(self.export_header_map.get(column) + '测定值')
+                header.append(self.export_header_map.get(column) + '临床意义判断')
+                header.append(self.export_header_map.get(column) + '备注')
+        return header
+
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'UPH', 'UGLU', 'LEU', 'ERY', 'NIT', 'BIL', 'USG',
                 'KET', 'BLD', 'PRO', 'UBG', 'COL', 'CLA','UPHMea', 'UGLUMea', 'LEUMea', 'ERYMea', 'NITMea', 'BILMea', 'USGMea',
@@ -498,6 +866,47 @@ class TumorMarker(Base):
     AFPNote = Column(Text(10000), comment='甲胎蛋白备注')
     SCCANote = Column(Text(10000), comment='鳞癌相关抗原备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
+
+    # 和导出功能有关
+    export_header_map = {'samplingTime':'肿瘤标志物','CEA':'CEA','NSE':'NSE','pro_GPR':'pro-GPR',
+                         'CYFRA':'CYFRA','FERR':'FERR','AFP':'AFP','SCCA':'SCCA'}
+
+    # 和导出功能有关
+    def get_export_row(self, columns, buffer, pid, treNum):
+        Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
+
+        row = []
+        if buffer.get('TumorMarker').get(pid) is None:
+            for column in columns:
+                if column == 'samplingTime':
+                    row.append('/')
+                else:
+                    row.extend(['/','/','/'])
+            return row
+        obj = buffer.get('TumorMarker').get(pid).get(treNum)
+        for column in columns:
+            x = getattr(obj, column)
+            if column == 'samplingTime':
+                value = self.filter_none(obj, column)
+                row.append(value)
+            else:
+                value = self.filter_none(obj, column)
+                value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
+                value_Note = self.filter_none(obj, column + 'Note')
+                row.extend([value, value_Mea, value_Note])
+        return row
+
+    # 和导出功能有关，得到导出的表的中文抬头
+    def get_export_header(self, columns, buffer):
+        header = []
+        for column in columns:
+            if column == 'samplingTime':
+                header.append(self.export_header_map.get(column))
+            else:
+                header.append(self.export_header_map.get(column) + '测定值(NG/ML)')
+                header.append(self.export_header_map.get(column) + '临床意义判断')
+                header.append(self.export_header_map.get(column) + '备注')
+        return header
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'CEA', 'NSE', 'pro_GPR', 'CYFRA', 'FERR', 'AFP', 'SCCA',

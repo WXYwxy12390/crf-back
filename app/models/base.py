@@ -72,6 +72,39 @@ class Base(db.Model):
     def delete(self):
         self.is_delete = 1
 
+    # 和导出功能有关
+    # 既能过滤空数据，也能过滤对象是空对象的情况
+    def filter_none(self, data, item=None):
+        if data is None:
+            return '/'
+        if item:
+            val = getattr(data, item)
+        else:
+            val = data
+        return val if val is not None else '/'
+
+    # 和导出功能有关
+    def change_bool_to_yes_or_no(self, bool_value):
+        if bool_value is None:
+            return '/'
+        return '是' if bool_value else '否'
+
+    # 和导出功能有关
+    def format_radio_data(self, object, item):
+        if object is None:
+            return '/'
+        data = getattr(object, item)
+        if data is None:
+            return '/'
+        radio = data.get('radio')
+        other = data.get('other')
+        value = ",".join(radio)
+        if other:
+            value = value + "," + "其他: " + other
+        return value
+
+
+
     @staticmethod
     def on_created():
         pass

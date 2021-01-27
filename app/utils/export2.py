@@ -10,43 +10,42 @@ class Export:
     lab_inspectation_table = ['BloodRoutine', 'BloodBio', 'Thyroid', 'Coagulation', 'MyocardialEnzyme',
                               'Cytokines', 'LymSubsets', 'UrineRoutine', 'TumorMarker']
     other_inspect_table = ['Lung', 'OtherExams', 'ImageExams']
-    header_map = {'patNumber': '编号', 'idNumber': '身份证号', 'patientName': '姓名', 'hospitalNumber': '住院号',
-                  'gender': '性别', 'birthday': '出生日期', 'age': '年龄', 'phoneNumber1': '电话号码1',
-                  'phoneNumber2': '电话号码2', 'updateTime': '更新时间', 'nextFollowupTime': '随访时间', 'finishFollowup': '是否完成随访',
-                  'basDisHis': '基础疾病史', 'infDisHis': '传染疾病史', 'tumor': '是否有肿瘤史', 'tumHis': '肿瘤史',
-                  'tumorFam': '是否有肿瘤家族史', 'tumFamHis': '肿瘤家族史', 'smoke': '是否吸烟', 'smokingHis': '吸烟史',
-                  'drink': '是否饮酒', 'drinkingHis': '饮酒史', 'hormone': '是否长期使用激素', 'hormoneUseHis': '激素使用史',
-                  'drug': '是否长期使用药物', 'drugUseHis': '药物使用史', 'PSScore': 'PS评分', 'cliniManifest': '临床表现',
-                  'videography': '影像学', 'part': '部位', 'bioMet': '活检方式', 'pleInv': '是否胸膜侵犯',
-                  'speSite': '标本部位', 'firVisDate': '初诊日期', 'patReDate': '病理报告日期', 'patNum': '病理号',
-                  'patDia': '病理诊断', 'mitIma': '核分裂像', 'comCar': '复合性癌', 'necArea': '坏死面积',
-                  'massSize': '肿块大小', 'Ki67': 'Ki67', 'traSite': '转移部位', 'TSize': 'TSize', 'stage': '分期情况',
-                  'cliStage': '临床分期', 'patStage': '病理分期', 'cRemark': 'cRemark', 'pRemark': 'pRemark',
-                  'samplingTime': '采样时间',
-                  'detectTime': '检测时间', 'FVC_exp': '用力肺活量(L)预期值', 'FEV1_FVC_exp': '用力呼气一秒率(%)预期值',
-                  'MEF_exp': '用力呼气中期流速(L/S)预期值', 'MEF25_exp': '25%用力呼气流速(L/S)预期值', 'MEF50_exp': '50%用力呼气流速(L/S)预期值',
-                  'MEF75_exp': '75%用力呼气流速(L/S)预期值', 'TLC_sb_exp': '肺总量(L)预期值', 'RV_exp': '残气容积(L)预期值',
-                  'RV_TLC_exp': '残气容积/肺总量比(%)预期值', 'VC_exp': '肺活量(L)预期值', 'DLCO_ex_exp': '无需屏气弥散(mL/mmHg/Mi)预期值',
-                  'DLCO_sb_exp': '肺一氧化碳弥散量(mL/mmHg/Mi)预期值', 'KCO_exp': '比弥散量预期值', 'FVC_best': '用力肺活量(L)最佳值',
-                  'FEV1_FVC_best': '用力呼气一秒率(%)最佳值', 'MEF_best': '用力呼气中期流速(L/S)最佳值', 'MEF25_best': '25%用力呼气流速(L/S)最佳值',
-                  'MEF50_best': '50%用力呼气流速(L/S)最佳值', 'MEF75_best': '75%用力呼气流速(L/S)最佳值', 'TLC_sb_best': '肺总量(L)最佳值',
-                  'RV_best': '残气容积(L)最佳值', 'RV_TLC_best': '残气容积/肺总量比(%)最佳值', 'VC_best': '肺活量(L)最佳值',
-                  'DLCO_ex_best': '无需屏气弥散(mL/mmHg/Mi)最佳值',
-                  'DLCO_sb_best': '肺一氧化碳弥散量(mL/mmHg/Mi)最佳值', 'KCO_best': '比弥散量最佳值', 'FVC_ratio': '用力肺活量(L)最佳值/预期值(%)',
-                  'FEV1_FVC_ratio': '用力呼气一秒率(%)最佳值/预期值(%)', 'MEF_ratio': '用力呼气中期流速(L/S)最佳值/预期值(%)',
-                  'MEF25_ratio': '25%用力呼气流速(L/S)最佳值/预期值(%)', 'MEF50_ratio': '50%用力呼气流速(L/S)最佳值/预期值(%)',
-                  'MEF75_ratio': '75%用力呼气流速(L/S)最佳值/预期值(%)', 'TLC_sb_ratio': '肺总量(L)最佳值/预期值(%)',
-                  'RV_ratio': '残气容积(L)最佳值/预期值(%)',
-                  'RV_TLC_ratio': '残气容积/肺总量比(%)最佳值/预期值(%)', 'VC_ratio': '肺活量(L)最佳值/预期值(%)',
-                  'DLCO_ex_ratio': '无需屏气弥散(mL/mmHg/Mi)最佳值/预期值(%)',
-                  'DLCO_sb_ratio': '肺一氧化碳弥散量(mL/mmHg/Mi)最佳值/预期值(%)', 'KCO_ratio': '比弥散量最佳值/预期值(%)',
+    header_map = {'patNumber': '编号', 'researchCenter':'研究中心', 'idNumber': '身份证号', 'patientName': '姓名', 'hospitalNumber': '住院号',
+                  'gender': '性别', 'birthday': '出生日期', 'age': '年龄', 'phoneNumber1': '电话号码1', 'phoneNumber2': '电话号码2',
+                  'basDisHis': '基础疾病史', 'infDisHis': '传染疾病史', 'tumor': '是否有肿瘤史', 'tumHis': '肿瘤史','tumorFam': '是否有肿瘤家族史',
+                  'tumFamHis': '肿瘤家族史', 'smoke': '是否吸烟', 'smokingHis': '吸烟史', 'drink': '是否饮酒', 'drinkingHis': '饮酒史',
+                  'hormone': '是否长期使用激素', 'hormoneUseHis': '激素使用史', 'drug': '是否长期使用药物', 'drugUseHis': '药物使用史',
+                  'PSScore': 'PS评分', 'cliniManifest': '临床表现', 'videography': '影像学', 'part': '部位', 'bioMet': '活检方式', 'pleInv': '是否胸膜侵犯',
+                  'speSite': '标本部位', 'firVisDate': '初诊日期', 'patReDate': '病理报告日期', 'patNum': '病理号', 'patDia': '病理诊断', 'mitIma': '核分裂像',
+                  'comCar': '复合性癌', 'necArea': '坏死面积', 'massSize': '肿块大小', 'Ki67': 'Ki67', 'traSite': '转移部位', 'TSize': 'TSize', 'stage': '分期情况',
+                  'cliStage': '临床分期', 'patStage': '病理分期', 'cRemark': 'C备注', 'pRemark': 'P备注',
+                  'samplingTime': '采样时间', 'detectTime': '检测时间',
                   'ECGDetTime': '12导联心电图检测时间', 'ECGDesc': '12导联心电图结果描述', 'ECGPath': '12导联心电图报告路径',
                   'UCGDetTime': '超声心动图检测时间', 'UCGDesc': '超声心动图结果描述', 'UCGPath': '超声心动图报告路径',
                   'detectTime': '检测时间', 'examArea': '检查部位', 'exmaMethod': '检查方法', 'tumorLD': '肿瘤长径', 'tumorSD': '肿瘤短径',
                   'tumorDesc': '肿瘤描述', 'path': '文件路径',
-                  'other': '其他', 'filePath': '文件路径', 'PDL1': 'PD-L1表达水平', 'PDL1KT': 'PDL1抗体'
+                  'other': '其他', 'filePath': '文件路径', 'PDL1': 'PD-L1表达水平', 'PDL1KT': 'PDL1抗体', 'PD1':'PD1表达水平', 'PD1KT':'PD1抗体',
+                  'trement': '几线治疗','beEffEvaDate':'最佳疗效评估日期','beEffEva':'最佳疗效评估','proDate':'进展日期',
+                  'proDes':'进展描述','PFS_DFS':'PFS/DFS',
+                  'isTre': '是否加入临床治疗', 'clinTri': '临床实验名称', 'treSolu': '治疗方案', 'begDate': '开始日期',
+                  'endDate': '结束日期', 'isRepBio': '是否重复活检', 'bioMet': '活检方式', 'matPart': '取材部位',
+                  'specNum': '标本库流水号', 'patDia': '病理诊断',
+                  'surSco': '手术范围', 'lymDis': '淋巴清扫范围', 'cleGro': '清扫组数', 'surDate': '手术日期', 'posAdjChem': '术后辅助化疗',
+                  'isRepBio': '是否重复活检', 'bioMet': '活检方式', 'matPart': '取材部位', 'specNum': '标本库流水号', 'patDia': '病理诊断',
+                  'begDate': '开始日期', 'endDate': '结束日期', 'radSite': '放疗部位', 'radDose': '放疗剂量', 'splTim': '分割次数',
+                  'isRepBio': '是否重复活检', 'bioMet': '活检方式', 'matPart': '取材部位', 'specNum': '标本库流水号', 'patDia': '病理诊断'
 
                   }
+    treRec_header_map = {'trement': '几线治疗','beEffEvaDate':'最佳疗效评估日期','beEffEva':'最佳疗效评估','proDate':'进展日期',
+                  'proDes':'进展描述','PFS_DFS':'PFS/DFS'}
+    oneToFive_header_map = {'isTre':'是否加入临床治疗', 'clinTri':'临床实验名称', 'treSolu':'治疗方案', 'begDate':'开始日期',
+                     'endDate':'结束日期', 'isRepBio':'是否重复活检', 'bioMet':'活检方式', 'matPart':'取材部位',
+                     'specNum':'标本库流水号', 'patDia':'病理诊断'}
+    surgery_header_map = {'surSco':'手术范围', 'lymDis':'淋巴清扫范围', 'cleGro':'清扫组数', 'surDate':'手术日期', 'posAdjChem':'术后辅助化疗',
+                          'isRepBio':'是否重复活检', 'bioMet':'活检方式', 'matPart':'取材部位', 'specNum':'标本库流水号','patDia':'病理诊断'}
+    radio_header_map = {'begDate':'开始日期', 'endDate':'结束日期', 'radSite':'放疗部位', 'radDose':'放疗剂量', 'splTim':'分割次数',
+                        'isRepBio':'是否重复活检', 'bioMet':'活检方式', 'matPart':'取材部位', 'specNum':'标本库流水号','patDia':'病理诊断'}
+
     patDia_map = {
         "0-0": "上皮型肿瘤",
         "0-0-0": "上皮型肿瘤-腺癌",
@@ -149,22 +148,53 @@ class Export:
         "0-5": "其他"
     }  # 病理诊断map
     gender_map = {0: "女", 1: "男", "/": "/"}
-    immunohis_map = {0: '-', 1: '±', 2: '+', 3: '++', 4: '+++'}
-    moleDetec_map = {0: '阴性', 1: '阳性', 2: '无'}
+    videography_map = {0:'周围型', 1:'中央型', "/": "/"}
+    stage_map = {'1':'未住院', '2':'C/P/S均无法分期', '3':'仅C分期', '4':'仅P分期', '5':'C分期和P分期', "/": "/"}
+    immunohis_map = {0: '无', 1: '-', 2: '±', 3: '+', 4: '++', 5: '+++', "/": "/"}
+
+    moleDetec_map = {0: '阴性', 1: '阳性', 2: '无', "/": "/"}
+    moleDetec_fields = ['ALK', 'BIM', 'BRAF', 'cMET', 'EGFR', 'HER_2', 'KRAS',
+                        'PIK3CA', 'ROS1', 'RET', 'UGT1A1', 'NTRK']
+    lung_fields = ['FVC', 'FEV1_FVC', 'MEF', 'MEF25', 'MEF50', 'MEF75', 'TLC_sb',
+                   'RV', 'RV_TLC', 'VC', 'DLCO_ex', 'DLCO_sb', 'KCO']
+    moleDetec_DetMed_map = {1: 'ARMS', 2: 'FISH', 3: 'NGS', "/": "/"}
+    moleDetec_MSI_map = {0: 'MSS', 1: 'MSIH', 2: 'MSIL', "/": "/"}
+    Mea_map = {-1:'异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
+    radosUnit_map = {0:'Gy', 1:'cGy', "/": "/"}
+    isTre_map = {0:'否', 1:'是', -1:'不详', "/": "/"}
+    isExe_map = {0:'否', 1:'是'}
+
 
     def __init__(self, info, tables, columns):
         self.headers = []
         self.info = info
         self.tables = tables
         self.columns = columns
+
         i = 0
         for x in columns:
             name = tables[i].__name__
-            if (name in self.lab_inspectation_table or
-                    name == 'Immunohis' or name == 'MoleDetec'):
+            if (name in self.lab_inspectation_table or name == 'Lung'
+            or name == 'Immunohis' or name == 'MoleDetec'):
                 for y in x:
-                    if (y == 'samplingTime' or y == 'other' or y == 'filePath' or
-                            y == 'PDL1' or y == 'PDL1KT'):
+                    if (y == 'samplingTime' or y == 'other' or y == 'filePath' or y == 'path'
+                    or y == 'PDL1' or y == 'PDL1KT' or y == 'PD1' or y == 'PD1KT' or y == 'detectTime'):
+                        self.headers.append(self.header_map.get(y))
+                    elif y[-3:] == 'Mea':
+                        self.headers.append(y[:-3] + '临床意义判断')
+                    elif y[-4:] == 'Note':
+                        self.headers.append(y[:-4] + '备注')
+                    elif y[-3:] == 'Sam':
+                        self.headers.append(y[:-3] + '检测样本')
+                    elif y[-6:] == 'DetMed':
+                        self.headers.append(y[:-6] + '检测方法')
+                    elif y[-4:] == 'Desc':
+                        self.headers.append(y[:-4] + '检测描述')
+                    elif y in self.lung_fields:
+                        self.headers.append(y)
+                        self.headers.append(y + '最佳值')
+                        self.headers.append(y + '最佳值/预期值(%)')
+                    elif y in self.header_map.keys():
                         self.headers.append(self.header_map.get(y))
                     else:
                         self.headers.append(y)
@@ -179,8 +209,10 @@ class Export:
                         self.headers.append('p分期T')
                         self.headers.append('p分期N')
                         self.headers.append('p分期M')
-                    else:
+                    elif y in self.header_map.keys():
                         self.headers.append(self.header_map.get(y))
+                    else:
+                        self.headers.append(y)
             i += 1
 
     def work(self):
@@ -190,73 +222,287 @@ class Export:
         ws.append(self.headers)
 
         for dic in self.info:
-            row = []
-            i = 0
+
             pid = dic.get('pid')
             treNum = dic.get('treNum')
-            for obj_class_name in self.tables:
-                name = obj_class_name.__name__
-                if name == 'Patient':
-                    obj_array = obj_class_name.query.filter(obj_class_name.id == pid,
-                                                            obj_class_name.is_delete == 0).all()
-                elif name == 'PastHis' or name == 'IniDiaPro':
-                    obj_array = obj_class_name.query.filter(obj_class_name.pid == pid,
-                                                            obj_class_name.is_delete == 0).all()
-                elif (name in self.lab_inspectation_table or name in self.other_inspect_table or
-                      name == 'Immunohis' or name == 'MoleDetec'):
-                    obj_array = obj_class_name.query.filter(obj_class_name.pid == pid,
-                                                            obj_class_name.treNum == treNum,
-                                                            obj_class_name.is_delete == 0).all()
-                if obj_array:
-                    obj = obj_array[0]
-                    for field in self.columns[i]:
-                        if field != 'age':
-                            x = getattr(obj, field)
-
-                        if name == 'Immunohis':
-                            value = self.filter_none(obj, field)
-                            value = self.immunohis_map.get(value)
-                        elif name == 'MoleDetec':
-                            value = self.filter_none(obj, field)
-                            value = self.moleDetec_map.get(value)
-                        elif field == 'gender':
-                            value = self.filter_none(obj, field)
-                            value = self.gender_map.get(value)
-                        elif field == 'age':
-                            idNumber = getattr(obj, 'idNumber')
-                            age = get_age_by_birth(get_birth_date_by_id_card(idNumber))
-                            value = age if age else '/'
-                        elif field == 'drinkingHis':
-                            value = self.format_drink_history(obj)
-                        elif field == 'smokingHis':
-                            value = self.format_smoke_history(obj)
-                        elif field == 'cStage' or field == 'pStage':
-                            stage_array = self.format_stage(obj, field)
-                            row.extend(stage_array)
-                        elif (field == 'bioMet' or field == 'traSite' or
-                              field == 'basDisHis' or field == 'infDisHis' or
-                              field == 'tumHis' or field == 'tumFamHis' or
-                              field == 'cliniManifest' or field == 'part'):
-                            value = self.format_radio_data(obj, field)
-                        elif field == 'patDia':
-                            value = self.format_patDia(obj)
-                        elif type(x) == bool:
-                            value = self.filter_none(self.change_bool_to_yes_or_no(x))
-                        elif type(x) == dict:
-                            value = str(x) if x else '/'
-                        elif type(x) == list:
-                            value = str(x) if x else '/'
+            treNums = []
+            if treNum > 0:
+                for k in range(1, treNum + 1):
+                    treNums.append(k)
+                for treNum in treNums:
+                    row = []
+                    i = 0
+                    for obj_class_name in self.tables:
+                        name = obj_class_name.__name__
+                        if name == 'Patient':
+                            obj_array = obj_class_name.query.filter(obj_class_name.id == pid,
+                                                                    obj_class_name.is_delete == 0).all()
+                        elif name == 'PastHis' or name == 'IniDiaPro':
+                            obj_array = obj_class_name.query.filter(obj_class_name.pid == pid,
+                                                                    obj_class_name.is_delete == 0).all()
                         else:
-                            value = self.filter_none(obj, field)
+                            obj_array = obj_class_name.query.filter(obj_class_name.pid == pid,
+                                                                    obj_class_name.treNum == treNum,
+                                                                    obj_class_name.is_delete == 0).all()
 
-                        if field != 'cStage' and field != 'pStage':
-                            row.append(value)
-                else:
-                    for j in range(0, len(self.columns[i])):
-                        row.append('/')
+                        if obj_array:
+                            obj = obj_array[0]
+                            for field in self.columns[i]:
+                                if field != 'age' and not(field in self.lung_fields):
+                                    x = getattr(obj, field)
 
-                i += 1
-            ws.append(row)
+                                if name == 'Immunohis':
+                                    if field == 'Ki67' or field == 'other' or field == 'filePath':
+                                        value = self.filter_none(obj, field)
+                                        row.append(value)
+                                    else:
+                                        value = self.filter_none(obj, field)
+                                        value = self.immunohis_map.get(value)
+                                        row.append(value)
+                                elif name == 'MoleDetec':
+                                    if field[-6:] == 'DetMed':
+                                        value = self.filter_none(obj, field)
+                                        value = self.moleDetec_DetMed_map.get(value)
+                                        row.append(value)
+                                    elif field == 'MSI':
+                                        value = self.filter_none(obj, field)
+                                        value = self.moleDetec_MSI_map.get(value)
+                                        row.append(value)
+                                    elif field in self.moleDetec_fields:
+                                        value = self.filter_none(obj, field)
+                                        value = self.moleDetec_map.get(value)
+                                        row.append(value)
+                                    else:
+                                        value = self.filter_none(obj, field)
+                                        row.append(value)
+                                elif name in self.lab_inspectation_table or name == 'Lung':
+                                    if field[-3:] == 'Mea':
+                                        value = self.filter_none(obj, field)
+                                        value = self.Mea_map.get(value)
+                                        row.append(value)
+                                    elif field in self.lung_fields:
+                                        value_exp = self.filter_none(obj, field+'_exp')
+                                        value_best = self.filter_none(obj, field+'_best')
+                                        value_ratio = self.filter_none(obj, field+'_ratio')
+                                        row.extend([value_exp, value_best, value_ratio])
+                                    else:
+                                        value = self.filter_none(obj, field)
+                                        row.append(value)
+                                elif field == 'gender':
+                                    value = self.filter_none(obj, field)
+                                    value = self.gender_map.get(value)
+                                    row.append(value)
+                                elif field == 'age':
+                                    idNumber = getattr(obj, 'idNumber')
+                                    age = get_age_by_birth(get_birth_date_by_id_card(idNumber))
+                                    value = age if age else '/'
+                                    row.append(value)
+                                elif field == 'drinkingHis':
+                                    value = self.format_drink_history(obj)
+                                    row.append(value)
+                                elif field == 'smokingHis':
+                                    value = self.format_smoke_history(obj)
+                                    row.append(value)
+                                elif field == 'videography':
+                                    value = self.filter_none(obj, field)
+                                    value = self.videography_map.get(value)
+                                    row.append(value)
+                                elif field == 'stage':
+                                    value = self.filter_none(obj, field)
+                                    value = self.stage_map.get(value)
+                                    row.append(value)
+                                elif field == 'cStage' or field == 'pStage':
+                                    stage_array = self.format_stage(obj, field)
+                                    row.extend(stage_array)
+                                elif (field == 'bioMet' or field == 'traSite' or
+                                field == 'basDisHis' or field == 'infDisHis' or
+                                field == 'tumHis' or field == 'tumFamHis' or
+                                field == 'cliniManifest' or field == 'part' or
+                                field == 'surSco' or field == 'lymDis' or field == 'radSite'):
+                                    value = self.format_radio_data(obj, field)
+                                    row.append(value)
+                                elif field == 'patDia':
+                                    value = self.format_patDia(obj)
+                                    row.append(value)
+                                elif field == 'isTre':
+                                    value = self.filter_none(obj, field)
+                                    value = self.isTre_map.get(value)
+                                    row.append(value)
+                                elif field == 'radDose':
+                                    value_radDose = self.filter_none(obj, field)
+                                    value_dosUnit = self.radosUnit_map.get(self.filter_none(obj, 'dosUnit'))
+                                    value = str(value_radDose) + value_dosUnit
+                                    row.append(value)
+                                elif field == 'splTim':
+                                    value_splTim = self.filter_none(obj, field)
+                                    value_method = self.filter_none(obj, 'method')
+                                    value = str(value_splTim) + value_method
+                                    row.append(value)
+                                elif field == 'isExe':
+                                    value = self.filter_none(obj, field)
+                                    value = self.isExe_map.get(value)
+                                    row.append(value)
+                                elif type(x) == bool:
+                                    value = self.filter_none(self.change_bool_to_yes_or_no(x))
+                                    row.append(value)
+                                elif type(x) == dict:
+                                    value = str(x) if x else '/'
+                                    row.append(value)
+                                elif type(x) == list:
+                                    value = str(x) if x else '/'
+                                    row.append(value)
+                                else:
+                                    value = self.filter_none(obj, field)
+                                    row.append(value)
+
+                        else:
+                            if name == 'IniDiaPro':
+                                for j in range(0, len(self.columns[i])):
+                                    if j == 'pStage' or j == 'cStage':
+                                        row.extend(['/','/','/'])
+                                    else:
+                                        row.append('/')
+                            elif name == 'Lung':
+                                for j in range(0, len(self.columns[i])):
+                                    if j in self.lung_fields:
+                                        row.extend(['/', '/', '/'])
+                                    else:
+                                        row.append('/')
+                            else:
+                                for j in range(0, len(self.columns[i])):
+                                    row.append('/')
+
+                        i += 1
+                    ws.append(row)
+            else:
+                i = 0
+                row = []
+                for obj_class_name in self.tables:
+                    name = obj_class_name.__name__
+                    if name == 'Patient':
+                        obj_array = obj_class_name.query.filter(obj_class_name.id == pid,
+                                                                obj_class_name.is_delete == 0).all()
+                    elif name == 'PastHis' or name == 'IniDiaPro':
+                        obj_array = obj_class_name.query.filter(obj_class_name.pid == pid,
+                                                                obj_class_name.is_delete == 0).all()
+                    else:
+                        obj_array = obj_class_name.query.filter(obj_class_name.pid == pid,
+                                                                obj_class_name.treNum == treNum,
+                                                                obj_class_name.is_delete == 0).all()
+
+                    if obj_array:
+                        obj = obj_array[0]
+
+                        for field in self.columns[i]:
+                            if field != 'age' and not (field in self.lung_fields):
+                                x = getattr(obj, field)
+
+                            if name == 'Immunohis':
+                                if field == 'Ki67' or field == 'other' or field == 'filePath':
+                                    value = self.filter_none(obj, field)
+                                    row.append(value)
+                                else:
+                                    value = self.filter_none(obj, field)
+                                    value = self.immunohis_map.get(value)
+                                    row.append(value)
+                            elif name == 'MoleDetec':
+                                if field[-6:] == 'DetMed':
+                                    value = self.filter_none(obj, field)
+                                    value = self.moleDetec_DetMed_map.get(value)
+                                    row.append(value)
+                                elif field == 'MSI':
+                                    value = self.filter_none(obj, field)
+                                    value = self.moleDetec_MSI_map.get(value)
+                                    row.append(value)
+                                elif field in self.moleDetec_fields:
+                                    value = self.filter_none(obj, field)
+                                    value = self.moleDetec_map.get(value)
+                                    row.append(value)
+                                else:
+                                    value = self.filter_none(obj, field)
+                                    row.append(value)
+                            elif name in self.lab_inspectation_table or name == 'Lung':
+                                if field[-3:] == 'Mea':
+                                    value = self.filter_none(obj, field)
+                                    value = self.Mea_map.get(value)
+                                    row.append(value)
+                                elif field in self.lung_fields:
+                                    value_exp = self.filter_none(obj, field + '_exp')
+                                    value_best = self.filter_none(obj, field + '_best')
+                                    value_ratio = self.filter_none(obj, field + '_ratio')
+                                    row.extend([value_exp, value_best, value_ratio])
+                                else:
+                                    value = self.filter_none(obj, field)
+                                    row.append(value)
+                            elif field == 'gender':
+                                value = self.filter_none(obj, field)
+                                value = self.gender_map.get(value)
+                                row.append(value)
+                            elif field == 'age':
+                                idNumber = getattr(obj, 'idNumber')
+                                age = get_age_by_birth(get_birth_date_by_id_card(idNumber))
+                                value = age if age else '/'
+                                row.append(value)
+                            elif field == 'drinkingHis':
+                                value = self.format_drink_history(obj)
+                                row.append(value)
+                            elif field == 'smokingHis':
+                                value = self.format_smoke_history(obj)
+                                row.append(value)
+                            elif field == 'videography':
+                                value = self.filter_none(obj, field)
+                                value = self.videography_map.get(value)
+                                row.append(value)
+                            elif field == 'stage':
+                                value = self.filter_none(obj, field)
+                                value = self.stage_map.get(value)
+                                row.append(value)
+                            elif field == 'cStage' or field == 'pStage':
+                                stage_array = self.format_stage(obj, field)
+                                row.extend(stage_array)
+                            elif (field == 'bioMet' or field == 'traSite' or
+                            field == 'basDisHis' or field == 'infDisHis' or
+                            field == 'tumHis' or field == 'tumFamHis' or
+                            field == 'cliniManifest' or field == 'part'):
+                                value = self.format_radio_data(obj, field)
+                                row.append(value)
+                            elif field == 'patDia':
+                                value = self.format_patDia(obj)
+                                row.append(value)
+
+                            elif type(x) == bool:
+                                value = self.filter_none(self.change_bool_to_yes_or_no(x))
+                                row.append(value)
+                            elif type(x) == dict:
+                                value = str(x) if x else '/'
+                                row.append(value)
+                            elif type(x) == list:
+                                value = str(x) if x else '/'
+                                row.append(value)
+                            else:
+                                value = self.filter_none(obj, field)
+                                row.append(value)
+
+                    else:
+                        if name == 'IniDiaPro':
+                            for j in range(0, len(self.columns[i])):
+                                if j == 'pStage' or j == 'cStage':
+                                    row.extend(['/', '/', '/'])
+                                else:
+                                    row.append('/')
+                        elif name == 'Lung':
+                            for j in range(0, len(self.columns[i])):
+                                if j in self.lung_fields:
+                                    row.extend(['/', '/', '/'])
+                                else:
+                                    row.append('/')
+                        else:
+                            for j in range(0, len(self.columns[i])):
+                                row.append('/')
+
+                    i += 1
+                ws.append(row)
+
 
         wb.save('test.xlsx')
         content = save_virtual_workbook(wb)
@@ -264,11 +510,6 @@ class Export:
         resp.headers["Content-Disposition"] = 'attachment; filename=samples.xlsx'
         resp.headers['Content-Type'] = 'application/x-xlsx'
         return resp
-
-
-
-
-
 
     def change_bool_to_yes_or_no(self, bool_value):
         if bool_value is None:

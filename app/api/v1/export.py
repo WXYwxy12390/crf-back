@@ -1,6 +1,7 @@
 from flask import request
 from app.libs.redprint import Redprint
-from app.utils.export2 import Export
+from app.utils.export2 import Export as Export2
+from app.utils.export3 import Export as Export3
 
 api = Redprint('export')
 
@@ -13,7 +14,10 @@ other_inspect_py = getattr(models_package, 'other_inspect')
 # questionnaire_py = getattr(models_package, 'questionnaire')
 therapy_record_py = getattr(models_package, 'therapy_record')
 
+lung_fields = ['FVC', 'FEV1_FVC', 'MEF', 'MEF25', 'MEF50', 'MEF75', 'TLC_sb',
+               'RV', 'RV_TLC', 'VC', 'DLCO_ex', 'DLCO_sb', 'KCO']
 
+'''
 @api.route('', methods=['POST'])
 def export():
     data = request.get_json()
@@ -26,7 +30,36 @@ def export():
         print(x)
         tables = x[0]
         columns = x[1]
-        return Export(info, tables, columns).work()
+        return Export2(info, tables, columns).work()
+    else:
+        print('接收的表名或者字段名存在错误')
+'''
+
+
+@api.route('', methods=['POST'])
+def export():
+    data = request.get_json()
+    pids = data['pids']
+    maxTreNum = data['maxTreNum']
+    minTreNum = data['minTreNum']
+
+    treNums = []
+    for i in range(minTreNum, maxTreNum + 1):
+        treNums.append(i)
+
+    del data['pids']
+    del data['maxTreNum']
+    del data['minTreNum']
+
+    tables = []
+    columns = []
+
+    x = check_tables_and_columns(data)
+    if x:
+        print(x)
+        tables = x[0]
+        columns = x[1]
+        return Export3(pids, treNums, tables, columns).work()
     else:
         print('接收的表名或者字段名存在错误')
 
@@ -92,9 +125,9 @@ def if_columns_exist(obj_class_name, columns):
     flag = True
     obj = obj_class_name()
     for column in columns:
-        if obj_class_name.__name__ == 'Patient' and column == 'age':
-            pass
-        elif not hasattr(obj, column):
+        export_header_map = getattr(obj_class_name, 'export_header_map')
+        if not (column in export_header_map.keys()):
             flag = False
             break
+
     return flag

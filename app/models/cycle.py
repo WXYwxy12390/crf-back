@@ -54,6 +54,43 @@ class Immunohis(Base):
     other = Column(String(2048), comment='其他')      #长度
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    # 和导出功能有关
+    export_header_map = {'ALKD5F3':'ALKD5F3','ALKD5F3N':'ALKD5F3N','CAIX':'CAIX','CAM52':'CAM52','CD10':'CD10',
+                         'CD34':'CD34','CD56':'CD56','CD117':'CD117','CDX2':'CDX2','CEA':'CEA','CgA':'CgA',
+                         'CK':'CK','CK56':'CK56','CK7':'CK7','CK818':'CK818','CK19':'CK19','CK20':'CK20',
+                         'Cyn':'Cyn','DLL3':'DLL3','EMA':'EMA','ERCC1':'ERCC1','LCA':'LCA','MCM2':'MCM2',
+                         'NapsinA':'NapsinA','P16':'P16','P40':'P40','p53':'p53','P63':'P63','PAX2':'PAX2',
+                         'PAX8':'PAX8','PCK':'PCK','PDL1':'PDL1','RRM1':'RRM1','SATB2':'SATB2','Syn':'Syn',
+                         'TTF1':'TTF1','VEGFC':'VEGFC','Villin':'Villin','Villinco':'Villinco','CD516':'CD516',
+                         'other':'其他','Ki67':'Ki67'}
+
+    # 和导出功能有关
+    def get_export_row(self, columns, buffer, pid, treNum):
+        immunohis_map = {0: '无', 1: '-', 2: '±', 3: '+', 4: '++', 5: '+++', "/": "/"}
+
+        row = []
+        if buffer.get('Immunohis').get(pid) is None:
+            for column in columns:
+                row.append('/')
+            return row
+        obj = buffer.get('Immunohis').get(pid).get(treNum)
+        for column in columns:
+            if column == 'Ki67' or column == 'other':
+                value = self.filter_none(obj, column)
+                row.append(value)
+            else:
+                value = self.filter_none(obj, column)
+                value = immunohis_map.get(value)
+                row.append(value)
+        return row
+
+    # 和导出功能有关，得到导出的表的中文抬头
+    def get_export_header(self, columns, buffer):
+        header = []
+        for column in columns:
+            header.append(self.export_header_map.get(column))
+        return header
+
     def keys(self):
         return ['id', 'pid', 'treNum', 'ALKD5F3', 'ALKD5F3N', 'CAIX', 'CAM52', 'CD10', 'CD34', 'CD56',
                 'CD117', 'CDX2', 'CEA', 'CgA', 'CK', 'CK56','CK7', 'CK818', 'CK19', 'CK20', 'Cyn', 'DLL3', 'EMA',
@@ -78,7 +115,6 @@ class MoleDetec(Base):
     ROS1 = Column(Integer, comment='ROS1(0-阴性,1-阳性,2-无)')
     RET = Column(Integer, comment='RET(0-阴性,1-阳性,2-无)')
     UGT1A1 = Column(Integer, comment='UGT1A1(0-阴性,1-阳性,2-无)')
-
     NTRK = Column(Integer)
 
     ALKSam = Column(String(255), comment='ALK检测样本')  #下面的文本都要改
@@ -130,18 +166,72 @@ class MoleDetec(Base):
 
     TMB = Column(String(20), comment='TMB') #???
 
+    # 和导出功能有关
+    export_header_map = {'EGFR':'EGFR','ALK':'ALK','ROS1':'ROS1','HER_2':'HER_2','BRAF':'BRAF',
+                         'cMET':'cMET','RET':'RET','NTRK':'NTRK','KRAS':'KRAS','BIM':'BIM',
+                         'PIK3CA':'PIK3CA','UGT1A1':'UGT1A1','MSI':'MSI','PD1':'PD-1表达',
+                         'PD1KT':'PD1KT','PDL1':'PD-L1表达','PDL1KT':'PDL1KT','TMB':'TMB','other':'其他'}
+
+    # 和导出功能有关
+    def get_export_row(self, columns, buffer, pid, treNum):
+        moleDetec_map = {0: '阴性', 1: '阳性', 2: '无', "/": "/"}
+        moleDetec_DetMed_map = {1: 'ARMS', 2: 'FISH', 3: 'NGS', "/": "/"}
+        moleDetec_MSI_map = {0: 'MSS', 1: 'MSIH', 2: 'MSIL', "/": "/"}
+        moleDetec_fields = ['ALK', 'BIM', 'BRAF', 'cMET', 'EGFR', 'HER_2', 'KRAS',
+                            'PIK3CA', 'ROS1', 'RET', 'UGT1A1', 'NTRK']
+        row = []
+        if buffer.get('MoleDetec').get(pid) is None:
+            for column in columns:
+                if (column == 'MSI' or column == 'PD1' or
+                column == 'PD1KT' or column == 'PDL1' or
+                column == 'PDL1KT' or column == 'TMB' or column == 'other'):
+                    row.append('/')
+                else:
+                    row.append(['/','/','/','/'])
+            return row
+        obj = buffer.get('MoleDetec').get(pid).get(treNum)
+        for column in columns:
+            if column in moleDetec_fields:
+                value = self.filter_none(obj, column)
+                value = moleDetec_map.get(value)
+                row.append(value)
+                if value == '阳性':
+                    valueSam = self.filter_none(obj, column+'Sam')
+                    valueDetMed = self.filter_none(obj, column+'DetMed')
+                    valueDetMed = moleDetec_DetMed_map.get(valueDetMed)
+                    valueDesc = self.filter_none(obj, column+'Desc')
+                    row.extend([valueSam,valueDetMed,valueDesc])
+                else:
+                    row.extend(['/','/','/'])
+            elif column == 'MSI':
+                value = self.filter_none(obj, column)
+                value = moleDetec_MSI_map.get(value)
+                row.append(value)
+            else:
+                value = self.filter_none(obj, column)
+                row.append(value)
+        return row
+
+    # 和导出功能有关，得到导出的表的中文抬头
+    def get_export_header(self, columns, buffer):
+        header = []
+        for column in columns:
+            if (column == 'MSI' or column == 'PD1' or column == 'PD1KT' or
+            column == 'PDL1' or column == 'PDL1KT' or column == 'TMB' or column == 'other'):
+                header.append(self.export_header_map.get(column))
+            else:
+                header.append(self.export_header_map.get(column))
+                header.append(self.export_header_map.get(column) + '检测样本')
+                header.append(self.export_header_map.get(column) + '检测方法')
+                header.append(self.export_header_map.get(column) + '检测描述')
+        return header
+
     def keys(self):
         return ['id', 'pid', 'treNum', 'ALK', 'BIM', 'BRAF', 'cMET', 'EGFR', 'HER_2', 'KRAS','NTRK',
                 'PIK3CA', 'ROS1', 'RET', 'UGT1A1', 'ALKSam', 'BIMSam','BRAFSam','cMETSam', 'EGFRSam', 'HER_2Sam', 'KRASSam', 'PIK3CASam', 'ROS1Sam','NTRKSam',
                 'RETSam', 'UGT1A1Sam', 'ALKDetMed', 'BIMDetMed', 'BRAFDetMed', 'cMETDetMed','EGFRDetMed', 'HER_2DetMed', 'KRASDetMed', 'PIK3CADetMed', 'ROS1DetMed','NTRKDetMed',
                 'RETDetMed', 'UGT1A1DetMed','ALKDesc', 'BIMDesc', 'BRAFDesc', 'cMETDesc', 'EGFRDesc', 'HER_2Desc','KRASDesc','PIK3CADesc',
                 'ROS1Desc','RETDesc','UGT1A1Desc','NTRKDesc','path','MSI','other','PDL1','PDL1KT','TMB','PD1','PD1KT']
-
-
-
-
-
-
 
 
 #症状体征表
@@ -154,6 +244,34 @@ class Signs(Base):
     begDate = Column(DateTime, comment='开始日期')
     isExe = Column(Integer, comment='目前是否存在')
     endDate = Column(DateTime, comment='结束日期')
+
+    # 和导出功能有关
+    export_header_map = {'symName':'症状名称', 'begDate':'开始日期',
+                         'isExe':'目前是否存在', 'endDate':'结束日期'}
+
+    # 和导出功能有关，得到导出的表的中文抬头
+    def get_export_header(self, columns, buffer):
+        header = []
+
+        # 求最多有多少条
+        max_num = 0
+        for value1 in buffer.get('Signs').values():
+            for value2 in value1.values():
+                if type(value2) == list:
+                    num = len(value2)
+                    if num > max_num:
+                        max_num = num
+
+        if max_num > 1:
+            header_num = max_num
+        else:
+            header_num = 1
+
+        for i in range(1, header_num+1):
+            for column in columns:
+                header.append(self.export_header_map.get(column) + str(i))
+
+        return header
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'symName', 'begDate', 'isExe', 'endDate']
@@ -171,6 +289,34 @@ class SideEffect(Base):
     isExe = Column(Integer, comment='目前是否存在')
     treatment = Column(String(2048), comment='治疗情况')
     endDate = Column(Date, comment='结束日期')
+
+    # 和导出功能有关
+    export_header_map = {'sidReaName':'症状描述', 'sidRecCla':'副反应分级', 'begDate':'开始日期',
+                         'isExe':'目前是否存在', 'endDate':'结束日期','treatment':'治疗情况'}
+
+    # 和导出功能有关，得到导出的表的中文抬头
+    def get_export_header(self, columns, buffer):
+        header = []
+
+        # 求最多有多少条
+        max_num = 0
+        for value1 in buffer.get('SideEffect').values():
+            for value2 in value1.values():
+                if type(value2) == list:
+                    num = len(value2)
+                    if num > max_num:
+                        max_num = num
+
+        if max_num > 1:
+            header_num = max_num
+        else:
+            header_num = 1
+
+        for i in range(1, header_num + 1):
+            for column in columns:
+                header.append(self.export_header_map.get(column) + str(i))
+
+        return header
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'sidReaName', 'sidRecCla', 'begDate', 'isExe','treatment','endDate','sidReaNameOther']

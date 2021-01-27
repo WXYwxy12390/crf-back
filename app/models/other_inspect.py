@@ -77,6 +77,51 @@ class Lung(Base):
     KCONote = Column(Text(10000), comment='比弥散量备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    # 和导出功能有关
+    export_header_map = {'detectTime':'肺功能检查时间','FVC':'FVC(L)','FEV1_FVC':'FEV1/FVC(%)','MEF':'MEF(L/S)',
+                         'MEF25':'MEF25(L/S)','MEF50':'MEF50(L/S)','MEF75':'MEF75(L/S)','TLC_sb':'TLC’sb(L)','RV':'RV(L)',
+                         'RV_TLC':'RV’/TLC’(%)','VC':'VC(L)','DLCO_ex':'DLCO-ex(mL/mmHg/Mi)','DLCO_sb':'DLCO-sb(mL/mmHg/Mi)','KCO':'KCO'}
+
+    # 和导出功能有关
+    def get_export_row(self, columns, buffer, pid, treNum):
+        Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
+
+        row = []
+        if buffer.get('Lung').get(pid) is None:
+            for column in columns:
+                if column == 'detectTime':
+                    row.append('/')
+                else:
+                    row.extend(['/', '/', '/','/','/'])
+            return row
+        obj = buffer.get('Lung').get(pid).get(treNum)
+        for column in columns:
+            if column == 'detectTime':
+                value = self.filter_none(obj, column)
+                row.append(value)
+            else:
+                value_exp = self.filter_none(obj, column + '_exp')
+                value_best = self.filter_none(obj, column + '_best')
+                value_ratio = self.filter_none(obj, column + '_ratio')
+                value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
+                value_Note = self.filter_none(obj, column + 'Note')
+                row.extend([value_exp, value_best, value_ratio, value_Mea, value_Note])
+        return row
+
+    # 和导出功能有关，得到导出的表的中文抬头
+    def get_export_header(self, columns, buffer):
+        header = []
+        for column in columns:
+            if column == 'detectTime':
+                header.append(self.export_header_map.get(column))
+            else:
+                header.append(self.export_header_map.get(column) + '预计值')
+                header.append(self.export_header_map.get(column) + '最佳值')
+                header.append(self.export_header_map.get(column) + '最佳值/预计值(%)')
+                header.append(self.export_header_map.get(column) + '临床意义判断')
+                header.append(self.export_header_map.get(column) + '备注')
+        return header
+
     def keys(self):
         return ['id', 'pid', 'treNum', 'detectTime', 'FVC_exp', 'FEV1_FVC_exp', 'MEF_exp', 'MEF25_exp', 'MEF50_exp',
                 'MEF75_exp','TLC_sb_exp', 'RV_exp', 'RV_TLC_exp', 'VC_exp', 'DLCO_ex_exp', 'DLCO_sb_exp', 'KCO_exp', 'FVC_best',
@@ -100,6 +145,31 @@ class OtherExams(Base):
     UCGDetTime = Column(Date, comment='超声心动图检测时间')
     UCGDesc = Column(Text, comment='超声心动图结果描述')    #长度
     UCGPath = Column(String(200), comment='超声心动图报告路径,多个以逗号分隔')
+
+    # 和导出功能有关
+    export_header_map = {'ECGDetTime': '12导联心电图检测时间', 'ECGDesc': '12导联心电图结果描述',
+                  'UCGDetTime': '超声心动图检测时间', 'UCGDesc': '超声心动图结果描述'}
+
+    # 和导出功能有关
+    def get_export_row(self, columns, buffer, pid, treNum):
+        row = []
+        if buffer.get('OtherExams').get(pid) is None:
+            for column in columns:
+                row.append('/')
+            return row
+        obj = buffer.get('OtherExams').get(pid).get(treNum)
+        for column in columns:
+            value = self.filter_none(obj, column)
+            row.append(value)
+        return row
+
+    # 和导出功能有关，得到导出的表的中文抬头
+    def get_export_header(self, columns, buffer):
+        header = []
+        for column in columns:
+            header.append(self.export_header_map.get(column))
+        return header
+
     def keys(self):
         return ['id','pid','treNum','ECGDetTime','ECGDesc','ECGPath','UCGDetTime','UCGDesc','UCGPath']
 
@@ -117,5 +187,66 @@ class ImageExams(Base):
     tumorDesc = Column(Text, comment='肿瘤描述')
     path = Column(String(200), comment='文件路径,多个以逗号分隔')
 
-    def keys(self):
+    # 和导出功能有关
+    export_header_map = {'detectTime':'影像学检查检测时间','examArea':'检查部位','exmaMethod':'检查方法',
+                         'tumorLD':'肿瘤长径','tumorSD':'肿瘤短径','tumorDesc':'肿瘤描述'}
+
+    # 和导出功能有关
+    def get_export_row(self, columns, buffer, pid, treNum):
+        # 求最多有多少条
+        max_num = 0
+        for value1 in buffer.get('ImageExams').values():
+            for value2 in value1.values():
+                if type(value2) == list:
+                    num = len(value2)
+                    if num > max_num:
+                        max_num = num
+        if max_num > 1:
+            header_num = max_num
+        else:
+            header_num = 1
+
+        row = []
+
+        if buffer.get('ImageExams').get(pid) is None:
+            for k in range(0, header_num):
+                for column in columns:
+                    row.append('/')
+            return row
+        obj_array = buffer.get('ImageExams').get(pid).get(treNum)
+
+        for obj in obj_array:
+            for column in columns:
+                value = self.filter_none(obj, column)
+                row.append(value)
+        for k in range(0, header_num-len(obj_array)):
+            for column in columns:
+                row.append('/')
+
+        return row
+
+    # 和导出功能有关，得到导出的表的中文抬头
+    def get_export_header(self, columns, buffer):
+        header = []
+        # 求最多有多少条
+        max_num = 0
+        for value1 in buffer.get('ImageExams').values():
+            for value2 in value1.values():
+                if type(value2) == list:
+                    num = len(value2)
+                    if num > max_num:
+                        max_num = num
+
+        if max_num > 1:
+            header_num = max_num
+        else:
+            header_num = 1
+
+        for i in range(1, header_num + 1):
+            for column in columns:
+                header.append(self.export_header_map.get(column) + str(i))
+
+        return header
+
+def keys(self):
         return ['id','pid','treNum','detectTime','examArea','exmaMethod','tumorLD','tumorSD','tumorDesc','path']

@@ -21,6 +21,11 @@ class TreRec(Base):
     proDate = Column(Date, comment='进展日期')
     proDes = Column(String(2048), comment='进展描述')  # text
     PFS_DFS = Column(String(2048),comment='PFS/DFS')
+
+    # 和导出功能有关
+    export_header_map = {'trement':'几线治疗', 'beEffEvaDate':'最佳疗效评估日期', 'beEffEva':'最佳疗效评估',
+                         'proDate':'进展日期', 'proDes':'进展描述', 'PFS_DFS':'PFS/DFS'}
+
     def keys(self):
         return ['id','treNum','trement','date','beEffEvaDate','beEffEva','proDate','proDes','PFS_DFS']
 
@@ -121,6 +126,11 @@ class OneToFive(Base):
     #patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
     note = Column(String(2048), comment='备注')
 
+    # 和导出功能有关
+    export_header_map = {'isTre':'是否加入临床治疗', 'clinTri':'临床实验名称', 'treSolu':'治疗方案', 'note':'备注','begDate':'开始日期',
+                     'endDate':'结束日期', 'isRepBio':'是否重复活检', 'bioMet':'活检方式', 'matPart':'取材部位',
+                     'specNum':'标本库流水号', 'patDia':'病理诊断'}
+
     def keys(self):
         return ['id','pid','treNum','isTre','clinTri','treSolu','spePlan','begDate',
                 'endDate','isRepBio','bioMet','matPart','specNum','patDiaRes','patDiaOthers','note','patDia',
@@ -142,10 +152,12 @@ class DetailTrePlan(Base):
     drugs = Column(JSON, comment='药物使用情况, {drugName:{drugDosa: ,duration: },...}')
     note = Column(String(2048), comment='药物使用备注')  #长度
 
+    # 和导出功能有关
+    export_header_map = {'treatName':'治疗名称','currPeriod':'周期','treSche':'药物方案','drugs':'药物',
+                         'begDate':'给药/治疗开始日期','endDate':'给药/治疗结束时间','note':'备注'}
+
     def keys(self):
         return ['id','treSolu','treSche','currPeriod','treatName','begDate','endDate','drugs','note']
-
-
 
 
 #手术表
@@ -169,8 +181,13 @@ class Surgery(Base):
     bioMet = Column(JSON, comment='活检方式')  # 长度
     matPart = Column(String(255), comment='取材部位')
     specNum = Column(String(255), comment='标本库流水号')
-
     patDia = Column(JSON, comment='病理诊断结果')
+
+    # 和导出功能有关
+    export_header_map = {'surSco':'手术范围', 'lymDis':'淋巴清扫范围', 'cleGro':'清扫组数', 'surDate':'手术日期',
+                         'posAdjChem':'术后辅助化疗','isRepBio':'是否重复活检', 'bioMet':'活检方式',
+                         'matPart':'取材部位', 'specNum':'标本库流水号','patDia':'病理诊断'}
+
     def keys(self):
         return ['id','pid','treNum','surSco','lymDis','cleGro','surDate','posAdjChem','isPro','proDate','proDes',
                 'isRepBio','bioMet','matPart','specNum','patDia',
@@ -192,13 +209,16 @@ class Radiotherapy(Base):
     splTim = Column(Integer, comment='分割次数')
     method = Column(String(255), comment='分割次数单位')
     isRepBio = Column(Boolean, comment='是否重复活检')
-
     # bioMet = Column(JSON, comment='活检方式')  # 长度
     bioMet = Column(JSON, comment='活检方式')  # 长度
-
     matPart = Column(String(255), comment='取材部位')
     specNum = Column(String(255), comment='标本库流水号')
     patDia = Column(JSON, comment='病理诊断结果')
+
+    # 和导出功能有关
+    export_header_map = {'begDate':'开始日期', 'endDate':'结束日期', 'radSite':'放疗部位', 'radDose':'放疗剂量',
+                         'splTim':'分割次数','isRepBio':'是否重复活检', 'bioMet':'活检方式', 'matPart':'取材部位',
+                         'specNum':'标本库流水号','patDia':'病理诊断'}
 
     def keys(self):
         return ['id','pid','treNum','begDate','endDate','radSite','radDose','dosUnit','splTim','method','_radSite',
