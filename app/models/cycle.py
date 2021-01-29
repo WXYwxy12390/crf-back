@@ -67,10 +67,9 @@ class Immunohis(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         immunohis_map = {0: '无', 1: '-', 2: '±', 3: '+', 4: '++', 5: '+++', "/": "/"}
-
         row = []
-        if buffer.get('Immunohis').get(pid) is None:
-            for column in columns:
+        if buffer.get('Immunohis').get(pid) is None or buffer.get('Immunohis').get(pid).get(treNum) is None:
+            for k in range(0, Immunohis.header_num):
                 row.append('/')
             return row
         obj = buffer.get('Immunohis').get(pid).get(treNum)
@@ -89,6 +88,8 @@ class Immunohis(Base):
         header = []
         for column in columns:
             header.append(self.export_header_map.get(column))
+
+        Immunohis.header_num = len(header)
         return header
 
     def keys(self):
@@ -180,14 +181,9 @@ class MoleDetec(Base):
         moleDetec_fields = ['ALK', 'BIM', 'BRAF', 'cMET', 'EGFR', 'HER_2', 'KRAS',
                             'PIK3CA', 'ROS1', 'RET', 'UGT1A1', 'NTRK']
         row = []
-        if buffer.get('MoleDetec').get(pid) is None:
-            for column in columns:
-                if (column == 'MSI' or column == 'PD1' or
-                column == 'PD1KT' or column == 'PDL1' or
-                column == 'PDL1KT' or column == 'TMB' or column == 'other'):
-                    row.append('/')
-                else:
-                    row.append(['/','/','/','/'])
+        if buffer.get('MoleDetec').get(pid) is None or buffer.get('MoleDetec').get(pid).get(treNum) is None:
+            for k in range(0, MoleDetec.header_num):
+                row.append('/')
             return row
         obj = buffer.get('MoleDetec').get(pid).get(treNum)
         for column in columns:
@@ -210,6 +206,7 @@ class MoleDetec(Base):
             else:
                 value = self.filter_none(obj, column)
                 row.append(value)
+
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
@@ -224,6 +221,8 @@ class MoleDetec(Base):
                 header.append(self.export_header_map.get(column) + '检测样本')
                 header.append(self.export_header_map.get(column) + '检测方法')
                 header.append(self.export_header_map.get(column) + '检测描述')
+
+        MoleDetec.header_num = len(header)
         return header
 
     def keys(self):
@@ -249,6 +248,38 @@ class Signs(Base):
     export_header_map = {'symName':'症状名称', 'begDate':'开始日期',
                          'isExe':'目前是否存在', 'endDate':'结束日期'}
 
+    # 和导出功能有关
+    def get_export_row(self, columns, buffer, pid, treNum):
+        isExe_map = {0: '否', 1: '是', '/': '/'}
+        row = []
+        if buffer.get('Signs').get(pid) is None or buffer.get('Signs').get(pid).get(treNum) is None:
+            for k in range(0, Signs.header_num):
+                row.append('/')
+            return row
+        obj_array = buffer.get('Signs').get(pid).get(treNum)
+
+        for obj in obj_array:
+            for column in columns:
+                if column == 'isExe':
+                    value = self.filter_none(obj, column)
+                    value = isExe_map.get(value)
+                    row.append(value)
+                elif column == 'endDate':
+                    value_isExe = self.filter_none(obj, 'isExe')
+                    if value_isExe == 0:
+                        value = self.filter_none(obj, column)
+                    else:
+                        value = '/'
+                    row.append(value)
+                else:
+                    value = self.filter_none(obj, column)
+                    row.append(value)
+
+        for k in range(0, Signs.header_num - len(row)):
+            row.append('/')
+
+        return row
+
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
         header = []
@@ -271,6 +302,7 @@ class Signs(Base):
             for column in columns:
                 header.append(self.export_header_map.get(column) + str(i))
 
+        Signs.header_num = len(header)
         return header
 
     def keys(self):
@@ -294,6 +326,39 @@ class SideEffect(Base):
     export_header_map = {'sidReaName':'症状描述', 'sidRecCla':'副反应分级', 'begDate':'开始日期',
                          'isExe':'目前是否存在', 'endDate':'结束日期','treatment':'治疗情况'}
 
+    # 和导出功能有关
+    def get_export_row(self, columns, buffer, pid, treNum):
+        isExe_map = {0: '否', 1: '是', '/':'/'}
+        row = []
+        if buffer.get('SideEffect').get(pid) is None or buffer.get('SideEffect').get(pid).get(treNum) is None:
+            for k in range(0, SideEffect.header_num):
+                row.append('/')
+            return row
+        obj_array = buffer.get('SideEffect').get(pid).get(treNum)
+
+        for obj in obj_array:
+            for column in columns:
+                if column == 'isExe':
+                    value = self.filter_none(obj, column)
+                    value = isExe_map.get(value)
+                    row.append(value)
+                elif column == 'endDate':
+                    value_isExe = self.filter_none(obj, 'isExe')
+                    if value_isExe == 0:
+                        value = self.filter_none(obj, column)
+                    else:
+                        value = '/'
+                    row.append(value)
+                else:
+                    value = self.filter_none(obj, column)
+                    row.append(value)
+
+        for k in range(0, SideEffect.header_num - len(row)):
+            row.append('/')
+
+        return row
+
+
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
         header = []
@@ -316,6 +381,7 @@ class SideEffect(Base):
             for column in columns:
                 header.append(self.export_header_map.get(column) + str(i))
 
+        SideEffect.header_num = len(header)
         return header
 
     def keys(self):

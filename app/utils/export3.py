@@ -3,6 +3,7 @@ from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 
 from app.models.base_line import DrugHistory
+from app.models.therapy_record import DetailTrePlan
 
 
 class Export:
@@ -55,8 +56,6 @@ class Export:
         resp.headers['Content-Type'] = 'application/x-xlsx'
         return resp
 
-
-
     def __init_buffer(self):
         for obj_class in self.tables:
             name = obj_class.__name__
@@ -64,9 +63,16 @@ class Export:
                 obj_array = obj_class.query.filter(obj_class.id.in_(self.pids), obj_class.is_delete == 0).all()
             elif name == 'PastHis':
                 obj_array = obj_class.query.filter(obj_class.pid.in_(self.pids), obj_class.is_delete == 0).all()
-                drug_history_array = DrugHistory.query.filter(DrugHistory.pid.in_(self.pids), DrugHistory.is_delete == 0).all()
+                drug_history_array = DrugHistory.query.filter(DrugHistory.pid.in_(self.pids),
+                                                              DrugHistory.is_delete == 0).all()
             elif name == 'IniDiaPro':
                 obj_array = obj_class.query.filter(obj_class.pid.in_(self.pids), obj_class.is_delete == 0).all()
+            elif name == 'Surgery' or name == 'OneToFive':
+                obj_array = obj_class.query.filter(obj_class.pid.in_(self.pids), obj_class.treNum.in_(self.treNums),
+                                                   obj_class.is_delete == 0).all()
+                detail_trePlan_array = DetailTrePlan.query.filter(DetailTrePlan.pid.in_(self.pids),
+                                                                  obj_class.treNum.in_(self.treNums),
+                                                                  DetailTrePlan.is_delete == 0).all()
             else:
                 obj_array = obj_class.query.filter(obj_class.pid.in_(self.pids), obj_class.treNum.in_(self.treNums),
                                                    obj_class.is_delete == 0).all()
@@ -76,12 +82,14 @@ class Export:
             elif name == 'PastHis':
                 self.add_buffer(name, self.classify_by_pid(obj_array))
                 self.add_buffer('DrugHistory', self.array_classify_by_pid(drug_history_array))
-            elif (name == 'ImageExams' or name == 'DetailTrePlan' or
+            elif (name == 'ImageExams' or
                   name == 'SideEffect' or name == 'Signs'):
                 self.add_buffer(name, self.array_classify_by_treNum(obj_array))
+            elif name == 'Surgery' or name == 'OneToFive':
+                self.add_buffer(name, self.classify_by_treNum(obj_array))
+                self.add_buffer('DetailTrePlan', self.array_classify_by_treNum(detail_trePlan_array))
             else:
                 self.add_buffer(name, self.classify_by_treNum(obj_array))
-
 
     # 缓存数据到内存中, 方便查询
     def add_buffer(self, key, value):
@@ -96,10 +104,10 @@ class Export:
                 data[item.id] = item
         return data
 
-    def array_classify_by_pid(self,items):
+    def array_classify_by_pid(self, items):
         data = {}
         for item in items:
-            pid = getattr(item,'pid')
+            pid = getattr(item, 'pid')
             if data.get(pid) is None:
                 data[pid] = []
             data[pid].append(item)

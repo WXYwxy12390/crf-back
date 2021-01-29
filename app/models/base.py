@@ -48,6 +48,10 @@ class Base(db.Model):
     create_time = Column(DateTime,server_default=func.now())
     update_time = Column(DateTime,server_default=func.now(),onupdate=func.now())
     is_delete = Column(SmallInteger, server_default='0')
+
+    # 和导出功能有关
+    header_num = 0
+
     # record_date = Column(Date)
     # def __init__(self):
     #     self.create_time = int(datetime.now().timestamp())
@@ -81,7 +85,10 @@ class Base(db.Model):
             val = getattr(data, item)
         else:
             val = data
-        return val if val is not None else '/'
+        if val is not None and val != '' and val != [] and val != {} and val!= ():
+            return val
+        else:
+            return '/'
 
     # 和导出功能有关
     def change_bool_to_yes_or_no(self, bool_value):

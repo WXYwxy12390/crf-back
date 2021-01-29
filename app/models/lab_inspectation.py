@@ -98,14 +98,10 @@ class BloodRoutine(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
-
         row = []
-        if buffer.get('BloodRoutine').get(pid) is None:
-            for column in columns:
-                if column == 'samplingTime':
-                    row.append('/')
-                else:
-                    row.extend(['/', '/', '/'])
+        if buffer.get('BloodRoutine').get(pid) is None or buffer.get('BloodRoutine').get(pid).get(treNum) is None:
+            for k in range(0, BloodRoutine.header_num):
+                row.append('/')
             return row
         obj = buffer.get('BloodRoutine').get(pid).get(treNum)
         for column in columns:
@@ -131,6 +127,7 @@ class BloodRoutine(Base):
                 header.append(self.export_header_map.get(column) + '临床意义判断')
                 header.append(self.export_header_map.get(column) + '备注')
 
+        BloodRoutine.header_num = len(header)
         return header
 
 
@@ -236,8 +233,11 @@ class BloodBio(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
-
         row = []
+        if buffer.get('BloodBio').get(pid) is None or buffer.get('BloodBio').get(pid).get(treNum) is None:
+            for k in range(0, BloodBio.header_num):
+                row.append('/')
+            return row
         if buffer.get('BloodBio').get(pid) is None:
             for column in columns:
                 if column == 'samplingTime':
@@ -269,6 +269,7 @@ class BloodBio(Base):
                 header.append(self.export_header_map.get(column) + '临床意义判断')
                 header.append(self.export_header_map.get(column) + '备注')
 
+        BloodBio.header_num = len(header)
         return header
 
     def keys(self):
@@ -309,8 +310,11 @@ class Thyroid(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
-
         row = []
+        if buffer.get('Thyroid').get(pid) is None or buffer.get('Thyroid').get(pid).get(treNum) is None:
+            for k in range(0, Thyroid.header_num):
+                row.append('/')
+            return row
         if buffer.get('Thyroid').get(pid) is None:
             for column in columns:
                 if column == 'samplingTime':
@@ -341,6 +345,8 @@ class Thyroid(Base):
                 header.append(self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')')
                 header.append(self.export_header_map.get(column) + '临床意义判断')
                 header.append(self.export_header_map.get(column) + '备注')
+
+        Thyroid.header_num = len(header)
         return header
 
     def keys(self):
@@ -385,6 +391,10 @@ class Coagulation(Base):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
 
         row = []
+        if buffer.get('Coagulation').get(pid) is None or buffer.get('Coagulation').get(pid).get(treNum) is None:
+            for k in range(0, Coagulation.header_num):
+                row.append('/')
+            return row
         if buffer.get('Coagulation').get(pid) is None:
             for column in columns:
                 if column == 'samplingTime':
@@ -415,6 +425,8 @@ class Coagulation(Base):
                 header.append(self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')')
                 header.append(self.export_header_map.get(column) + '临床意义判断')
                 header.append(self.export_header_map.get(column) + '备注')
+
+        Coagulation.header_num = len(header)
         return header
 
 
@@ -467,6 +479,10 @@ class MyocardialEnzyme(Base):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
 
         row = []
+        if buffer.get('MyocardialEnzyme').get(pid) is None or buffer.get('MyocardialEnzyme').get(pid).get(treNum) is None:
+            for k in range(0, MyocardialEnzyme.header_num):
+                row.append('/')
+            return row
         if buffer.get('MyocardialEnzyme').get(pid) is None:
             for column in columns:
                 if column == 'samplingTime':
@@ -497,6 +513,8 @@ class MyocardialEnzyme(Base):
                 header.append(self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')')
                 header.append(self.export_header_map.get(column) + '临床意义判断')
                 header.append(self.export_header_map.get(column) + '备注')
+
+        MyocardialEnzyme.header_num = len(header)
         return header
 
 
@@ -545,6 +563,10 @@ class Cytokines(Base):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
 
         row = []
+        if buffer.get('Cytokines').get(pid) is None or buffer.get('Cytokines').get(pid).get(treNum) is None:
+            for k in range(0, Cytokines.header_num):
+                row.append('/')
+            return row
         if buffer.get('Cytokines').get(pid) is None:
             for column in columns:
                 if column == 'samplingTime':
@@ -575,6 +597,8 @@ class Cytokines(Base):
                 header.append(self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')')
                 header.append(self.export_header_map.get(column) + '临床意义判断')
                 header.append(self.export_header_map.get(column) + '备注')
+
+        Cytokines.header_num = len(header)
         return header
 
     def keys(self):
@@ -696,6 +720,10 @@ class LymSubsets(Base):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
 
         row = []
+        if buffer.get('LymSubsets').get(pid) is None or buffer.get('LymSubsets').get(pid).get(treNum) is None:
+            for k in range(0, LymSubsets.header_num):
+                row.append('/')
+            return row
         if buffer.get('LymSubsets').get(pid) is None:
             for column in columns:
                 if column == 'samplingTime':
@@ -726,6 +754,8 @@ class LymSubsets(Base):
                 header.append(self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')')
                 header.append(self.export_header_map.get(column) + '临床意义判断')
                 header.append(self.export_header_map.get(column) + '备注')
+
+        LymSubsets.header_num = len(header)
         return header
 
     def keys(self):
@@ -798,6 +828,10 @@ class UrineRoutine(Base):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
 
         row = []
+        if buffer.get('UrineRoutine').get(pid) is None or buffer.get('UrineRoutine').get(pid).get(treNum) is None:
+            for k in range(0, UrineRoutine.header_num):
+                row.append('/')
+            return row
         if buffer.get('UrineRoutine').get(pid) is None:
             for column in columns:
                 if column == 'samplingTime':
@@ -828,6 +862,8 @@ class UrineRoutine(Base):
                 header.append(self.export_header_map.get(column) + '测定值')
                 header.append(self.export_header_map.get(column) + '临床意义判断')
                 header.append(self.export_header_map.get(column) + '备注')
+
+        UrineRoutine.header_num = len(header)
         return header
 
     def keys(self):
@@ -876,6 +912,10 @@ class TumorMarker(Base):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
 
         row = []
+        if buffer.get('TumorMarker').get(pid) is None or buffer.get('TumorMarker').get(pid).get(treNum) is None:
+            for k in range(0, TumorMarker.header_num):
+                row.append('/')
+            return row
         if buffer.get('TumorMarker').get(pid) is None:
             for column in columns:
                 if column == 'samplingTime':
@@ -906,6 +946,8 @@ class TumorMarker(Base):
                 header.append(self.export_header_map.get(column) + '测定值(NG/ML)')
                 header.append(self.export_header_map.get(column) + '临床意义判断')
                 header.append(self.export_header_map.get(column) + '备注')
+
+        TumorMarker.header_num = len(header)
         return header
 
     def keys(self):

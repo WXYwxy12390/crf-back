@@ -85,15 +85,12 @@ class Lung(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
-
         row = []
-        if buffer.get('Lung').get(pid) is None:
-            for column in columns:
-                if column == 'detectTime':
-                    row.append('/')
-                else:
-                    row.extend(['/', '/', '/','/','/'])
+        if buffer.get('Lung').get(pid) is None or buffer.get('Lung').get(pid).get(treNum) is None:
+            for k in range(0, Lung.header_num):
+                row.append('/')
             return row
+
         obj = buffer.get('Lung').get(pid).get(treNum)
         for column in columns:
             if column == 'detectTime':
@@ -120,6 +117,8 @@ class Lung(Base):
                 header.append(self.export_header_map.get(column) + '最佳值/预计值(%)')
                 header.append(self.export_header_map.get(column) + '临床意义判断')
                 header.append(self.export_header_map.get(column) + '备注')
+
+        Lung.header_num = len(header)
         return header
 
     def keys(self):
@@ -153,8 +152,8 @@ class OtherExams(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         row = []
-        if buffer.get('OtherExams').get(pid) is None:
-            for column in columns:
+        if buffer.get('OtherExams').get(pid) is None or buffer.get('OtherExams').get(pid).get(treNum) is None:
+            for k in range(0, OtherExams.header_num):
                 row.append('/')
             return row
         obj = buffer.get('OtherExams').get(pid).get(treNum)
@@ -168,6 +167,8 @@ class OtherExams(Base):
         header = []
         for column in columns:
             header.append(self.export_header_map.get(column))
+
+        OtherExams.header_num = len(header)
         return header
 
     def keys(self):
@@ -193,6 +194,13 @@ class ImageExams(Base):
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
+        row = []
+        if buffer.get('ImageExams').get(pid) is None or buffer.get('ImageExams').get(pid).get(treNum) is None:
+            for k in range(0, ImageExams.header_num):
+                row.append('/')
+            return row
+
+        obj_array = buffer.get('ImageExams').get(pid).get(treNum)
         # 求最多有多少条
         max_num = 0
         for value1 in buffer.get('ImageExams').values():
@@ -205,15 +213,6 @@ class ImageExams(Base):
             header_num = max_num
         else:
             header_num = 1
-
-        row = []
-
-        if buffer.get('ImageExams').get(pid) is None:
-            for k in range(0, header_num):
-                for column in columns:
-                    row.append('/')
-            return row
-        obj_array = buffer.get('ImageExams').get(pid).get(treNum)
 
         for obj in obj_array:
             for column in columns:
@@ -246,6 +245,7 @@ class ImageExams(Base):
             for column in columns:
                 header.append(self.export_header_map.get(column) + str(i))
 
+        ImageExams.header_num = len(header)
         return header
 
 def keys(self):

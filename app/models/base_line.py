@@ -41,6 +41,8 @@ class Patient(Base):
         header = []
         for column in columns:
             header.append(self.export_header_map.get(column))
+
+        Patient.header_num = len(header)
         return header
 
     # 和导出功能有关
@@ -48,7 +50,7 @@ class Patient(Base):
         gender_map = {0: "女", 1: "男", "/": "/"}
         row = []
         if buffer.get('Patient').get(pid) is None:
-            for column in columns:
+            for k in range(0, Patient.header_num):
                 row.append('/')
             return row
         obj = buffer.get('Patient').get(pid)
@@ -450,7 +452,10 @@ class PastHis(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         row = []
-
+        if buffer.get('PastHis').get(pid) is None:
+            for k in range(0, PastHis.header_num):
+                row.append('/')
+            return row
         obj = buffer.get('PastHis').get(pid)
 
         for column in columns:
@@ -592,6 +597,7 @@ class PastHis(Base):
             else:
                 header.append(self.export_header_map.get(column))
 
+        PastHis.header_num = len(header)
         return header
 
     def keys(self):
@@ -722,6 +728,8 @@ class IniDiaPro(Base):
         header = []
         for column in columns:
             header.append(self.export_header_map.get(column))
+
+        IniDiaPro.header_num = len(header)
         return header
 
     # 和导出功能有关
@@ -731,9 +739,10 @@ class IniDiaPro(Base):
                      '4': '仅P分期', '5': 'C分期和P分期', "/": "/"}
         row = []
         if buffer.get('IniDiaPro').get(pid) is None:
-            for column in columns:
+            for k in range(0, IniDiaPro.header_num):
                 row.append('/')
             return row
+
         obj = buffer.get('IniDiaPro').get(pid)
         for column in columns:
             x = getattr(obj, column)
