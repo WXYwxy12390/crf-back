@@ -221,12 +221,12 @@ class BloodBio(Base):
     # 和导出功能有关
     export_header_map = {'samplingTime':'血生化检查时间','TP':'TP','ALB':'ALB','GLO':'GLO','ALT':'ALT',
                          'AST':'AST','LDH':'LDH','GGT':'GGT','TBIL':'TBIL','DBIL':'DBIL','IBIL':'IBIL',
-                         'GLU':'GLU','TC':'TC','LDL':'LDL','HDL':'HDL','TG':'TG','UREA':'UREA',
+                         'GLU':'GLU','TC':'TC','LDL':'LDL','hDL':'HDL','TG':'TG','UREA':'UREA',
                          'ALP':'ALP','CREA':'CREA','UA':'UA','CO2':'CO2','K':'K','Na':'Na',
                          'Cl':'Cl','Ca':'Ca','Mg':'Mg','P':'P'}
     unit_map = {'TP':'g/L','ALB':'g/L','GLO':'g/L','ALT':'U/L',
                 'AST':'U/L','LDH':'U/L','GGT':'U/L','TBIL':'μmol/L','DBIL':'μmol/L','IBIL':'μmol/L',
-                'GLU':'mmol/L','TC':'mmol/L','LDL':'mmol/L','HDL':'mmol/L','TG':'mmol/L','UREA':'mmol/L',
+                'GLU':'mmol/L','TC':'mmol/L','LDL':'mmol/L','hDL':'mmol/L','TG':'mmol/L','UREA':'mmol/L',
                 'ALP':'U/L','CREA':'μmol/L','UA':'μmol/L','CO2':'mmol/L','K':'mmol/L','Na':'mmol/L',
                 'Cl':'mmol/L','Ca':'mmol/L','Mg':'mmol/L','P':'mmol/L'}
 

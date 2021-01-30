@@ -21,6 +21,7 @@ class Export:
         self.columns = columns
 
         self.__init_buffer()
+        print(self.buffer)
         self.headers = []
 
     def work(self):
