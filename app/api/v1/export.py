@@ -11,29 +11,7 @@ crf_info_py = getattr(models_package, 'crf_info')
 cycle_py = getattr(models_package, 'cycle')
 lab_inspectation_py = getattr(models_package, 'lab_inspectation')
 other_inspect_py = getattr(models_package, 'other_inspect')
-# questionnaire_py = getattr(models_package, 'questionnaire')
 therapy_record_py = getattr(models_package, 'therapy_record')
-
-lung_fields = ['FVC', 'FEV1_FVC', 'MEF', 'MEF25', 'MEF50', 'MEF75', 'TLC_sb',
-               'RV', 'RV_TLC', 'VC', 'DLCO_ex', 'DLCO_sb', 'KCO']
-
-'''
-@api.route('', methods=['POST'])
-def export():
-    data = request.get_json()
-    info = data['info']
-    tables = []
-    columns = []
-    del data['info']
-    x = check_tables_and_columns(data)
-    if x:
-        print(x)
-        tables = x[0]
-        columns = x[1]
-        return Export2(info, tables, columns).work()
-    else:
-        print('接收的表名或者字段名存在错误')
-'''
 
 
 @api.route('', methods=['POST'])
@@ -109,9 +87,6 @@ def if_table_exist(tableName):
     elif hasattr(other_inspect_py, tableName):
         obj_class_name = getattr(other_inspect_py, tableName)
         return obj_class_name
-    # elif hasattr(questionnaire_py, tableName):
-    #   obj_class_name = getattr(questionnaire_py, tableName)
-    #   return obj_class_name
     elif hasattr(therapy_record_py, tableName):
         obj_class_name = getattr(therapy_record_py, tableName)
         return obj_class_name

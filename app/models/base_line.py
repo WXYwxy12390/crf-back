@@ -8,7 +8,7 @@ from app.models.cycle import MoleDetec
 from app.models.therapy_record import PatDia
 from app.models.therapy_record import TreRec, OneToFive, Surgery, Radiotherapy
 from app.utils.date import get_birth_date_by_id_card, get_age_by_birth, str2date
-
+from app.spider.research_center import ResearchCenterSpider
 
 class Patient(Base):
     __tablename__ = 'patient'
@@ -65,6 +65,15 @@ class Patient(Base):
                 age = get_age_by_birth(get_birth_date_by_id_card(idNumber))
                 value = age if age else '/'
                 row.append(value)
+            elif column == 'researchCenter':
+                researchCenterSpider = ResearchCenterSpider()
+                value = self.filter_none(obj, column)
+                if value != '/':
+                    value = researchCenterSpider.search_by_center(value)
+                    value = value.get('data').get('name')
+                print(value)
+                row.append(value)
+
             else:
                 value = self.filter_none(obj, column)
                 row.append(value)
@@ -486,6 +495,19 @@ class PastHis(Base):
                 value = self.format_smoke_history(obj)
                 row.append(value)
             elif column == 'hormoneUseHis':
+                if_hormone = getattr(obj, 'hormone')
+                if (if_hormone and buffer.get('DrugHistory') is not None and
+                buffer.get('DrugHistory').get(pid) is not None):
+                    value = ''
+                    for drug_history_obj in buffer.get('DrugHistory').get(pid):
+                        if drug_history_obj.type == 1:
+                            value += drug_history_obj.drug_name + ','
+                            value += drug_history_obj.drug_dose + ','
+                            value += str(drug_history_obj.use_time) + '月;'
+                else:
+                    value = '/'
+                row.append(value)
+                '''
                 # 求激素使用史最多有多少条
                 max_num = 0
                 for pid, array_drugHistory in buffer.get('DrugHistory').items():
@@ -511,9 +533,22 @@ class PastHis(Base):
                         row.append(drug_history_obj.use_time)
 
                 for k in range(0, header_num - sum):
-                    row.extend(['/', '/', '/'])
+                    row.extend(['/', '/', '/'])'''
 
             elif column == 'drugUseHis':
+                if_drug = getattr(obj, 'drug')
+                if (if_drug and buffer.get('DrugHistory') is not None and
+                buffer.get('DrugHistory').get(pid) is not None):
+                    value = ''
+                    for drug_history_obj in buffer.get('DrugHistory').get(pid):
+                        if drug_history_obj.type == 0:
+                            value += drug_history_obj.drug_name + ','
+                            value += drug_history_obj.drug_dose + ','
+                            value += str(drug_history_obj.use_time) + '月;'
+                else:
+                    value = '/'
+                row.append(value)
+                '''
                 # 求药物使用史最多有多少条
                 max_num = 0
                 for pid, array_drugHistory in buffer.get('DrugHistory').items():
@@ -539,7 +574,7 @@ class PastHis(Base):
                         row.append(drug_history_obj.use_time)
 
                 for k in range(0, header_num - sum):
-                    row.extend(['/', '/', '/'])
+                    row.extend(['/', '/', '/'])'''
 
             elif type(x) == bool:
                 value = self.filter_none(self.change_bool_to_yes_or_no(x))
@@ -553,50 +588,7 @@ class PastHis(Base):
     def get_export_header(self, columns, buffer):
         header = []
         for column in columns:
-            if column == 'hormoneUseHis':
-                # 求激素使用史最多有多少条
-                max_num = 0
-                for pid, array_drugHistory in buffer.get('DrugHistory').items():
-                    num = 0
-                    for drugHistory in array_drugHistory:
-                        if drugHistory.type == 1:
-                            num += 1
-                    if num > max_num:
-                        max_num = num
-
-                if max_num > 1:
-                    header_num = max_num
-                else:
-                    header_num = 1
-
-                for k in range(1, header_num + 1):
-                    header.append('激素使用史:药物名称' + str(k))
-                    header.append('激素使用史:日使用剂量' + str(k))
-                    header.append('激素使用史:累积使用时间（月）' + str(k))
-
-            elif column == 'drugUseHis':
-                # 求药物使用史最多有多少条
-                max_num = 0
-                for pid, array_drugHistory in buffer.get('DrugHistory').items():
-                    num = 0
-                    for drugHistory in array_drugHistory:
-                        if drugHistory.type == 0:
-                            num += 1
-                    if num > max_num:
-                        max_num = num
-
-                if max_num > 1:
-                    header_num = max_num
-                else:
-                    header_num = 1
-
-                for k in range(1, header_num + 1):
-                    header.append('药物使用史:药物名称' + str(k))
-                    header.append('药物使用史:日使用剂量' + str(k))
-                    header.append('药物使用史:累积使用时间（月）' + str(k))
-
-            else:
-                header.append(self.export_header_map.get(column))
+            header.append(self.export_header_map.get(column))
 
         PastHis.header_num = len(header)
         return header

@@ -151,7 +151,13 @@ class TreRec(Base):
             return row
         obj = buffer.get('TreRec').get(pid).get(treNum)
         for column in columns:
-            value = self.filter_none(obj, column)
+            if column == 'trement':
+                trement_map = {'one':'1线','two':'2线','three':'3线','four':'4线',
+                               'five':'5线','surgery':'手术','radiotherapy':'放疗','other':'其他','/':'/'}
+                value = self.filter_none(obj, column)
+                value = trement_map.get(value)
+            else:
+                value = self.filter_none(obj, column)
             row.append(value)
         return row
 
@@ -284,7 +290,10 @@ class OneToFive(Base, PatDia):
         isTre_map = {0: '否', 1: '是', -1: '不详', "/": "/"}
 
         row = []
-        if buffer.get('OneToFive').get(pid) is None or buffer.get('OneToFive').get(pid).get(treNum) is None:
+        if (buffer.get('OneToFive') is None or buffer.get('OneToFive').get(pid) is None or
+        buffer.get('OneToFive').get(pid).get(treNum) is None or buffer.get('TreRec') is None or
+        buffer.get('TreRec').get(pid) is None or buffer.get('TreRec').get(pid).get(treNum) is None
+        or not(buffer.get('TreRec').get(pid).get(treNum).trement in ['one','two','three','four','five'])):
             for k in range(0, OneToFive.header_num):
                 row.append('/')
             return row
@@ -304,7 +313,18 @@ class OneToFive(Base, PatDia):
                 value = self.filter_none(obj, column) if value_isTre == 1 else '/'
                 row.append(value)
             elif column =='treSolu':
-                value = self.filter_none(obj, column)
+                value = ''
+                treSolu_value = self.filter_none(obj, column)
+                if 'Chemotherapy' in treSolu_value:
+                    value += '化疗 '
+                if 'TargetedTherapy' in treSolu_value:
+                    value += '靶向治疗 '
+                if 'ImmunityTherapy' in treSolu_value:
+                    value += '免疫治疗 '
+                if 'AntivascularTherapy' in treSolu_value:
+                    value += '抗血管治疗 '
+                if 'Other' in treSolu_value:
+                    value += '其他 '
                 row.append(value)
                 if detail_trePlan_array == None:
                     for k in range(0, OneToFive.chemo_detail_num):
@@ -321,7 +341,7 @@ class OneToFive(Base, PatDia):
                     immunity_detail_num = 0
                     antivascular_detail_num = 0
 
-                    if 'Chemotherapy' in value:
+                    if 'Chemotherapy' in treSolu_value:
                         for detail_trePlan in detail_trePlan_array:
                             if detail_trePlan.treSolu == 'Chemotherapy':
                                 chemo_detail_num += 1
@@ -354,7 +374,7 @@ class OneToFive(Base, PatDia):
                     for k in range(0, OneToFive.chemo_detail_num - chemo_detail_num):
                         row.extend(['/', '/', '/', '/', '/', '/', '/'])
 
-                    if 'TargetedTherapy' in value:
+                    if 'TargetedTherapy' in treSolu_value:
                         for detail_trePlan in detail_trePlan_array:
                             if detail_trePlan.treSolu == 'TargetedTherapy':
                                 targeted_detail_num += 1
@@ -387,7 +407,7 @@ class OneToFive(Base, PatDia):
                     for k in range(0, OneToFive.targeted_detail_num - targeted_detail_num):
                         row.extend(['/', '/', '/', '/', '/', '/', '/'])
 
-                    if 'ImmunityTherapy' in value:
+                    if 'ImmunityTherapy' in treSolu_value:
                         for detail_trePlan in detail_trePlan_array:
                             if detail_trePlan.treSolu == 'ImmunityTherapy':
                                 immunity_detail_num += 1
@@ -420,7 +440,7 @@ class OneToFive(Base, PatDia):
                     for k in range(0, OneToFive.immunity_detail_num - immunity_detail_num):
                         row.extend(['/', '/', '/', '/', '/', '/', '/'])
 
-                    if 'AntivascularTherapy' in value:
+                    if 'AntivascularTherapy' in treSolu_value:
                         for detail_trePlan in detail_trePlan_array:
                             if detail_trePlan.treSolu == 'AntivascularTherapy':
                                 antivascular_detail_num += 1
@@ -614,7 +634,9 @@ class Surgery(Base, PatDia):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         row = []
-        if buffer.get('Surgery').get(pid) is None or buffer.get('Surgery').get(pid).get(treNum) is None:
+        if (buffer.get('Surgery') is None or buffer.get('Surgery').get(pid) is None or buffer.get('Surgery').get(pid).get(treNum) is None
+        or buffer.get('TreRec') is None or buffer.get('TreRec').get(pid) is None or buffer.get('TreRec').get(pid).get(treNum) is None
+        or buffer.get('TreRec').get(pid).get(treNum).trement != 'surgery'):
             for k in range(0, Surgery.header_num):
                 row.append('/')
             return row
@@ -771,7 +793,9 @@ class Radiotherapy(Base, PatDia):
         radosUnit_map = {0: 'Gy', 1: 'cGy', "/": "/"}
 
         row = []
-        if buffer.get('Radiotherapy').get(pid) is None or buffer.get('Radiotherapy').get(pid).get(treNum) is None:
+        if (buffer.get('Radiotherapy') is None or buffer.get('Radiotherapy').get(pid) is None or buffer.get('Radiotherapy').get(pid).get(treNum) is None
+        or buffer.get('TreRec') is None or buffer.get('TreRec').get(pid) is None or buffer.get('TreRec').get(pid).get(treNum) is None
+        or buffer.get('TreRec').get(pid).get(treNum).trement != 'radiotherapy'):
             for k in range(0, Radiotherapy.header_num):
                 row.append('/')
             return row
