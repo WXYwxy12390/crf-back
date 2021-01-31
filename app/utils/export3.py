@@ -71,7 +71,7 @@ class Export:
 
         wb = Workbook()
         ws = wb.active
-        ws.alignment = Alignment(horizontal='center', vertical='center')
+        # ws.alignment = Alignment(horizontal='center', vertical='center')
         ws.title = '导出样本数据'
         ws.append(self.headers)
         '''

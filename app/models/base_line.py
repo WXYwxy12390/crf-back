@@ -71,9 +71,7 @@ class Patient(Base):
                 if value != '/':
                     value = researchCenterSpider.search_by_center(value)
                     value = value.get('data').get('name')
-                print(value)
                 row.append(value)
-
             else:
                 value = self.filter_none(obj, column)
                 row.append(value)
