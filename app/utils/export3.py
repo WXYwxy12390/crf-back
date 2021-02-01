@@ -43,7 +43,6 @@ class Export:
             i += 1
 
         self.__init_buffer()
-        print(self.buffer)
         self.headers = []
 
     def work(self):
