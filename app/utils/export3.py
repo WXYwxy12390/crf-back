@@ -126,7 +126,7 @@ class Export:
                 obj_array = obj_class.query.filter(obj_class.pid.in_(self.pids), obj_class.treNum.in_(self.treNums),
                                                    obj_class.is_delete == 0).all()
                 detail_trePlan_array = DetailTrePlan.query.filter(DetailTrePlan.pid.in_(self.pids),
-                                                                  obj_class.treNum.in_(self.treNums),
+                                                                  DetailTrePlan.treNum.in_(self.treNums),
                                                                   DetailTrePlan.is_delete == 0).all()
             else:
                 obj_array = obj_class.query.filter(obj_class.pid.in_(self.pids), obj_class.treNum.in_(self.treNums),

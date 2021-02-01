@@ -499,9 +499,9 @@ class PastHis(Base):
                     value = ''
                     for drug_history_obj in buffer.get('DrugHistory').get(pid):
                         if drug_history_obj.type == 1:
-                            value += drug_history_obj.drug_name + ','
-                            value += drug_history_obj.drug_dose + ','
-                            value += str(drug_history_obj.use_time) + '月;'
+                            value += self.filter_none(drug_history_obj.drug_name) + ','
+                            value += self.filter_none(drug_history_obj.drug_dose) + ','
+                            value += str(self.filter_none(drug_history_obj.use_time)) + '月;'
                 else:
                     value = '/'
                 row.append(value)
@@ -540,9 +540,9 @@ class PastHis(Base):
                     value = ''
                     for drug_history_obj in buffer.get('DrugHistory').get(pid):
                         if drug_history_obj.type == 0:
-                            value += drug_history_obj.drug_name + ','
-                            value += drug_history_obj.drug_dose + ','
-                            value += str(drug_history_obj.use_time) + '月;'
+                            value += self.filter_none(drug_history_obj.drug_name) + ','
+                            value += self.filter_none(drug_history_obj.drug_dose) + ','
+                            value += str(self.filter_none(drug_history_obj.use_time)) + '月;'
                 else:
                     value = '/'
                 row.append(value)
