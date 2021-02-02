@@ -58,9 +58,6 @@ class Export:
             i += 1
 
         self.__init_buffer()
-        for x in self.buffer.get('FollInfo').get(513):
-            print(x.date)
-
 
     def work(self):
         '''
