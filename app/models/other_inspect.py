@@ -248,5 +248,5 @@ class ImageExams(Base):
         ImageExams.header_num = len(header)
         return header
 
-def keys(self):
+    def keys(self):
         return ['id','pid','treNum','detectTime','examArea','exmaMethod','tumorLD','tumorSD','tumorDesc','path']

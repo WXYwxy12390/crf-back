@@ -354,16 +354,16 @@ class OneToFive(Base, PatDia):
                                     for key, value in value_drugs.items():
                                         drugs += key + ':'
                                         if 'drugDosa' in value.keys():
-                                            drugs += str(value['drugDosa'])
+                                            drugs += str(self.filter_none(value['drugDosa']))
                                         if 'unit' in value.keys():
-                                            drugs += value['unit']
+                                            drugs += self.filter_none(value['unit'])
                                         drugs += '  '
                                 elif type(value_drugs) == list:
                                     for each in value_drugs:
                                         if 'name' in each.keys():
-                                            drugs += each['name'] + ':'
+                                            drugs += self.filter_none(each['name']) + ':'
                                         if 'dose' in each.keys():
-                                            drugs += each['dose']
+                                            drugs += self.filter_none(each['dose'])
                                         drugs += '  '
                                 else:
                                     drugs = str(value_drugs)
@@ -387,16 +387,16 @@ class OneToFive(Base, PatDia):
                                     for key, value in value_drugs.items():
                                         drugs += key + ':'
                                         if 'drugDosa' in value.keys():
-                                            drugs += str(value['drugDosa'])
+                                            drugs += str(self.filter_none(value['drugDosa']))
                                         if 'unit' in value.keys():
-                                            drugs += value['unit']
+                                            drugs += self.filter_none(value['unit'])
                                         drugs += '  '
                                 elif type(value_drugs) == list:
                                     for each in value_drugs:
                                         if 'name' in each.keys():
-                                            drugs += each['name'] + ':'
+                                            drugs += self.filter_none(each['name']) + ':'
                                         if 'dose' in each.keys():
-                                            drugs += each['dose']
+                                            drugs += self.filter_none(each['dose'])
                                         drugs += '  '
                                 else:
                                     drugs = str(value_drugs)
@@ -420,16 +420,16 @@ class OneToFive(Base, PatDia):
                                     for key, value in value_drugs.items():
                                         drugs += key + ':'
                                         if 'drugDosa' in value.keys():
-                                            drugs += str(value['drugDosa'])
+                                            drugs += str(self.filter_none(value['drugDosa']))
                                         if 'unit' in value.keys():
-                                            drugs += value['unit']
+                                            drugs += self.filter_none(value['unit'])
                                         drugs += '  '
                                 elif type(value_drugs) == list:
                                     for each in value_drugs:
                                         if 'name' in each.keys():
-                                            drugs += each['name'] + ':'
+                                            drugs += self.filter_none(each['name']) + ':'
                                         if 'dose' in each.keys():
-                                            drugs += each['dose']
+                                            drugs += self.filter_none(each['dose'])
                                         drugs += '  '
                                 else:
                                     drugs = str(value_drugs)
@@ -453,16 +453,16 @@ class OneToFive(Base, PatDia):
                                     for key, value in value_drugs.items():
                                         drugs += key + ':'
                                         if 'drugDosa' in value.keys():
-                                            drugs += str(value['drugDosa'])
+                                            drugs += str(self.filter_none(value['drugDosa']))
                                         if 'unit' in value.keys():
-                                            drugs += value['unit']
+                                            drugs += self.filter_none(value['unit'])
                                         drugs += '  '
                                 elif type(value_drugs) == list:
                                     for each in value_drugs:
                                         if 'name' in each.keys():
-                                            drugs += each['name'] + ':'
+                                            drugs += self.filter_none(each['name']) + ':'
                                         if 'dose' in each.keys():
-                                            drugs += each['dose']
+                                            drugs += self.filter_none(each['dose'])
                                         drugs += '  '
                                 else:
                                     drugs = str(value_drugs)

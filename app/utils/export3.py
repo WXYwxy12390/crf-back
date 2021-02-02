@@ -17,9 +17,6 @@ class Export:
     trement_info_table = ['TreRec','OneToFive','Surgery','Radiotherapy','BloodRoutine', 'BloodBio', 'Thyroid',
                           'Coagulation', 'MyocardialEnzyme','Cytokines', 'LymSubsets', 'UrineRoutine', 'TumorMarker','Lung',
                           'OtherExams', 'ImageExams','Immunohis','MoleDetec','Signs','SideEffect']
-    lab_inspectation_table = ['BloodRoutine', 'BloodBio', 'Thyroid', 'Coagulation', 'MyocardialEnzyme',
-                              'Cytokines', 'LymSubsets', 'UrineRoutine', 'TumorMarker']
-    other_inspect_table = ['Lung', 'OtherExams', 'ImageExams']
 
     def __init__(self, pids, treNums, tables, columns):
         self.pids = pids
@@ -126,7 +123,7 @@ class Export:
                 obj_array = obj_class.query.filter(obj_class.pid.in_(self.pids), obj_class.treNum.in_(self.treNums),
                                                    obj_class.is_delete == 0).all()
                 detail_trePlan_array = DetailTrePlan.query.filter(DetailTrePlan.pid.in_(self.pids),
-                                                                  obj_class.treNum.in_(self.treNums),
+                                                                  DetailTrePlan.treNum.in_(self.treNums),
                                                                   DetailTrePlan.is_delete == 0).all()
             else:
                 obj_array = obj_class.query.filter(obj_class.pid.in_(self.pids), obj_class.treNum.in_(self.treNums),
