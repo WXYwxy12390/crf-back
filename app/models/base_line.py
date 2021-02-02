@@ -146,7 +146,7 @@ class Patient(Base):
         pagination = Patient.query.filter(Patient.is_delete == 0, Patient.id.in_(pids)).order_by(
             Patient.update_time.desc()).paginate(page=page, per_page=limit)
 
-        return pagination.items, pagination.total
+        return pagination.items, pagination.total,pids
 
     # 获取一组样本中最新的病例诊断
     @classmethod
