@@ -7,8 +7,7 @@ from app.models.base import Base, db
 from app.models.cycle import MoleDetec
 from app.models.therapy_record import PatDia
 from app.models.therapy_record import TreRec, OneToFive, Surgery, Radiotherapy
-from app.utils.date import get_birth_date_by_id_card, get_age_by_birth, str2date
-from app.spider.research_center import ResearchCenterSpider
+from app.utils.date import get_birth_date_by_id_card, get_age_by_birth
 
 class Patient(Base):
     __tablename__ = 'patient'
@@ -66,14 +65,9 @@ class Patient(Base):
                 value = age if age else '/'
                 row.append(value)
             elif column == 'researchCenter':
-                researchCenterSpider = ResearchCenterSpider()
                 value = self.filter_none(obj, column)
                 if value != '/':
-                    try:
-                        value = researchCenterSpider.search_by_center(value)
-                        value = value.get('data').get('name')
-                    except Exception:
-                        value = self.filter_none(obj, column)
+                    value = buffer.get('ResearchCenter').get(value)
                 row.append(value)
             else:
                 value = self.filter_none(obj, column)
@@ -502,7 +496,7 @@ class PastHis(Base):
                     value = ''
                     for drug_history_obj in buffer.get('DrugHistory').get(pid):
                         if drug_history_obj.type == 1:
-                            value += self.filter_none(drug_history_obj.drug_dose) + ','
+                            value += self.filter_none(drug_history_obj.drug_name) + ','
                             value += self.filter_none(drug_history_obj.drug_dose) + ','
                             value += str(self.filter_none(drug_history_obj.use_time)) + '月;'
                 else:
@@ -543,7 +537,7 @@ class PastHis(Base):
                     value = ''
                     for drug_history_obj in buffer.get('DrugHistory').get(pid):
                         if drug_history_obj.type == 0:
-                            value += self.filter_none(drug_history_obj.drug_dose) + ','
+                            value += self.filter_none(drug_history_obj.drug_name) + ','
                             value += self.filter_none(drug_history_obj.drug_dose) + ','
                             value += str(self.filter_none(drug_history_obj.use_time)) + '月;'
                 else:

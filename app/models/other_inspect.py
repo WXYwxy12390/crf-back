@@ -9,7 +9,7 @@ class Lung(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
     treNum = Column(Integer, comment='0对应初诊信息、1-n表示对应第x条治疗记录')
-    detectTime = Column(Date, comment='检测时间')
+    samplingTime = Column(Date, comment='检测时间')
     FVC_exp = Column(Float, comment='用力肺活量(L)预期值')
     FEV1_FVC_exp = Column(Float, comment='用力呼气一秒率(%)预期值')
     MEF_exp = Column(Float, comment='用力呼气中期流速(L/S)预期值')
@@ -78,7 +78,7 @@ class Lung(Base):
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
     # 和导出功能有关
-    export_header_map = {'detectTime':'肺功能检查时间','FVC':'FVC(L)','FEV1_FVC':'FEV1/FVC(%)','MEF':'MEF(L/S)',
+    export_header_map = {'samplingTime':'肺功能检查时间','FVC':'FVC(L)','FEV1_FVC':'FEV1/FVC(%)','MEF':'MEF(L/S)',
                          'MEF25':'MEF25(L/S)','MEF50':'MEF50(L/S)','MEF75':'MEF75(L/S)','TLC_sb':'TLC’sb(L)','RV':'RV(L)',
                          'RV_TLC':'RV’/TLC’(%)','VC':'VC(L)','DLCO_ex':'DLCO-ex(mL/mmHg/Mi)','DLCO_sb':'DLCO-sb(mL/mmHg/Mi)','KCO':'KCO'}
 
@@ -93,13 +93,14 @@ class Lung(Base):
 
         obj = buffer.get('Lung').get(pid).get(treNum)
         for column in columns:
-            if column == 'detectTime':
+            if column == 'samplingTime':
                 value = self.filter_none(obj, column)
                 row.append(value)
             else:
                 value_exp = self.filter_none(obj, column + '_exp')
                 value_best = self.filter_none(obj, column + '_best')
                 value_ratio = self.filter_none(obj, column + '_ratio')
+                value_ratio = str(value_ratio) + "%" if value_ratio != "/" else value_ratio
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
                 row.extend([value_exp, value_best, value_ratio, value_Mea, value_Note])
@@ -109,7 +110,7 @@ class Lung(Base):
     def get_export_header(self, columns, buffer):
         header = []
         for column in columns:
-            if column == 'detectTime':
+            if column == 'samplingTime':
                 header.append(self.export_header_map.get(column))
             else:
                 header.append(self.export_header_map.get(column) + '预计值')
@@ -122,7 +123,7 @@ class Lung(Base):
         return header
 
     def keys(self):
-        return ['id', 'pid', 'treNum', 'detectTime', 'FVC_exp', 'FEV1_FVC_exp', 'MEF_exp', 'MEF25_exp', 'MEF50_exp',
+        return ['id', 'pid', 'treNum', 'samplingTime', 'FVC_exp', 'FEV1_FVC_exp', 'MEF_exp', 'MEF25_exp', 'MEF50_exp',
                 'MEF75_exp','TLC_sb_exp', 'RV_exp', 'RV_TLC_exp', 'VC_exp', 'DLCO_ex_exp', 'DLCO_sb_exp', 'KCO_exp', 'FVC_best',
                 'FEV1_FVC_best','MEF_best', 'MEF25_best', 'MEF50_best', 'MEF75_best', 'TLC_sb_best', 'RV_best', 'RV_TLC_best',
                 'VC_best', 'DLCO_ex_best','DLCO_sb_best', 'KCO_best', 'FVC_ratio', 'FEV1_FVC_ratio', 'MEF_ratio', 'MEF25_ratio', 'MEF50_ratio',

@@ -1,3 +1,5 @@
+from time import time
+
 from flask import make_response
 from openpyxl import Workbook
 from openpyxl.styles import Alignment
@@ -5,6 +7,7 @@ from openpyxl.writer.excel import save_virtual_workbook
 
 from app.models.base_line import DrugHistory
 from app.models.therapy_record import DetailTrePlan
+from app.spider.research_center import ResearchCenterSpider
 
 
 class Export:
@@ -40,7 +43,6 @@ class Export:
             i += 1
 
         self.__init_buffer()
-        print(self.buffer)
         self.headers = []
 
     def work(self):
@@ -66,10 +68,11 @@ class Export:
                     self.headers.extend(obj.get_export_header(self.trementInfoColumns[i], self.buffer))
                     i += 1
 
-        wb = Workbook()
-        ws = wb.active
+        wb = Workbook(write_only=True)
+        # ws = wb.active
+        ws = wb.create_sheet(title='导出样本数据')
         # ws.alignment = Alignment(horizontal='center', vertical='center')
-        ws.title = '导出样本数据'
+        # ws.title = '导出样本数据'
         ws.append(self.headers)
         '''
         for pid in self.pids:
@@ -99,9 +102,6 @@ class Export:
                         row.extend(obj.get_export_row(self.trementInfoColumns[i], self.buffer, pid, treNum))
                         i += 1
             ws.append(row)
-
-
-        wb.save('test.xlsx')
         content = save_virtual_workbook(wb)
         resp = make_response(content)
         resp.headers["Content-Disposition"] = 'attachment; filename=samples.xlsx'
@@ -109,6 +109,13 @@ class Export:
         return resp
 
     def __init_buffer(self):
+        #缓存研究中心信息
+        centers_info = ResearchCenterSpider().search_all().get('data')
+        centers_dict = {}
+        for center in centers_info:
+            id = center.get('id')
+            centers_dict[id] = center.get('name')
+        self.add_buffer('ResearchCenter',centers_dict)
         for obj_class in self.tables:
             name = obj_class.__name__
             if name == 'Patient':

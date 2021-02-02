@@ -76,6 +76,7 @@ class Immunohis(Base):
         for column in columns:
             if column == 'Ki67' or column == 'other':
                 value = self.filter_none(obj, column)
+                value = str(value) + "%" if value != '/' else value
                 row.append(value)
             else:
                 value = self.filter_none(obj, column)
@@ -202,6 +203,10 @@ class MoleDetec(Base):
             elif column == 'MSI':
                 value = self.filter_none(obj, column)
                 value = moleDetec_MSI_map.get(value)
+                row.append(value)
+            elif column == 'PD1' or column == 'PDL1':
+                value = self.filter_none(obj, column)
+                value = str(value) + "%"  if value != '/' else value
                 row.append(value)
             else:
                 value = self.filter_none(obj, column)

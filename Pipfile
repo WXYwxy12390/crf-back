@@ -21,6 +21,7 @@ request = "*"
 requests = "*"
 flask-mail = "*"
 werkzeug = "*"
+lxml = "*"
 
 [requires]
 python_version = "3"

@@ -18,19 +18,10 @@ therapy_record_py = getattr(models_package, 'therapy_record')
 def export():
     data = request.get_json()
     pids = data['pids']
-    maxTreNum = data['maxTreNum']
-    minTreNum = data['minTreNum']
-
-    treNums = []
-    for i in range(minTreNum, maxTreNum + 1):
-        treNums.append(i)
+    treNums = data['treNums']
 
     del data['pids']
-    del data['maxTreNum']
-    del data['minTreNum']
-
-    tables = []
-    columns = []
+    del data['treNums']
 
     x = check_tables_and_columns(data)
     if x:
