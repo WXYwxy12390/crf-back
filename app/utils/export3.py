@@ -112,14 +112,14 @@ class Export:
                     i = 0
                     for obj_class_name in self.baseLineTable:
                         obj = obj_class_name()
-                        row.extend(obj.get_export_row(self.baseLineColumns[i], self.buffer, pid, treNum, self.follInfoNum))
+                        row.extend(obj.get_export_row(self.baseLineColumns[i], self.buffer, pid, treNum))
                         i += 1
                 else:
                     row.append('')
                     i = 0
                     for obj_class_name in self.trementInfoTable:
                         obj = obj_class_name()
-                        row.extend(obj.get_export_row(self.trementInfoColumns[i], self.buffer, pid, treNum, self.follInfoNum))
+                        row.extend(obj.get_export_row(self.trementInfoColumns[i], self.buffer, pid, treNum))
                         i += 1
             if self.if_follInfo:
                 obj = FollInfo()
