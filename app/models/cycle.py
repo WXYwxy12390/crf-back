@@ -175,7 +175,7 @@ class MoleDetec(Base):
                          'PD1KT':'PD1KT','PDL1':'PD-L1表达','PDL1KT':'PDL1KT','TMB':'TMB','other':'其他'}
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum, follInfoNum):
+    def get_export_row(self, columns, buffer, pid, treNum):
         moleDetec_map = {0: '阴性', 1: '阳性', 2: '无', "/": "/"}
         moleDetec_DetMed_map = {1: 'ARMS', 2: 'FISH', 3: 'NGS', "/": "/"}
         moleDetec_MSI_map = {0: 'MSS', 1: 'MSIH', 2: 'MSIL', "/": "/"}
