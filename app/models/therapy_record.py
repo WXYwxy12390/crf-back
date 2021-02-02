@@ -125,7 +125,7 @@ class PatDia:
     }  # 病理诊断map
 
 
-class TreRec(Base):
+class TreRec(Base, PatDia):
     __tablename__ = 'treRec'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -140,7 +140,8 @@ class TreRec(Base):
 
     # 和导出功能有关
     export_header_map = {'trement': '几线治疗', 'beEffEvaDate': '最佳疗效评估日期', 'beEffEva': '最佳疗效评估',
-                         'proDate': '进展日期', 'proDes': '进展描述', 'PFS_DFS': 'PFS/DFS'}
+                         'proDate': '进展日期', 'proDes': '进展描述', 'PFS_DFS': 'PFS/DFS',
+                         'isRepBio': '是否重复活检', 'bioMet': '活检方式', 'matPart': '取材部位','specNum': '标本库流水号', 'patDia': '病理诊断'}
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
@@ -150,15 +151,50 @@ class TreRec(Base):
                 row.append('/')
             return row
         obj = buffer.get('TreRec').get(pid).get(treNum)
+
+        if obj.trement == 'surgery':
+            if buffer.get('Surgery').get(pid) is None or buffer.get('Surgery').get(pid).get(treNum) is None:
+                obj2 = None
+            else:
+                obj2 = buffer.get('Surgery').get(pid).get(treNum)
+        elif obj.trement == 'radiotherapy':
+            if buffer.get('Radiotherapy').get(pid) is None or buffer.get('Radiotherapy').get(pid).get(treNum) is None:
+                obj2 = None
+            else:
+                obj2 = buffer.get('Radiotherapy').get(pid).get(treNum)
+        elif obj.trement in ['one','two','three','four','five']:
+            if buffer.get('OneToFive').get(pid) is None or buffer.get('OneToFive').get(pid).get(treNum) is None:
+                obj2 = None
+            else:
+                obj2 = buffer.get('OneToFive').get(pid).get(treNum)
+        else:
+            obj2 = None
+
         for column in columns:
             if column == 'trement':
                 trement_map = {'one':'1线','two':'2线','three':'3线','four':'4线',
                                'five':'5线','surgery':'手术','radiotherapy':'放疗','other':'其他','/':'/'}
                 value = self.filter_none(obj, column)
                 value = trement_map.get(value)
+                row.append(value)
+            elif column == 'isRepBio':
+                value = self.filter_none(self.change_bool_to_yes_or_no(getattr(obj2, column))) if obj2 else '/'
+                row.append(value)
+            elif column == 'matPart' or column == 'specNum':
+                value_isRepBio = getattr(obj2, 'isRepBio') if obj2 else None
+                value = self.filter_none(obj2, column) if value_isRepBio else '/'
+                row.append(value)
+            elif column == 'bioMet':
+                value_isRepBio = getattr(obj2, 'isRepBio') if obj2 else None
+                value = self.format_radio_data(obj2, column) if value_isRepBio else '/'
+                row.append(value)
+            elif column == 'patDia':
+                value_isRepBio = getattr(obj2, 'isRepBio') if obj2 else None
+                value = self.format_patDia(obj2) if value_isRepBio else '/'
+                row.append(value)
             else:
                 value = self.filter_none(obj, column)
-            row.append(value)
+                row.append(value)
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
@@ -276,9 +312,8 @@ class OneToFive(Base, PatDia):
     targeted_detail_num = 0
     immunity_detail_num = 0
     antivascular_detail_num = 0
-    export_header_map = {'isTre': '是否加入临床治疗', 'clinTri': '临床实验名称', 'treSolu': '治疗方案', 'note': '备注', 'begDate': '开始日期',
-                         'endDate': '结束日期', 'isRepBio': '是否重复活检', 'bioMet': '活检方式', 'matPart': '取材部位',
-                         'specNum': '标本库流水号', 'patDia': '病理诊断'}
+    export_header_map = {'isTre': '是否加入临床治疗', 'clinTri': '临床实验名称', 'treSolu': '治疗方案',
+                         'note': '备注', 'begDate': '开始日期', 'endDate': '结束日期'}
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'isTre', 'clinTri', 'treSolu', 'spePlan', 'begDate',
@@ -290,9 +325,8 @@ class OneToFive(Base, PatDia):
         isTre_map = {0: '否', 1: '是', -1: '不详', "/": "/"}
 
         row = []
-        if (buffer.get('OneToFive') is None or buffer.get('OneToFive').get(pid) is None or
-        buffer.get('OneToFive').get(pid).get(treNum) is None or buffer.get('TreRec') is None or
-        buffer.get('TreRec').get(pid) is None or buffer.get('TreRec').get(pid).get(treNum) is None
+        if (buffer.get('OneToFive').get(pid) is None or buffer.get('OneToFive').get(pid).get(treNum) is None
+        or buffer.get('TreRec').get(pid) is None or buffer.get('TreRec').get(pid).get(treNum) is None
         or not(buffer.get('TreRec').get(pid).get(treNum).trement in ['one','two','three','four','five'])):
             for k in range(0, OneToFive.header_num):
                 row.append('/')
@@ -480,21 +514,6 @@ class OneToFive(Base, PatDia):
                 else:
                     value = '/'
                 row.append(value)
-            elif column == 'isRepBio':
-                value = self.filter_none(self.change_bool_to_yes_or_no(getattr(obj, column)))
-                row.append(value)
-            elif column == 'matPart' or column == 'specNum':
-                value_isRepBio = getattr(obj, 'isRepBio')
-                value = self.filter_none(obj, column) if value_isRepBio else '/'
-                row.append(value)
-            elif column == 'bioMet':
-                value_isRepBio = getattr(obj, 'isRepBio')
-                value = self.format_radio_data(obj, column) if value_isRepBio else '/'
-                row.append(value)
-            elif column == 'patDia':
-                value_isRepBio = getattr(obj, 'isRepBio')
-                value = self.format_patDia(obj) if value_isRepBio else '/'
-                row.append(value)
             else:
                 value = self.filter_none(obj, column)
                 row.append(value)
@@ -627,15 +646,14 @@ class Surgery(Base, PatDia):
 
     # 和导出功能有关
     detail_header_num = 0
-    export_header_map = {'surSco': '手术范围', 'lymDis': '淋巴清扫范围', 'cleGro': '清扫组数', 'surDate': '手术日期',
-                         'posAdjChem': '术后辅助化疗', 'isRepBio': '是否重复活检', 'bioMet': '活检方式',
-                         'matPart': '取材部位', 'specNum': '标本库流水号', 'patDia': '病理诊断'}
+    export_header_map = {'surSco': '手术范围', 'lymDis': '淋巴清扫范围',
+                         'cleGro': '清扫组数', 'surDate': '手术日期', 'posAdjChem': '术后辅助化疗'}
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         row = []
-        if (buffer.get('Surgery') is None or buffer.get('Surgery').get(pid) is None or buffer.get('Surgery').get(pid).get(treNum) is None
-        or buffer.get('TreRec') is None or buffer.get('TreRec').get(pid) is None or buffer.get('TreRec').get(pid).get(treNum) is None
+        if (buffer.get('Surgery').get(pid) is None or buffer.get('Surgery').get(pid).get(treNum) is None
+        or buffer.get('TreRec').get(pid) is None or buffer.get('TreRec').get(pid).get(treNum) is None
         or buffer.get('TreRec').get(pid).get(treNum).trement != 'surgery'):
             for k in range(0, Surgery.header_num):
                 row.append('/')
@@ -690,21 +708,7 @@ class Surgery(Base, PatDia):
                             row.append(self.filter_none(detail_trePlan, 'note'))
                     for k in range(0, Surgery.detail_header_num - detail_num):
                         row.extend(['/', '/', '/', '/', '/', '/', '/'])
-            elif column == 'isRepBio':
-                value = self.filter_none(self.change_bool_to_yes_or_no(getattr(obj, column)))
-                row.append(value)
-            elif column == 'matPart' or column == 'specNum':
-                value_isRepBio = getattr(obj, 'isRepBio')
-                value = self.filter_none(obj, column) if value_isRepBio else '/'
-                row.append(value)
-            elif column == 'bioMet':
-                value_isRepBio = getattr(obj, 'isRepBio')
-                value = self.format_radio_data(obj, column) if value_isRepBio else '/'
-                row.append(value)
-            elif column == 'patDia':
-                value_isRepBio = getattr(obj, 'isRepBio')
-                value = self.format_patDia(obj) if value_isRepBio else '/'
-                row.append(value)
+
             else:
                 value = self.filter_none(obj, column)
                 row.append(value)
@@ -761,7 +765,7 @@ class Surgery(Base, PatDia):
 
 
 # 放疗表
-class Radiotherapy(Base, PatDia):
+class Radiotherapy(Base):
     __tablename__ = 'radiotherapy'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -784,17 +788,16 @@ class Radiotherapy(Base, PatDia):
     patDia = Column(JSON, comment='病理诊断结果')
 
     # 和导出功能有关
-    export_header_map = {'begDate': '开始日期', 'endDate': '结束日期', 'radSite': '放疗部位', 'radDose': '放疗剂量',
-                         'splTim': '分割次数', 'isRepBio': '是否重复活检', 'bioMet': '活检方式', 'matPart': '取材部位',
-                         'specNum': '标本库流水号', 'patDia': '病理诊断'}
+    export_header_map = {'begDate': '开始日期', 'endDate': '结束日期', 'radSite': '放疗部位',
+                         'radDose': '放疗剂量','splTim': '分割次数'}
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         radosUnit_map = {0: 'Gy', 1: 'cGy', "/": "/"}
 
         row = []
-        if (buffer.get('Radiotherapy') is None or buffer.get('Radiotherapy').get(pid) is None or buffer.get('Radiotherapy').get(pid).get(treNum) is None
-        or buffer.get('TreRec') is None or buffer.get('TreRec').get(pid) is None or buffer.get('TreRec').get(pid).get(treNum) is None
+        if (buffer.get('Radiotherapy').get(pid) is None or buffer.get('Radiotherapy').get(pid).get(treNum) is None
+        or buffer.get('TreRec').get(pid) is None or buffer.get('TreRec').get(pid).get(treNum) is None
         or buffer.get('TreRec').get(pid).get(treNum).trement != 'radiotherapy'):
             for k in range(0, Radiotherapy.header_num):
                 row.append('/')
@@ -814,21 +817,7 @@ class Radiotherapy(Base, PatDia):
                 value_method = self.filter_none(obj, 'method')
                 value = str(value_splTim) + value_method if value_splTim != '/' else '/'
                 row.append(value)
-            elif column == 'isRepBio':
-                value = self.filter_none(self.change_bool_to_yes_or_no(getattr(obj, column)))
-                row.append(value)
-            elif column == 'matPart' or column == 'specNum':
-                value_isRepBio = getattr(obj, 'isRepBio')
-                value = self.filter_none(obj, column) if value_isRepBio else '/'
-                row.append(value)
-            elif column == 'bioMet':
-                value_isRepBio = getattr(obj, 'isRepBio')
-                value = self.format_radio_data(obj, column) if value_isRepBio else '/'
-                row.append(value)
-            elif column == 'patDia':
-                value_isRepBio = getattr(obj, 'isRepBio')
-                value = self.format_patDia(obj) if value_isRepBio else '/'
-                row.append(value)
+
             else:
                 value = self.filter_none(obj, column)
                 row.append(value)

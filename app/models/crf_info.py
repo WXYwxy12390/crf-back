@@ -23,23 +23,111 @@ class FollInfo(Base):
     tumorDesc = Column(String(100), comment='肿瘤描述') #废弃
 
     # 和导出功能有关
-    export_header_map = {'date':'随访日期', 'folMet':'随访方式', 'effEva':'疗效评估',
+    export_header_map = {'nextFollowupTime':'计划下次随访时间', 'date':'随访日期', 'folMet':'随访方式', 'effEva':'疗效评估',
                          'livSta':'生存状态','imaFilType':'影像类型', 'remarks':'备注'}
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treNum, follInfoNum):
         folMet_map = {1:'电话', 2:'门诊', 3:'住院', '/':'/'}
         effEva_map = {1:'PD-进展', 2:'SD-稳定' , 3:'PR-部分缓解',
                       4:'CR-完全缓解', 5:'术后未发现新病灶', '/':'/'}
         livSta_map = {1:'死亡', 2:'存活', 3:'失联', '/':'/'}
-        imaFilType = {1:'X光', 2:'超声', 3:'CT',
-                      4:'MRI', 5:'PET/CT', '/':'/'}
+        imaFilType_map = {1:'X光', 2:'超声', 3:'CT',4:'MRI', 5:'PET/CT', '/':'/',
+                          '1': 'X光', '2': '超声', '3': 'CT', '4': 'MRI', '5': 'PET/CT'}
+        nextFollowupTime_flag = False
+        row = []
 
+        if buffer.get('FollInfo').get(pid) is None:
+            for k in range(0, FollInfo.header_num):
+                row.append('/')
+            return row
+        obj_array = buffer.get('FollInfo').get(pid)
+
+        if buffer.get('Patient').get(pid) is None:
+            patient_obj = None
+        else:
+            patient_obj = buffer.get('Patient').get(pid)
+
+        if len(obj_array) < follInfoNum:
+            for k in range(0, len(obj_array)):
+                for column in columns:
+                    if column == 'folMet':
+                        value = self.filter_none(obj_array[k], column)
+                        value = folMet_map.get(value)
+                        row.append(value)
+                    elif column == 'effEva':
+                        value = self.filter_none(obj_array[k], column)
+                        value = effEva_map.get(value)
+                        row.append(value)
+                    elif column == 'livSta':
+                        value = self.filter_none(obj_array[k], column)
+                        value = livSta_map.get(value)
+                        if value == '死亡':
+                            value += ',死亡时间:' + str(obj_array[k].dieDate) if obj_array[k].dieDate else ',死亡时间未知'
+                        row.append(value)
+                    elif column == 'imaFilType':
+                        value = self.filter_none(obj_array[k], column)
+                        value = imaFilType_map.get(value)
+                        row.append(value)
+                    elif column == 'nextFollowupTime':
+                        if not nextFollowupTime_flag:
+                            value = self.filter_none(patient_obj, column) if patient_obj else '/'
+                            row.append(value)
+                            nextFollowupTime_flag = True
+                    else:
+                        value = self.filter_none(obj_array[k], column)
+                        row.append(value)
+
+            for k in range(0, FollInfo.header_num - len(row)):
+                row.append('/')
+
+        else:
+            for k in range(0, follInfoNum):
+                for column in columns:
+                    if column == 'folMet':
+                        value = self.filter_none(obj_array[k], column)
+                        value = folMet_map.get(value)
+                        row.append(value)
+                    elif column == 'effEva':
+                        value = self.filter_none(obj_array[k], column)
+                        value = effEva_map.get(value)
+                        row.append(value)
+                    elif column == 'livSta':
+                        value = self.filter_none(obj_array[k], column)
+                        value = livSta_map.get(value)
+                        if value == '死亡':
+                            value += ',死亡时间:' + str(obj_array[k].dieDate) if obj_array[k].dieDate else '死亡时间未知'
+                        row.append(value)
+                    elif column == 'imaFilType':
+                        value = self.filter_none(obj_array[k], column)
+                        value = imaFilType_map.get(value)
+                        row.append(value)
+                    elif column == 'nextFollowupTime':
+                        if not nextFollowupTime_flag:
+                            value = self.filter_none(patient_obj, column) if patient_obj else '/'
+                            row.append(value)
+                            nextFollowupTime_flag = True
+                    else:
+                        value = self.filter_none(obj_array[k], column)
+                        row.append(value)
+
+        return row
 
 
     # 和导出功能有关，得到导出的表的中文抬头
-    def get_export_header(self, columns, buffer):
-        pass
+    def get_export_header(self, columns, buffer, follInfoNum):
+        nextFollowupTime_flag = False
+        header = []
+        for i in range(1, follInfoNum + 1):
+            for column in columns:
+                if column == 'nextFollowupTime':
+                    if not nextFollowupTime_flag:
+                        header.append(self.export_header_map.get(column))
+                        nextFollowupTime_flag = True
+                else:
+                    header.append(self.export_header_map.get(column) + str(i))
+        FollInfo.header_num = len(header)
+        return header
 
     def keys(self):
         return ['id', 'pid', 'number', 'date', 'effEva', 'folMet', 'livSta', 'dieDate','remarks', 'imaFilType', 'suv', 'savFilPath',

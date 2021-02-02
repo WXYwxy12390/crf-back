@@ -19,16 +19,14 @@ def export():
     data = request.get_json()
     pids = data['pids']
     treNums = data['treNums']
+    follInfoNum = data['follInfoNum']
 
-    del data['pids']
-    del data['treNums']
-
-    x = check_tables_and_columns(data)
+    x = check_tables_and_columns(data['data'])
     if x:
         print(x)
         tables = x[0]
         columns = x[1]
-        return Export3(pids, treNums, tables, columns).work()
+        return Export3(pids, treNums, follInfoNum, tables, columns).work()
     else:
         print('接收的表名或者字段名存在错误')
 
@@ -39,12 +37,15 @@ def check_tables_and_columns(data):
     flag = True
     tables = []
     columns = []
-    for key, value in data.items():
-        obj_class_name = if_table_exist(key)
+
+    for dic in data:
+        table = dic['table']
+        column = dic['column']
+        obj_class_name = if_table_exist(table)
         if obj_class_name:
             tables.append(obj_class_name)
-            if if_columns_exist(obj_class_name, value):
-                columns.append(value)
+            if if_columns_exist(obj_class_name, column):
+                columns.append(column)
             else:
                 print('字段名不存在！')
                 flag = False
@@ -53,7 +54,6 @@ def check_tables_and_columns(data):
             print('表名不存在！')
             flag = False
             break
-
     if flag:
         return tables, columns
     else:
@@ -89,7 +89,6 @@ def if_table_exist(tableName):
 # obj为表对应的模型类；columns是字符串数组，存放若干个字段名
 def if_columns_exist(obj_class_name, columns):
     flag = True
-    obj = obj_class_name()
     for column in columns:
         export_header_map = getattr(obj_class_name, 'export_header_map')
         if not (column in export_header_map.keys()):
