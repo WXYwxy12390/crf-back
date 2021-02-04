@@ -315,7 +315,7 @@ class OneToFive(Base, PatDia):
     immunity_detail_num = 0
     antivascular_detail_num = 0
     export_header_map = {'isTre': '是否加入临床治疗', 'clinTri': '临床实验名称', 'treSolu': '治疗方案',
-                         'note': '备注', 'begDate': '开始日期', 'endDate': '结束日期',
+                         'note': '其他', 'begDate': '开始日期', 'endDate': '结束日期',
                          'treatName': '治疗名称', 'currPeriod': '周期', 'treSche': '药物方案',
                          'drugs': '药物', 'detailBegDate': '给药/治疗开始日期', 'detailEndDate': '给药/治疗结束日期', 'detailNote': '备注'}
     detail_header = ['treatName', 'currPeriod', 'treSche', 'drugs', 'detailBegDate', 'detailEndDate', 'detailNote']
