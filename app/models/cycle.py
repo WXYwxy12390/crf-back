@@ -354,6 +354,12 @@ class SideEffect(Base):
                     else:
                         value = '/'
                     row.append(value)
+                elif column == 'sidReaName':
+                    value = self.filter_none(obj, column)
+                    if value == '其他副作用_其他':
+                        sidReaNameOther_value = self.filter_none(obj, 'sidReaNameOther')
+                        value = '其他副作用_' + sidReaNameOther_value
+                    row.append(value)
                 else:
                     value = self.filter_none(obj, column)
                     row.append(value)
