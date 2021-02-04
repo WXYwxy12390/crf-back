@@ -105,7 +105,6 @@ class BloodRoutine(Base):
             return row
         obj = buffer.get('BloodRoutine').get(pid).get(treNum)
         for column in columns:
-            x = getattr(obj, column)
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
                 row.append(value)
@@ -114,6 +113,7 @@ class BloodRoutine(Base):
                 value_Mea = Mea_map.get(self.filter_none(obj, column+'Mea'))
                 value_Note = self.filter_none(obj, column+'Note')
                 row.extend([value, value_Mea, value_Note])
+
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
@@ -247,7 +247,6 @@ class BloodBio(Base):
             return row
         obj = buffer.get('BloodBio').get(pid).get(treNum)
         for column in columns:
-            x = getattr(obj, column)
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
                 row.append(value)
@@ -256,6 +255,7 @@ class BloodBio(Base):
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
                 row.extend([value, value_Mea, value_Note])
+
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
@@ -324,7 +324,6 @@ class Thyroid(Base):
             return row
         obj = buffer.get('Thyroid').get(pid).get(treNum)
         for column in columns:
-            x = getattr(obj, column)
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
                 row.append(value)
@@ -333,6 +332,7 @@ class Thyroid(Base):
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
                 row.extend([value, value_Mea, value_Note])
+
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
@@ -404,7 +404,6 @@ class Coagulation(Base):
             return row
         obj = buffer.get('Coagulation').get(pid).get(treNum)
         for column in columns:
-            x = getattr(obj, column)
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
                 row.append(value)
@@ -413,6 +412,7 @@ class Coagulation(Base):
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
                 row.extend([value, value_Mea, value_Note])
+
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
@@ -492,7 +492,6 @@ class MyocardialEnzyme(Base):
             return row
         obj = buffer.get('MyocardialEnzyme').get(pid).get(treNum)
         for column in columns:
-            x = getattr(obj, column)
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
                 row.append(value)
@@ -501,6 +500,7 @@ class MyocardialEnzyme(Base):
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
                 row.extend([value, value_Mea, value_Note])
+
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
@@ -576,7 +576,6 @@ class Cytokines(Base):
             return row
         obj = buffer.get('Cytokines').get(pid).get(treNum)
         for column in columns:
-            x = getattr(obj, column)
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
                 row.append(value)
@@ -585,6 +584,7 @@ class Cytokines(Base):
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
                 row.extend([value, value_Mea, value_Note])
+
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
@@ -733,7 +733,6 @@ class LymSubsets(Base):
             return row
         obj = buffer.get('LymSubsets').get(pid).get(treNum)
         for column in columns:
-            x = getattr(obj, column)
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
                 row.append(value)
@@ -742,6 +741,7 @@ class LymSubsets(Base):
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
                 row.extend([value, value_Mea, value_Note])
+
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
@@ -841,7 +841,6 @@ class UrineRoutine(Base):
             return row
         obj = buffer.get('UrineRoutine').get(pid).get(treNum)
         for column in columns:
-            x = getattr(obj, column)
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
                 row.append(value)
@@ -850,6 +849,7 @@ class UrineRoutine(Base):
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
                 row.extend([value, value_Mea, value_Note])
+
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
@@ -925,7 +925,6 @@ class TumorMarker(Base):
             return row
         obj = buffer.get('TumorMarker').get(pid).get(treNum)
         for column in columns:
-            x = getattr(obj, column)
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
                 row.append(value)
@@ -934,6 +933,7 @@ class TumorMarker(Base):
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
                 row.extend([value, value_Mea, value_Note])
+
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头

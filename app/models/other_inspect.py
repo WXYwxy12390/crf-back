@@ -104,6 +104,7 @@ class Lung(Base):
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
                 row.extend([value_exp, value_best, value_ratio, value_Mea, value_Note])
+
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
@@ -161,6 +162,7 @@ class OtherExams(Base):
         for column in columns:
             value = self.filter_none(obj, column)
             row.append(value)
+
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
@@ -200,16 +202,14 @@ class ImageExams(Base):
             for k in range(0, ImageExams.header_num):
                 row.append('/')
             return row
-
         obj_array = buffer.get('ImageExams').get(pid).get(treNum)
         # 求最多有多少条
         max_num = 0
         for value1 in buffer.get('ImageExams').values():
             for value2 in value1.values():
-                if type(value2) == list:
-                    num = len(value2)
-                    if num > max_num:
-                        max_num = num
+                num = len(value2)
+                if num > max_num:
+                    max_num = num
         if max_num > 1:
             header_num = max_num
         else:
@@ -232,10 +232,9 @@ class ImageExams(Base):
         max_num = 0
         for value1 in buffer.get('ImageExams').values():
             for value2 in value1.values():
-                if type(value2) == list:
-                    num = len(value2)
-                    if num > max_num:
-                        max_num = num
+                num = len(value2)
+                if num > max_num:
+                    max_num = num
 
         if max_num > 1:
             header_num = max_num

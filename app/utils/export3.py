@@ -12,118 +12,86 @@ from app.models.lab_inspectation import BloodRoutine, BloodBio, Thyroid, Coagula
 from app.models.other_inspect import Lung, OtherExams, ImageExams
 from app.models.therapy_record import DetailTrePlan, Surgery, OneToFive, Radiotherapy, TreRec
 from app.spider.research_center import ResearchCenterSpider
+import gc
 
 
 class Export:
     # 缓存数据
     buffer = {}
 
-    base_line_table = ['Patient', 'PastHis', 'IniDiaPro', 'BloodRoutine', 'BloodBio', 'Thyroid', 'Coagulation',
-                       'MyocardialEnzyme',
-                       'Cytokines', 'LymSubsets', 'UrineRoutine', 'TumorMarker', 'Lung', 'OtherExams', 'ImageExams',
-                       'Immunohis', 'MoleDetec']
-    trement_info_table = ['TreRec', 'OneToFive', 'Surgery', 'Radiotherapy', 'BloodRoutine', 'BloodBio', 'Thyroid',
-                          'Coagulation', 'MyocardialEnzyme', 'Cytokines', 'LymSubsets', 'UrineRoutine', 'TumorMarker',
-                          'Lung',
-                          'OtherExams', 'ImageExams', 'Immunohis', 'MoleDetec', 'Signs', 'SideEffect']
-
-    def __init__(self, pids, treNums, follInfoNum, tables, columns):
+    def __init__(self, pids, treNums, follInfoNum, baseLine, trementInfo, follInfo):
         self.pids = pids
         self.treNums = treNums
         self.follInfoNum = follInfoNum
-        self.tables = tables
-        self.columns = columns
-
-        self.baseLineTable = []
-        self.baseLineColumns = []
-        self.trementInfoTable = []
-        self.trementInfoColumns = []
-        self.if_follInfo = False
-        self.follInfoColumns = []
+        self.baseLine = baseLine
+        self.trementInfo = trementInfo
+        self.follInfo = follInfo
 
         self.headers = []
 
-        i = 0
-        for obj_class_name in self.tables:
-            name = obj_class_name.__name__
-            if name in Export.base_line_table:
-                self.baseLineTable.append(obj_class_name)
-                self.baseLineColumns.append(self.columns[i])
-            if name in Export.trement_info_table:
-                self.trementInfoTable.append(obj_class_name)
-                self.trementInfoColumns.append(self.columns[i])
-            if name == 'FollInfo':
-                self.if_follInfo = True
-                self.follInfoColumns = self.columns[i]
-            i += 1
+        if follInfo:
+            self.if_follInfo = True
+        else:
+            self.if_follInfo = False
 
         self.__init_buffer()
 
     def work(self):
-        '''
-        i = 0
-        for obj_class_name in self.tables:
-            obj = obj_class_name()
-            self.headers.extend(obj.get_export_header(self.columns[i], self.buffer))
-            i += 1
-        '''
         for treNum in self.treNums:
             if treNum == 0:
-                i = 0
-                for obj_class_name in self.baseLineTable:
+                for dic in self.baseLine:
+                    obj_class_name = dic['table']
+                    columns = dic['column']
                     obj = obj_class_name()
-                    self.headers.extend(obj.get_export_header(self.baseLineColumns[i], self.buffer))
-                    i += 1
+                    self.headers.extend(obj.get_export_header(columns, self.buffer))
             else:
-                self.headers.append('治疗信息' + str(treNum))
-                i = 0
-                for obj_class_name in self.trementInfoTable:
+                if self.trementInfo:
+                    self.headers.append('治疗信息' + str(treNum))
+                for dic in self.trementInfo:
+                    obj_class_name = dic['table']
+                    columns = dic['column']
                     obj = obj_class_name()
-                    self.headers.extend(obj.get_export_header(self.trementInfoColumns[i], self.buffer))
-                    i += 1
-        if self.if_follInfo:
-            obj = FollInfo()
-            self.headers.extend(obj.get_export_header(self.follInfoColumns, self.buffer, self.follInfoNum))
+                    self.headers.extend(obj.get_export_header(columns, self.buffer))
 
-        wb = Workbook()
-        # wb = Workbook(write_only=True)
-        ws = wb.active
-        # ws = wb.create_sheet(title='导出样本数据')
-        ws.title = '导出样本数据'
+        if self.follInfo:
+            obj = FollInfo()
+            self.headers.extend(obj.get_export_header(self.follInfo['column'], self.buffer, self.follInfoNum))
+
+        # wb = Workbook()
+        wb = Workbook(write_only=True)
+        # ws = wb.active
+        ws = wb.create_sheet(title='导出样本数据')
+        # ws.title = '导出样本数据'
         ws.append(self.headers)
-        '''
-        for pid in self.pids:
-            for treNum in self.treNums:
-                row = []
-                i = 0
-                for obj_class_name in self.tables:
-                    obj = obj_class_name()
-                    row.extend(obj.get_export_row(self.columns[i], self.buffer, pid, treNum))
-                    i += 1
-                ws.append(row)
-        '''
+
         for pid in self.pids:
             row = []
             for treNum in self.treNums:
                 if treNum == 0:
-                    i = 0
-                    for obj_class_name in self.baseLineTable:
+                    for dic in self.baseLine:
+                        obj_class_name = dic['table']
+                        columns = dic['column']
                         obj = obj_class_name()
-                        row.extend(obj.get_export_row(self.baseLineColumns[i], self.buffer, pid, treNum))
-                        i += 1
-                else:
-                    row.append('')
-                    i = 0
-                    for obj_class_name in self.trementInfoTable:
-                        obj = obj_class_name()
-                        row.extend(obj.get_export_row(self.trementInfoColumns[i], self.buffer, pid, treNum))
-                        i += 1
-            if self.if_follInfo:
-                obj = FollInfo()
-                row.extend(obj.get_export_row(self.follInfoColumns, self.buffer, pid, 0, self.follInfoNum))
-            ws.append(row)
+                        row.extend(obj.get_export_row(columns, self.buffer, pid, treNum))
 
-        wb.save('test.xlsx')
+                else:
+                    if self.trementInfo:
+                        row.append('')
+                    for dic in self.trementInfo:
+                        obj_class_name = dic['table']
+                        columns = dic['column']
+                        obj = obj_class_name()
+                        row.extend(obj.get_export_row(columns, self.buffer, pid, treNum))
+
+            if self.follInfo:
+                obj = FollInfo()
+                row.extend(obj.get_export_row(self.follInfo['column'], self.buffer, pid, 0, self.follInfoNum))
+
+            ws.append(row)
+            print(pid)
+            gc.collect()
+
+        # wb.save('test.xlsx')
         content = save_virtual_workbook(wb)
         resp = make_response(content)
         resp.headers["Content-Disposition"] = 'attachment; filename=samples.xlsx'
@@ -203,7 +171,7 @@ class Export:
         self.add_buffer('TreRec', self.classify_by_treNum(treRec_array))
         self.add_buffer('Surgery', self.classify_by_treNum(surgery_array))
         self.add_buffer('OneToFive', self.classify_by_treNum(oneToFive_array))
-        self.add_buffer('DetailTrePlan', self.array_classify_by_treNum(detail_trePlan_array))
+        self.add_buffer('DetailTrePlan', self.array_classify_by_treSolu(detail_trePlan_array))
         self.add_buffer('Radiotherapy', self.classify_by_treNum(radio_array))
         self.add_buffer('Signs', self.array_classify_by_treNum(signs_array))
         self.add_buffer('SideEffect', self.array_classify_by_treNum(sideEffect_array))
@@ -253,7 +221,6 @@ class Export:
         :param items:[objent]
         :return: map = {
             pid:{
-                "total":xxx,
                 treNum:obj
             }
         }
@@ -263,10 +230,8 @@ class Export:
             pid = getattr(item, 'pid')
             if data.get(pid) is None:
                 data[pid] = {}
-                data[pid]['total'] = 0
             if data.get(pid).get(item.treNum) is None:
                 data[pid][item.treNum] = item
-                data[pid]['total'] += 1
         return data
 
     def array_classify_by_treNum(self, items):
@@ -274,7 +239,6 @@ class Export:
         :param items:[objent]
         :return: map = {
             pid:{
-                "total":xxx,
                 treNum:[]
             }
         }
@@ -284,21 +248,20 @@ class Export:
             pid = getattr(item, 'pid')
             if data.get(pid) is None:
                 data[pid] = {}
-                data[pid]['total'] = 0
             if data.get(pid).get(item.treNum) is None:
                 data[pid][item.treNum] = []
-                data[pid]['total'] += 1
             data[pid][item.treNum].append(item)
 
         return data
 
-    def array_classify_by_treNum(self, items):
+    def array_classify_by_treSolu(self, items):
         '''
         :param items:[objent]
         :return: map = {
             pid:{
-                "total":xxx,
-                treNum:[]
+                treNum:{
+                    treSolu:[..,..]
+                }
             }
         }
         '''
@@ -307,10 +270,10 @@ class Export:
             pid = getattr(item, 'pid')
             if data.get(pid) is None:
                 data[pid] = {}
-                data[pid]['total'] = 0
             if data.get(pid).get(item.treNum) is None:
-                data[pid][item.treNum] = []
-                data[pid]['total'] += 1
-            data[pid][item.treNum].append(item)
+                data[pid][item.treNum] = {}
+            if data.get(pid).get(item.treNum).get(item.treSolu) is None:
+                data[pid][item.treNum][item.treSolu] = []
+            data[pid][item.treNum][item.treSolu].append(item)
 
         return data

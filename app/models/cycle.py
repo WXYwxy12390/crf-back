@@ -82,6 +82,7 @@ class Immunohis(Base):
                 value = self.filter_none(obj, column)
                 value = immunohis_map.get(value)
                 row.append(value)
+
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
@@ -293,10 +294,9 @@ class Signs(Base):
         max_num = 0
         for value1 in buffer.get('Signs').values():
             for value2 in value1.values():
-                if type(value2) == list:
-                    num = len(value2)
-                    if num > max_num:
-                        max_num = num
+                num = len(value2)
+                if num > max_num:
+                    max_num = num
 
         if max_num > 1:
             header_num = max_num
@@ -372,10 +372,9 @@ class SideEffect(Base):
         max_num = 0
         for value1 in buffer.get('SideEffect').values():
             for value2 in value1.values():
-                if type(value2) == list:
-                    num = len(value2)
-                    if num > max_num:
-                        max_num = num
+                num = len(value2)
+                if num > max_num:
+                    max_num = num
 
         if max_num > 1:
             header_num = max_num

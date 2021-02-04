@@ -17,16 +17,32 @@ therapy_record_py = getattr(models_package, 'therapy_record')
 @api.route('', methods=['POST'])
 def export():
     data = request.get_json()
-    pids = data['pids']
-    treNums = data['treNums']
-    follInfoNum = data['follInfoNum']
+    keys = data.keys()
+    pids = data['pids'] if 'pids' in keys else []
+    treNums = data['treNums'] if 'treNums' in keys else []
+    follInfoNum = data['follInfoNum'] if 'follInfoNum' in keys else 0
+    baseLine = []
+    trementInfo = []
+    follInfo = {}
+    if_baseLine_ok = True
+    if_trementInfo_ok = True
+    if_follInfo_ok = True
+    if 'baseLine' in keys:
+        baseLine = data['baseLine']
+        if_baseLine_ok = check_tables_and_columns(baseLine)
+    if 'trementInfo' in keys:
+        trementInfo = data['trementInfo']
+        if_trementInfo_ok = check_tables_and_columns(trementInfo)
+    if 'follInfo' in keys:
+        follInfo = data['follInfo']
+        if if_table_exist(follInfo['table']) and if_columns_exist(if_table_exist(follInfo['table']),
+                                                                  follInfo['column']):
+            if_follInfo_ok = True
+        else:
+            if_follInfo_ok = False
 
-    x = check_tables_and_columns(data['data'])
-    if x:
-        print(x)
-        tables = x[0]
-        columns = x[1]
-        return Export3(pids, treNums, follInfoNum, tables, columns).work()
+    if if_baseLine_ok and if_trementInfo_ok and if_follInfo_ok:
+        return Export3(pids, treNums, follInfoNum, baseLine, trementInfo, follInfo).work()
     else:
         print('接收的表名或者字段名存在错误')
 
@@ -35,18 +51,14 @@ def export():
 # 若正确返回tables,columns两个数组，若不正确返回None
 def check_tables_and_columns(data):
     flag = True
-    tables = []
-    columns = []
 
-    for dic in data:
-        table = dic['table']
-        column = dic['column']
+    for k in range(0, len(data)):
+        table = data[k].get('table')
+        column = data[k].get('column')
         obj_class_name = if_table_exist(table)
         if obj_class_name:
-            tables.append(obj_class_name)
-            if if_columns_exist(obj_class_name, column):
-                columns.append(column)
-            else:
+            data[k]['table'] = obj_class_name
+            if not if_columns_exist(obj_class_name, column):
                 print('字段名不存在！')
                 flag = False
                 break
@@ -55,9 +67,9 @@ def check_tables_and_columns(data):
             flag = False
             break
     if flag:
-        return tables, columns
+        return data
     else:
-        return None
+        return []
 
 
 # 判断该名称的表在数据库中是否存在。

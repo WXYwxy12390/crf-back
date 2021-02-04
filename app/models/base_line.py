@@ -72,6 +72,7 @@ class Patient(Base):
             else:
                 value = self.filter_none(obj, column)
                 row.append(value)
+
         return row
 
     def keys(self):
@@ -502,33 +503,6 @@ class PastHis(Base):
                 else:
                     value = '/'
                 row.append(value)
-                '''
-                # 求激素使用史最多有多少条
-                max_num = 0
-                for pid, array_drugHistory in buffer.get('DrugHistory').items():
-                    num = 0
-                    for drugHistory in array_drugHistory:
-                        if drugHistory.type == 1:
-                            num += 1
-                    if num > max_num:
-                        max_num = num
-                if max_num > 1:
-                    header_num = max_num
-                else:
-                    header_num = 1
-
-                sum = 0
-                drug_history_obj_array = buffer.get('DrugHistory').get(pid)
-                for drug_history_obj in drug_history_obj_array:
-                    _type = drug_history_obj.type
-                    if _type == 1:
-                        sum += 1
-                        row.append(drug_history_obj.drug_name)
-                        row.append(drug_history_obj.drug_dose)
-                        row.append(drug_history_obj.use_time)
-
-                for k in range(0, header_num - sum):
-                    row.extend(['/', '/', '/'])'''
 
             elif column == 'drugUseHis':
                 if_drug = getattr(obj, 'drug')
@@ -543,33 +517,6 @@ class PastHis(Base):
                 else:
                     value = '/'
                 row.append(value)
-                '''
-                # 求药物使用史最多有多少条
-                max_num = 0
-                for pid, array_drugHistory in buffer.get('DrugHistory').items():
-                    num = 0
-                    for drugHistory in array_drugHistory:
-                        if drugHistory.type == 0:
-                            num += 1
-                    if num > max_num:
-                        max_num = num
-                if max_num > 1:
-                    header_num = max_num
-                else:
-                    header_num = 1
-
-                sum = 0
-                drug_history_obj_array = buffer.get('DrugHistory').get(pid)
-                for drug_history_obj in drug_history_obj_array:
-                    _type = drug_history_obj.type
-                    if _type == 0:
-                        sum += 1
-                        row.append(drug_history_obj.drug_name)
-                        row.append(drug_history_obj.drug_dose)
-                        row.append(drug_history_obj.use_time)
-
-                for k in range(0, header_num - sum):
-                    row.extend(['/', '/', '/'])'''
 
             elif type(x) == bool:
                 value = self.filter_none(self.change_bool_to_yes_or_no(x))
@@ -577,6 +524,7 @@ class PastHis(Base):
             else:
                 value = self.filter_none(obj, column)
                 row.append(value)
+
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
@@ -792,4 +740,5 @@ class IniDiaPro(Base, PatDia):
             else:
                 value = self.filter_none(obj, column)
                 row.append(value)
+
         return row
