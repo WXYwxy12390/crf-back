@@ -178,6 +178,12 @@ class TreRec(Base, PatDia):
                 value = self.filter_none(obj, column)
                 value = trement_map.get(value)
                 row.append(value)
+            elif column == 'beEffEva':
+                beEffEva_map = {'1':'PD-进展','2':'SD-稳定','3':'PR-部分缓解','4':'CR-完全缓解','5':'术后未发现新病灶','/':'/',
+                                'PD-进展':'PD-进展','SD-稳定':'SD-稳定','PR-部分缓解':'PR-部分缓解','CR-完全缓解':'CR-完全缓解','术后未发现新病灶':'术后未发现新病灶'}
+                value = self.filter_none(obj, column)
+                value = beEffEva_map.get(value)
+                row.append(value)
             elif column == 'isRepBio':
                 value = self.filter_none(self.change_bool_to_yes_or_no(getattr(obj2, column))) if obj2 else '/'
                 row.append(value)
