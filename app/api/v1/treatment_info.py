@@ -38,8 +38,11 @@ def add_treatment_evaluation(pid, treNum, trement):
     每一次治疗信息中，疗效评估页面，增加一个字段"PFS/DFS"，该字段可以手动录入，也可以系统自动计算填写，自动计算优先于手动填写。
     填写了进展时间之后，系统需要自动计算PFS/DFS，并填写，计算逻辑为：用药开始时间到进展时间之间的时间间隔。如果不自动计算，则可以手动填写
     """
-    if 'proDate' in data and 'PFS_DFS' not in data:
-        treRec = TreRec.query.filter_by(pid=pid,treNum=treNum).first()
+    # if 'proDate' in data and 'PFS_DFS' not in data:
+    #     treRec = TreRec.query.filter_by(pid=pid,treNum=treNum).first()
+    #     treRec.compute_FPS_DFS()
+    treRec = TreRec.query.filter_by(pid=pid, treNum=treNum).first()
+    if treRec.is_auto_compute == 1:
         treRec.compute_FPS_DFS()
     return Success()
 
