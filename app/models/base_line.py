@@ -4,6 +4,7 @@ from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON
 
 from app.models.base import Base, db
 # 病人基本信息表
+from app.models.crf_info import FollInfo
 from app.models.cycle import MoleDetec
 from app.models.therapy_record import PatDia
 from app.models.therapy_record import TreRec, OneToFive, Surgery, Radiotherapy
@@ -83,6 +84,7 @@ class Patient(Base):
 
     def get_fotmat_info(self):
         pat_dia = Patient.get_pat_dia([self.id])
+        foll_info = FollInfo.query.filter_by(pid=self.id).order_by(FollInfo.update_time.desc()).first()
         data = {
             'id': self.id,
             'patNumber': self.patNumber,
@@ -94,7 +96,8 @@ class Patient(Base):
             'age': get_age_by_birth(get_birth_date_by_id_card(self.idNumber)),
             'patDia': pat_dia[self.id] if pat_dia else None,
             'update_time': self.update_time,
-            'research_center_id': self.researchCenter
+            'research_center_id': self.researchCenter,
+            'livSta':foll_info.livSta if foll_info else None
         }
         return data
 
