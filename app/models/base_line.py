@@ -85,6 +85,15 @@ class Patient(Base):
     def get_fotmat_info(self):
         pat_dia = Patient.get_pat_dia([self.id])
         foll_info = FollInfo.query.filter_by(pid=self.id).order_by(FollInfo.update_time.desc()).first()
+        liv_sta_info = None
+        if foll_info:
+            val = foll_info.livSta
+            if val == 1:
+                liv_sta_info = '生存'
+            elif val == 2:
+                liv_sta_info = '死亡'
+            elif val == 3:
+                liv_sta_info = '失联'
         data = {
             'id': self.id,
             'patNumber': self.patNumber,
@@ -97,7 +106,7 @@ class Patient(Base):
             'patDia': pat_dia[self.id] if pat_dia else None,
             'update_time': self.update_time,
             'research_center_id': self.researchCenter,
-            'livSta':foll_info.livSta if foll_info else None
+            'livSta':liv_sta_info
         }
         return data
 
@@ -745,3 +754,17 @@ class IniDiaPro(Base, PatDia):
                 row.append(value)
 
         return row
+
+
+class SpecimenInfo(Base):
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    pid = Column(Integer, comment='病人id', index=True)
+    number = Column(Text,comment="样本编号")
+    type = Column(JSON,comment="样本类型")
+    amount = Column(Integer,comment="样本数量")
+    samplingTime = Column(Date, comment='取样时间')
+    storeSite = Column(Text,comment="存储位置")
+    note = Column(Text)
+
+    def keys(self):
+        return ['id','number','type','amount','samplingTime','note']
