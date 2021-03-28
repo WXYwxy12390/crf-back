@@ -89,9 +89,9 @@ class Patient(Base):
         if foll_info:
             val = foll_info.livSta
             if val == 1:
-                liv_sta_info = '生存'
-            elif val == 2:
                 liv_sta_info = '死亡'
+            elif val == 2:
+                liv_sta_info = '存活'
             elif val == 3:
                 liv_sta_info = '失联'
         data = {
@@ -767,4 +767,4 @@ class SpecimenInfo(Base):
     note = Column(Text)
 
     def keys(self):
-        return ['id','number','type','amount','samplingTime','note']
+        return ['id','number','type','amount','samplingTime','note','storeSite']
