@@ -24,7 +24,7 @@ class FollInfo(Base):
 
     # 和导出功能有关
     export_header_map = {'nextFollowupTime':'计划下次随访时间', 'date':'随访日期', 'folMet':'随访方式', 'effEva':'疗效评估',
-                         'livSta':'生存状态','imaFilType':'影像类型', 'remarks':'备注'}
+                         'livSta':'生存状态','dieDate':'死亡时间','imaFilType':'影像类型', 'remarks':'备注'}
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum, follInfoNum):
@@ -62,8 +62,14 @@ class FollInfo(Base):
                     elif column == 'livSta':
                         value = self.filter_none(obj_array[k], column)
                         value = livSta_map.get(value)
-                        if value == '死亡':
-                            value += ',死亡时间:' + str(obj_array[k].dieDate) if obj_array[k].dieDate else ',死亡时间未知'
+                        row.append(value)
+                    elif column == 'dieDate':
+                        livSta = self.filter_none(obj_array[k], 'livSta')
+                        livSta = livSta_map.get(livSta)
+                        if livSta == '死亡':
+                            value = str(obj_array[k].dieDate) if obj_array[k].dieDate else '/'
+                        else:
+                            value = '/'
                         row.append(value)
                     elif column == 'imaFilType':
                         value = self.filter_none(obj_array[k], column)
@@ -95,8 +101,14 @@ class FollInfo(Base):
                     elif column == 'livSta':
                         value = self.filter_none(obj_array[k], column)
                         value = livSta_map.get(value)
-                        if value == '死亡':
-                            value += ',死亡时间:' + str(obj_array[k].dieDate) if obj_array[k].dieDate else '死亡时间未知'
+                        row.append(value)
+                    elif column == 'dieDate':
+                        livSta = self.filter_none(obj_array[k], 'livSta')
+                        livSta = livSta_map.get(livSta)
+                        if livSta == '死亡':
+                            value = str(obj_array[k].dieDate) if obj_array[k].dieDate else '/'
+                        else:
+                            value = '/'
                         row.append(value)
                     elif column == 'imaFilType':
                         value = self.filter_none(obj_array[k], column)
