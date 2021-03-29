@@ -385,18 +385,15 @@ class OneToFive(Base, PatDia):
                 detail_flag = True
                 treSolu_value = self.filter_none(obj, 'treSolu')
                 if not detail_trePlan_array:
+                    size = len(detail_columns)
                     for k in range(0, OneToFive.chemo_detail_num):
-                        for i in range(0, len(detail_columns)):
-                            row.append('/')
+                        row.extend(['/'] * size)
                     for k in range(0, OneToFive.targeted_detail_num):
-                        for i in range(0, len(detail_columns)):
-                            row.append('/')
+                        row.extend(['/'] * size)
                     for k in range(0, OneToFive.immunity_detail_num):
-                        for i in range(0, len(detail_columns)):
-                            row.append('/')
+                        row.extend(['/'] * size)
                     for k in range(0, OneToFive.antivascular_detail_num):
-                        for i in range(0, len(detail_columns)):
-                            row.append('/')
+                        row.extend(['/'] * size)
                 else:
                     chemo_detail_num = 0
                     targeted_detail_num = 0

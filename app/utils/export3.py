@@ -88,7 +88,6 @@ class Export:
                 row.extend(obj.get_export_row(self.follInfo['column'], self.buffer, pid, 0, self.follInfoNum))
 
             ws.append(row)
-            print(pid)
             gc.collect()
 
         # wb.save('test.xlsx')
