@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime
+from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime, SmallInteger
 from app.models.base import Base, db
 
 # 治疗记录及疗效评估表
@@ -137,12 +137,16 @@ class TreRec(Base, PatDia):
     proDate = Column(Date, comment='进展日期')
     proDes = Column(String(2048), comment='进展描述')  # text
     PFS_DFS = Column(String(2048), comment='PFS/DFS')
+    is_auto_compute = Column(SmallInteger,server_default="1")
 
     # 和导出功能有关
     export_header_map = {'trement': '几线治疗', 'beEffEvaDate': '最佳疗效评估日期', 'beEffEva': '最佳疗效评估',
                          'proDate': '进展日期', 'proDes': '进展描述', 'PFS_DFS': 'PFS/DFS',
                          'isRepBio': '是否重复活检', 'bioMet': '活检方式', 'matPart': '取材部位', 'specNum': '标本库流水号',
                          'patDia': '病理诊断'}
+
+    def keys(self):
+        return ['id', 'treNum', 'trement', 'date', 'beEffEvaDate', 'beEffEva', 'proDate', 'proDes', 'PFS_DFS','is_auto_compute']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
@@ -213,8 +217,7 @@ class TreRec(Base, PatDia):
         TreRec.header_num = len(header)
         return header
 
-    def keys(self):
-        return ['id', 'treNum', 'trement', 'date', 'beEffEvaDate', 'beEffEva', 'proDate', 'proDes', 'PFS_DFS']
+
 
     def get_parent(self):
         data = {
