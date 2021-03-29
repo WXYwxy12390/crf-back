@@ -4,6 +4,7 @@ from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON
 
 from app.models.base import Base, db
 # 病人基本信息表
+from app.models.crf_info import FollInfo
 from app.models.cycle import MoleDetec
 from app.models.therapy_record import PatDia
 from app.models.therapy_record import TreRec, OneToFive, Surgery, Radiotherapy
@@ -83,6 +84,16 @@ class Patient(Base):
 
     def get_fotmat_info(self):
         pat_dia = Patient.get_pat_dia([self.id])
+        foll_info = FollInfo.query.filter_by(pid=self.id).order_by(FollInfo.update_time.desc()).first()
+        liv_sta_info = None
+        if foll_info:
+            val = foll_info.livSta
+            if val == 1:
+                liv_sta_info = '死亡'
+            elif val == 2:
+                liv_sta_info = '存活'
+            elif val == 3:
+                liv_sta_info = '失联'
         data = {
             'id': self.id,
             'patNumber': self.patNumber,
@@ -94,7 +105,8 @@ class Patient(Base):
             'age': get_age_by_birth(get_birth_date_by_id_card(self.idNumber)),
             'patDia': pat_dia[self.id] if pat_dia else None,
             'update_time': self.update_time,
-            'research_center_id': self.researchCenter
+            'research_center_id': self.researchCenter,
+            'livSta':liv_sta_info
         }
         return data
 
@@ -742,3 +754,17 @@ class IniDiaPro(Base, PatDia):
                 row.append(value)
 
         return row
+
+
+class SpecimenInfo(Base):
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    pid = Column(Integer, comment='病人id', index=True)
+    number = Column(Text,comment="样本编号")
+    type = Column(JSON,comment="样本类型")
+    amount = Column(Integer,comment="样本数量")
+    samplingTime = Column(Date, comment='取样时间')
+    storeSite = Column(Text,comment="存储位置")
+    note = Column(Text)
+
+    def keys(self):
+        return ['id','number','type','amount','samplingTime','note','storeSite']

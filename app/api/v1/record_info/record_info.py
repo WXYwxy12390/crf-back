@@ -3,11 +3,13 @@
 @file: record_info.py
 @time: 2020-09-16 20:44
 """
+from flask import request
+
 from app.libs.decorator import edit_need_auth, update_time
 from app.libs.error import Success
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
-from app.models import json2db, db
+from app.models import json2db, db, json2db_add
 from app.models.therapy_record import TreRec
 
 api = Redprint('record_info')
@@ -23,10 +25,15 @@ def get_record_info_nav(pid):
 @update_time
 def add_record_info(pid):
     tre_recs = TreRec.query.filter_by(pid=pid).all()
+    data = request.get_json()
     json2db({
         'pid':pid,
-        'treNum':len(tre_recs) + 1
+        'treNum':len(tre_recs) + 1,
+        'trement': data.get('trement')
     },TreRec)
+
+
+
     return Success()
 
 @api.route('/<int:pid>',methods = ['DELETE'])
