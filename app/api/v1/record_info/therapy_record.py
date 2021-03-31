@@ -34,6 +34,7 @@ def add_therapy_record(pid,treNum):
     if 'parent' in data:
         data['parent']['pid'] = pid
         data['parent']['treNum'] = treNum
+        data['parent']['is_auto_compute'] = 1
         json2db(data['parent'], TreRec)
     if 'child' in data:
         tre_rec = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()

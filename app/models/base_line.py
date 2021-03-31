@@ -84,7 +84,7 @@ class Patient(Base):
 
     def get_fotmat_info(self):
         pat_dia = Patient.get_pat_dia([self.id])
-        foll_info = FollInfo.query.filter_by(pid=self.id).order_by(FollInfo.update_time.desc()).first()
+        foll_info = FollInfo.query.filter_by(pid=self.id).order_by(FollInfo.date.desc()).first()
         liv_sta_info = None
         if foll_info:
             val = foll_info.livSta
