@@ -21,6 +21,8 @@ api = Redprint('treatment_info')
 @api.route('/evaluation/<int:pid>/<int:treNum>/<string:trement>', methods=['GET'])
 def get_treatment_evaluation(pid, treNum, trement):
     treRec = TreRec.query.filter_by(pid=pid, treNum=treNum, trement=trement).first()
+    if treRec and treRec.is_auto_compute == 1:
+        treRec.compute_FPS_DFS()
     return Success(data=treRec if treRec else {})
 
 
