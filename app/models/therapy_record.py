@@ -238,7 +238,7 @@ class TreRec(Base, PatDia):
                 date1 = trePlan.begDate
             else:
                 one_to_five = OneToFive.query.filter_by(pid=self.pid,treNum=self.treNum).first()
-                date1 = one_to_five.begDate
+                date1 = one_to_five.begDate if one_to_five else None
         date2 = self.proDate
         if date1 and date2:
             with db.auto_commit():
