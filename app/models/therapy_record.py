@@ -233,7 +233,7 @@ class TreRec(Base, PatDia):
             if surgery:
                 date1 = surgery.surDate
         elif self.trement in ["one", "two", "three", "four", "five", 'other']:
-            trePlan = DetailTrePlan.query.filter(DetailTrePlan.pid==self.pid, DetailTrePlan.treNum==self.treNum,DetailTrePlan.begDate!=None).order_by(DetailTrePlan.begDate).first()
+            trePlan = DetailTrePlan.query.filter(DetailTrePlan.is_delete==0,DetailTrePlan.pid==self.pid, DetailTrePlan.treNum==self.treNum,DetailTrePlan.begDate!=None).order_by(DetailTrePlan.begDate).first()
             if trePlan:
                 date1 = trePlan.begDate
             else:
