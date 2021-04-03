@@ -247,10 +247,10 @@ class TreRec(Base, PatDia):
                     self.PFS_DFS = None
                 return
             else:
-                if one_to_five.begDate and trePlan.begDate:
+                if one_to_five.begDate is not None and trePlan.begDate is not None:
                     date1 = min(one_to_five.begDate,trePlan.begDate)
                 else:
-                    date1 = one_to_five.begDate if one_to_five else trePlan.begDate
+                    date1 = one_to_five.begDate if one_to_five.begDate else trePlan.begDate
 
 
         date2 = self.proDate
