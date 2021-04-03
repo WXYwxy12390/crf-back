@@ -1,3 +1,6 @@
+from time import time
+
+import numpy
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime, SmallInteger
 from app.models.base import Base, db
 
@@ -234,11 +237,18 @@ class TreRec(Base, PatDia):
                 date1 = surgery.surDate
         elif self.trement in ["one", "two", "three", "four", "five", 'other']:
             trePlan = DetailTrePlan.query.filter(DetailTrePlan.is_delete==0,DetailTrePlan.pid==self.pid, DetailTrePlan.treNum==self.treNum,DetailTrePlan.begDate!=None).order_by(DetailTrePlan.begDate).first()
-            if trePlan:
-                date1 = trePlan.begDate
+            one_to_five = OneToFive.query.filter_by(pid=self.pid, treNum=self.treNum).first()
+            if one_to_five is None:
+                return
+            elif trePlan is None:
+                return
             else:
-                one_to_five = OneToFive.query.filter_by(pid=self.pid,treNum=self.treNum).first()
-                date1 = one_to_five.begDate if one_to_five else None
+                if one_to_five.begDate and trePlan.begDate:
+                    date1 = min(one_to_five.begDate,trePlan.begDate)
+                else:
+                    date1 = one_to_five.begDate if one_to_five else trePlan.begDate
+
+
         date2 = self.proDate
         if date1 and date2:
             with db.auto_commit():
@@ -338,6 +348,7 @@ class OneToFive(Base, PatDia):
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
+
         isTre_map = {0: '否', 1: '是', -1: '不详', "/": "/"}
         chemo_detail_trePlan_array = None
         targeted_detail_trePlan_array = None
@@ -362,7 +373,7 @@ class OneToFive(Base, PatDia):
         else:
             detail_trePlan_array = buffer.get('DetailTrePlan').get(pid).get(treNum)
         detail_flag = False #标志是否已经处理了详细治疗方案的字段
-
+        # time1 = time()
         for column in columns:
             if column == 'isTre':
                 value = self.filter_none(obj, column)
@@ -387,18 +398,26 @@ class OneToFive(Base, PatDia):
                     value += '其他 '
                 row.append(value)
             elif column in detail_columns and not detail_flag:
+
                 detail_flag = True
                 treSolu_value = self.filter_none(obj, 'treSolu')
+
                 if not detail_trePlan_array:
+                    # time1 = time()
                     size = len(detail_columns)
-                    for k in range(0, OneToFive.chemo_detail_num):
-                        row.extend(['/'] * size)
-                    for k in range(0, OneToFive.targeted_detail_num):
-                        row.extend(['/'] * size)
-                    for k in range(0, OneToFive.immunity_detail_num):
-                        row.extend(['/'] * size)
-                    for k in range(0, OneToFive.antivascular_detail_num):
-                        row.extend(['/'] * size)
+                    times = OneToFive.chemo_detail_num + OneToFive.targeted_detail_num + OneToFive.immunity_detail_num + OneToFive.antivascular_detail_num
+                    # row.extend(['/'] * size * times)
+                    row.extend(numpy.array(['/'] * size*times))
+                    # for k in range(0, OneToFive.chemo_detail_num):
+                    #     row.extend(['/'] * size)
+                    # for k in range(0, OneToFive.targeted_detail_num):
+                    #     row.extend(['/'] * size)
+                    # for k in range(0, OneToFive.immunity_detail_num):
+                    #     row.extend(['/'] * size)
+                    # for k in range(0, OneToFive.antivascular_detail_num):
+                    #     row.extend(['/'] * size)
+                    # time2 = time()
+                    # print("oneTofive  " + str(time2 - time1))
                 else:
                     chemo_detail_num = 0
                     targeted_detail_num = 0
@@ -443,6 +462,7 @@ class OneToFive(Base, PatDia):
                     for k in range(0, OneToFive.chemo_detail_num - chemo_detail_num):
                         for i in range(0, len(detail_columns)):
                             row.append('/')
+
 
                     if 'TargetedTherapy' in treSolu_value and detail_trePlan_array.get('TargetedTherapy'):
                         targeted_detail_trePlan_array = detail_trePlan_array['TargetedTherapy']
@@ -560,7 +580,6 @@ class OneToFive(Base, PatDia):
                     for k in range(0, OneToFive.antivascular_detail_num - antivascular_detail_num):
                         for i in range(0, len(detail_columns)):
                             row.append('/')
-
             elif column == 'note':
                 value_treSolu = self.filter_none(obj, 'treSolu')
                 if 'Other' in value_treSolu:
@@ -571,7 +590,8 @@ class OneToFive(Base, PatDia):
             elif not (column in detail_columns):
                 value = self.filter_none(obj, column)
                 row.append(value)
-
+        # time2 = time()
+        # print("oneTofive  " + str(time2-time1))
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
