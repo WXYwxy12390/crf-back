@@ -1,6 +1,6 @@
 from time import time
 
-import numpy
+# import numpy
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime, SmallInteger
 from app.models.base import Base, db
 
@@ -239,8 +239,12 @@ class TreRec(Base, PatDia):
             trePlan = DetailTrePlan.query.filter(DetailTrePlan.is_delete==0,DetailTrePlan.pid==self.pid, DetailTrePlan.treNum==self.treNum,DetailTrePlan.begDate!=None).order_by(DetailTrePlan.begDate).first()
             one_to_five = OneToFive.query.filter_by(pid=self.pid, treNum=self.treNum).first()
             if one_to_five is None:
+                with db.auto_commit():
+                    self.PFS_DFS = None
                 return
             elif trePlan is None:
+                with db.auto_commit():
+                    self.PFS_DFS = None
                 return
             else:
                 if one_to_five.begDate and trePlan.begDate:
