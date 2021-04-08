@@ -4,7 +4,7 @@ from flask import make_response
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 
-from app.models.base_line import DrugHistory, Patient, IniDiaPro, PastHis
+from app.models.base_line import DrugHistory, Patient, IniDiaPro, PastHis, SpecimenInfo
 from app.models.crf_info import FollInfo
 from app.models.cycle import Signs, SideEffect, MoleDetec, Immunohis
 from app.models.lab_inspectation import BloodRoutine, BloodBio, Thyroid, Coagulation, MyocardialEnzyme, Cytokines, \
@@ -110,6 +110,7 @@ class Export:
         iniDiaPro_array = IniDiaPro.query.filter(IniDiaPro.pid.in_(self.pids), IniDiaPro.is_delete == 0).all()
         pastHis_array = PastHis.query.filter(PastHis.pid.in_(self.pids), PastHis.is_delete == 0).all()
         drugHistory_array = DrugHistory.query.filter(DrugHistory.pid.in_(self.pids), DrugHistory.is_delete == 0).all()
+        specimenInfo_array = SpecimenInfo.query.filter(SpecimenInfo.pid.in_(self.pids), SpecimenInfo.is_delete == 0).all()
 
         treRec_array = TreRec.query.filter(TreRec.pid.in_(self.pids), TreRec.treNum.in_(self.treNums),
                                            TreRec.is_delete == 0).all()
@@ -166,6 +167,7 @@ class Export:
         self.add_buffer('PastHis', self.classify_by_pid(pastHis_array))
         self.add_buffer('DrugHistory', self.array_classify_by_pid(drugHistory_array))
         self.add_buffer('IniDiaPro', self.classify_by_pid(iniDiaPro_array))
+        self.add_buffer('SpecimenInfo', self.array_classify_by_pid(specimenInfo_array))
 
         self.add_buffer('TreRec', self.classify_by_treNum(treRec_array))
         self.add_buffer('Surgery', self.classify_by_treNum(surgery_array))

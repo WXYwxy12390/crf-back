@@ -1,6 +1,5 @@
 from flask import request
 from app.libs.redprint import Redprint
-from app.utils.export2 import Export as Export2
 from app.utils.export3 import Export as Export3
 
 api = Redprint('export')

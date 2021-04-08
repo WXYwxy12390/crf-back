@@ -766,5 +766,66 @@ class SpecimenInfo(Base):
     storeSite = Column(Text,comment="存储位置")
     note = Column(Text)
 
+    # 和导出功能有关
+    export_header_map = {'number':'样本编号','type':'样本类型','amount':'样本数量',
+                         'samplingTime':'取样时间','storeSite':'样本储存位置',
+                         'note':'备注'}
+
+    # 和导出功能有关，得到导出的表的中文抬头
+    def get_export_header(self, columns, buffer):
+        header = []
+        # 求最多有多少条
+        max_num = 0
+        for value in buffer.get('SpecimenInfo').values():
+            num = len(value)
+            if num > max_num:
+                max_num = num
+
+        if max_num > 1:
+            header_num = max_num
+        else:
+            header_num = 1
+
+        for i in range(1, header_num + 1):
+            for column in columns:
+                header.append(self.export_header_map.get(column) + str(i))
+
+        SpecimenInfo.header_num = len(header)
+        return header
+
+    # 和导出功能有关
+    def get_export_row(self, columns, buffer, pid, treNum):
+        row = []
+        if buffer.get('SpecimenInfo').get(pid) is None:
+            for k in range(0, SpecimenInfo.header_num):
+                row.append('/')
+            return row
+        obj_array = buffer.get('SpecimenInfo').get(pid)
+
+        for obj in obj_array:
+            for column in columns:
+                if column == 'type':
+                    value = self.format_type(obj)
+                    row.append(value)
+                else:
+                    value = self.filter_none(obj, column)
+                    row.append(value)
+        for k in range(0, SpecimenInfo.header_num-len(row)):
+            row.append('/')
+        return row
+
+    def format_type(self,obj):
+        type_dict = getattr(obj, 'type')
+        if not type_dict:
+            return '/'
+        value = '/'
+        radio = type_dict['radio'][0]
+        other = type_dict.get('other')
+        if radio:
+            value = radio
+            if other:
+                value += ':'+other
+        return value
+
     def keys(self):
         return ['id','number','type','amount','samplingTime','note','storeSite']
