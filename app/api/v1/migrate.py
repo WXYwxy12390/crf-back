@@ -11,7 +11,7 @@ from app.models.cycle import Immunohis, MoleDetec
 from app.models.lab_inspectation import BloodRoutine, BloodBio, Thyroid, Coagulation, MyocardialEnzyme, Cytokines, \
     LymSubsets, UrineRoutine, TumorMarker
 from app.models.other_inspect import Lung, OtherExams, ImageExams
-from app.models.therapy_record import Surgery, Radiotherapy, OneToFive
+from app.models.therapy_record import Surgery, Radiotherapy, OneToFive, TreRec
 
 api = Redprint('migrate')
 
@@ -216,13 +216,26 @@ api = Redprint('migrate')
 #
 #     return 'ok'
 
-@api.route('/2_1')
-def migrate_2_1():
-    items = IniDiaPro.query.filter_by().all()
+# @api.route('/2_1')
+# def migrate_2_1():
+#     items = IniDiaPro.query.filter_by().all()
+#     with db.auto_commit():
+#         for item in items:
+#             if item.PSScore == -1:
+#                 item.PSScore = None
+#     return 'ok'
+
+
+@api.route('/4_2')
+def migrate_4_2():
+    items = TreRec.query.filter_by().all()
     with db.auto_commit():
+        i = 0
         for item in items:
-            if item.PSScore == -1:
-                item.PSScore = None
+            if item.is_auto_compute == 1:
+                item.compute_FPS_DFS()
+                print(i)
+                i = i + 1
     return 'ok'
 
 def generate_value(str):
