@@ -10,6 +10,7 @@ from app.models.therapy_record import PatDia
 from app.models.therapy_record import TreRec, OneToFive, Surgery, Radiotherapy
 from app.utils.date import get_birth_date_by_id_card, get_age_by_birth
 
+
 class Patient(Base):
     __tablename__ = 'patient'
     id = Column(Integer, primary_key=True, autoincrement=True, comment='病人id')
@@ -106,7 +107,7 @@ class Patient(Base):
             'patDia': pat_dia[self.id] if pat_dia else None,
             'update_time': self.update_time,
             'research_center_id': self.researchCenter,
-            'livSta':liv_sta_info
+            'livSta': liv_sta_info
         }
         return data
 
@@ -155,11 +156,15 @@ class Patient(Base):
         # 转移部位 IniDiaPro
         if 'traSite' in search_data:
             pids = Patient.filter_traSite(pids, search_data['traSite'])
+        # 样本类型 SpecimenInfo
+        if 'specimenType' in search_data:
+            pids = Patient.filter_specimenType(pids, search_data['specimenType'])
+
         pids = list(set(pids))
         pagination = Patient.query.filter(Patient.is_delete == 0, Patient.id.in_(pids)).order_by(
             Patient.update_time.desc()).paginate(page=page, per_page=limit)
 
-        return pagination.items, pagination.total,pids
+        return pagination.items, pagination.total, pids
 
     # 获取一组样本中最新的病例诊断
     @classmethod
@@ -407,9 +412,7 @@ class Patient(Base):
 
     @classmethod
     def filter_traSite(cls, pids, items):
-
         ini_dia_pros = IniDiaPro.query.filter(IniDiaPro.pid.in_(pids)).all()
-
         patient_ids = []
         for ini_dia_pro in ini_dia_pros:
             if ini_dia_pro.traSite is None:
@@ -424,6 +427,32 @@ class Patient(Base):
                 patient_ids.append(ini_dia_pro.pid)
 
         return patient_ids
+
+    @classmethod
+    def filter_specimenType(cls, pids, type):
+        specimenInfo_array = SpecimenInfo.query.filter(SpecimenInfo.pid.in_(pids),
+                                                       SpecimenInfo.is_delete == 0).all()
+        specimenInfo_classify_by_pid = cls.array_classify_by_pid(specimenInfo_array)
+        patient_ids = []
+        for key, value in specimenInfo_classify_by_pid.items():
+            flag = False
+            for specimentInfo in value:
+                if specimentInfo.type and specimentInfo.type['radio'][0] == type:
+                    flag = True
+                    break
+            if flag:
+                patient_ids.append(key)
+        return patient_ids
+
+    @classmethod
+    def array_classify_by_pid(cls, items):
+        data = {}
+        for item in items:
+            pid = getattr(item, 'pid')
+            if data.get(pid) is None:
+                data[pid] = []
+            data[pid].append(item)
+        return data
 
 
 # 病人既往史表
@@ -505,7 +534,7 @@ class PastHis(Base):
             elif column == 'hormoneUseHis':
                 if_hormone = getattr(obj, 'hormone')
                 if (if_hormone and buffer.get('DrugHistory') is not None and
-                buffer.get('DrugHistory').get(pid) is not None):
+                        buffer.get('DrugHistory').get(pid) is not None):
                     value = ''
                     for drug_history_obj in buffer.get('DrugHistory').get(pid):
                         if drug_history_obj.type == 1:
@@ -519,7 +548,7 @@ class PastHis(Base):
             elif column == 'drugUseHis':
                 if_drug = getattr(obj, 'drug')
                 if (if_drug and buffer.get('DrugHistory') is not None and
-                buffer.get('DrugHistory').get(pid) is not None):
+                        buffer.get('DrugHistory').get(pid) is not None):
                     value = ''
                     for drug_history_obj in buffer.get('DrugHistory').get(pid):
                         if drug_history_obj.type == 0:
@@ -703,7 +732,7 @@ class IniDiaPro(Base, PatDia):
                 value = stage_map.get(value)
                 row.append(value)
             elif (column == 'cliniManifest' or column == 'part' or
-            column == 'bioMet' or column == 'traSite'):
+                  column == 'bioMet' or column == 'traSite'):
                 value = self.format_radio_data(obj, column)
                 row.append(value)
             elif column == 'patDia':
@@ -759,17 +788,17 @@ class IniDiaPro(Base, PatDia):
 class SpecimenInfo(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id', index=True)
-    number = Column(Text,comment="样本编号")
-    type = Column(JSON,comment="样本类型")
-    amount = Column(Integer,comment="样本数量")
+    number = Column(Text, comment="样本编号")
+    type = Column(JSON, comment="样本类型")
+    amount = Column(Integer, comment="样本数量")
     samplingTime = Column(Date, comment='取样时间')
-    storeSite = Column(Text,comment="存储位置")
+    storeSite = Column(Text, comment="存储位置")
     note = Column(Text)
 
     # 和导出功能有关
-    export_header_map = {'number':'样本编号','type':'样本类型','amount':'样本数量',
-                         'samplingTime':'取样时间','storeSite':'样本储存位置',
-                         'note':'备注'}
+    export_header_map = {'number': '样本编号', 'type': '样本类型', 'amount': '样本数量',
+                         'samplingTime': '取样时间', 'storeSite': '样本储存位置',
+                         'note': '备注'}
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
@@ -810,11 +839,11 @@ class SpecimenInfo(Base):
                 else:
                     value = self.filter_none(obj, column)
                     row.append(value)
-        for k in range(0, SpecimenInfo.header_num-len(row)):
+        for k in range(0, SpecimenInfo.header_num - len(row)):
             row.append('/')
         return row
 
-    def format_type(self,obj):
+    def format_type(self, obj):
         type_dict = getattr(obj, 'type')
         if not type_dict:
             return '/'
@@ -824,8 +853,8 @@ class SpecimenInfo(Base):
         if radio:
             value = radio
             if other:
-                value += ':'+other
+                value += ':' + other
         return value
 
     def keys(self):
-        return ['id','number','type','amount','samplingTime','note','storeSite']
+        return ['id', 'number', 'type', 'amount', 'samplingTime', 'note', 'storeSite']
