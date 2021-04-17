@@ -10,6 +10,8 @@ class Immunohis(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
     treNum = Column(Integer, comment='number,对应病人的某一条治疗记录')
+    detectTime = Column(Date, comment='检测时间')
+    patNum = Column(String(255),comment='病理号')
     ALKD5F3 = Column(Integer, comment='ALKD5F3 0:-,1:±,2:+,3:++,4:+++')
     ALKD5F3N = Column(Integer, comment='ALKD5F3-N')
     CAIX = Column(Integer, comment='CAIX')
@@ -63,6 +65,11 @@ class Immunohis(Base):
                          'PAX8':'PAX8','PCK':'PCK','PDL1':'PDL1','RRM1':'RRM1','SATB2':'SATB2','Syn':'Syn',
                          'TTF1':'TTF1','VEGFC':'VEGFC','Villin':'Villin','Villinco':'Villinco','CD516':'CD516',
                          'other':'其他','Ki67':'Ki67'}
+    def keys(self):
+        return ['id', 'pid', 'treNum', 'ALKD5F3', 'ALKD5F3N', 'CAIX', 'CAM52', 'CD10', 'CD34', 'CD56',
+                'CD117', 'CDX2', 'CEA', 'CgA', 'CK', 'CK56','CK7', 'CK818', 'CK19', 'CK20', 'Cyn', 'DLL3', 'EMA',
+                'ERCC1', 'LCA', 'MCM2', 'NapsinA', 'P16', 'P40','p53', 'P63', 'PAX2', 'PAX8', 'PCK',
+                'PDL1', 'RRM1','SATB2', 'Syn', 'TTF1', 'VEGFC', 'Villin', 'Villinco','other','filePath','Ki67','CD516','detectTime','patNum']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
@@ -94,11 +101,6 @@ class Immunohis(Base):
         Immunohis.header_num = len(header)
         return header
 
-    def keys(self):
-        return ['id', 'pid', 'treNum', 'ALKD5F3', 'ALKD5F3N', 'CAIX', 'CAM52', 'CD10', 'CD34', 'CD56',
-                'CD117', 'CDX2', 'CEA', 'CgA', 'CK', 'CK56','CK7', 'CK818', 'CK19', 'CK20', 'Cyn', 'DLL3', 'EMA',
-                'ERCC1', 'LCA', 'MCM2', 'NapsinA', 'P16', 'P40','p53', 'P63', 'PAX2', 'PAX8', 'PCK',
-                'PDL1', 'RRM1','SATB2', 'Syn', 'TTF1', 'VEGFC', 'Villin', 'Villinco','other','filePath','Ki67','CD516']
 
 
 # 病人分子检测信息表
@@ -168,12 +170,20 @@ class MoleDetec(Base):
     PD1KT = Column(String(255), comment='PD1抗体')
 
     TMB = Column(String(20), comment='TMB') #???
+    detectTime = Column(Date, comment='检测时间')
+    sampleType = Column(String(255), comment='样本类型')
 
     # 和导出功能有关
     export_header_map = {'EGFR':'EGFR','ALK':'ALK','ROS1':'ROS1','HER_2':'HER_2','BRAF':'BRAF',
                          'cMET':'cMET','RET':'RET','NTRK':'NTRK','KRAS':'KRAS','BIM':'BIM',
                          'PIK3CA':'PIK3CA','UGT1A1':'UGT1A1','MSI':'MSI','PD1':'PD-1表达',
                          'PD1KT':'PD1KT','PDL1':'PD-L1表达','PDL1KT':'PDL1KT','TMB':'TMB','other':'其他'}
+    def keys(self):
+        return ['id', 'pid', 'treNum', 'ALK', 'BIM', 'BRAF', 'cMET', 'EGFR', 'HER_2', 'KRAS','NTRK',
+                'PIK3CA', 'ROS1', 'RET', 'UGT1A1', 'ALKSam', 'BIMSam','BRAFSam','cMETSam', 'EGFRSam', 'HER_2Sam', 'KRASSam', 'PIK3CASam', 'ROS1Sam','NTRKSam',
+                'RETSam', 'UGT1A1Sam', 'ALKDetMed', 'BIMDetMed', 'BRAFDetMed', 'cMETDetMed','EGFRDetMed', 'HER_2DetMed', 'KRASDetMed', 'PIK3CADetMed', 'ROS1DetMed','NTRKDetMed',
+                'RETDetMed', 'UGT1A1DetMed','ALKDesc', 'BIMDesc', 'BRAFDesc', 'cMETDesc', 'EGFRDesc', 'HER_2Desc','KRASDesc','PIK3CADesc',
+                'ROS1Desc','RETDesc','UGT1A1Desc','NTRKDesc','path','MSI','other','PDL1','PDL1KT','TMB','PD1','PD1KT','sampleType','detectTime']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
@@ -231,12 +241,6 @@ class MoleDetec(Base):
         MoleDetec.header_num = len(header)
         return header
 
-    def keys(self):
-        return ['id', 'pid', 'treNum', 'ALK', 'BIM', 'BRAF', 'cMET', 'EGFR', 'HER_2', 'KRAS','NTRK',
-                'PIK3CA', 'ROS1', 'RET', 'UGT1A1', 'ALKSam', 'BIMSam','BRAFSam','cMETSam', 'EGFRSam', 'HER_2Sam', 'KRASSam', 'PIK3CASam', 'ROS1Sam','NTRKSam',
-                'RETSam', 'UGT1A1Sam', 'ALKDetMed', 'BIMDetMed', 'BRAFDetMed', 'cMETDetMed','EGFRDetMed', 'HER_2DetMed', 'KRASDetMed', 'PIK3CADetMed', 'ROS1DetMed','NTRKDetMed',
-                'RETDetMed', 'UGT1A1DetMed','ALKDesc', 'BIMDesc', 'BRAFDesc', 'cMETDesc', 'EGFRDesc', 'HER_2Desc','KRASDesc','PIK3CADesc',
-                'ROS1Desc','RETDesc','UGT1A1Desc','NTRKDesc','path','MSI','other','PDL1','PDL1KT','TMB','PD1','PD1KT']
 
 
 #症状体征表

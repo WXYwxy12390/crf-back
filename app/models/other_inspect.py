@@ -185,6 +185,7 @@ class ImageExams(Base):
     treNum = Column(Integer, comment='0对应初诊信息、1-n表示对应第x条治疗记录')
     detectTime = Column(Date, comment='检测时间')
     examArea = Column(String(255), comment='检查部位')
+    photoNumber = Column(String(255), comment='影像号')
     exmaMethod = Column(String(255), comment='检查方法')
     tumorLD = Column(Float, comment='肿瘤长径')
     tumorSD = Column(Float, comment='肿瘤短径')
@@ -194,6 +195,9 @@ class ImageExams(Base):
     # 和导出功能有关
     export_header_map = {'detectTime':'影像学检查检测时间','examArea':'检查部位','exmaMethod':'检查方法',
                          'tumorLD':'肿瘤长径','tumorSD':'肿瘤短径','tumorDesc':'肿瘤描述'}
+
+    def keys(self):
+        return ['id','pid','treNum','detectTime','examArea','exmaMethod','tumorLD','tumorSD','tumorDesc','path','photoNumber']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
@@ -248,5 +252,3 @@ class ImageExams(Base):
         ImageExams.header_num = len(header)
         return header
 
-    def keys(self):
-        return ['id','pid','treNum','detectTime','examArea','exmaMethod','tumorLD','tumorSD','tumorDesc','path']
