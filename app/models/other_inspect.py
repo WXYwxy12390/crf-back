@@ -207,26 +207,13 @@ class ImageExams(Base):
                 row.append('/')
             return row
         obj_array = buffer.get('ImageExams').get(pid).get(treNum)
-        # 求最多有多少条
-        max_num = 0
-        for value1 in buffer.get('ImageExams').values():
-            for value2 in value1.values():
-                num = len(value2)
-                if num > max_num:
-                    max_num = num
-        if max_num > 1:
-            header_num = max_num
-        else:
-            header_num = 1
 
         for obj in obj_array:
             for column in columns:
                 value = self.filter_none(obj, column)
                 row.append(value)
-        for k in range(0, header_num-len(obj_array)):
-            for column in columns:
-                row.append('/')
-
+        for k in range(0, ImageExams.header_num-len(row)):
+            row.append('/')
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
