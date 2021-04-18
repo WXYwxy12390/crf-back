@@ -3,7 +3,7 @@ from time import time
 from flask import make_response
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
-
+import numpy as np
 from app.models.base_line import DrugHistory, Patient, IniDiaPro, PastHis, SpecimenInfo
 from app.models.crf_info import FollInfo
 from app.models.cycle import Signs, SideEffect, MoleDetec, Immunohis
@@ -27,8 +27,8 @@ class Export:
         self.trementInfo = trementInfo
         self.follInfo = follInfo
 
+        # self.headers = np.zeros(0, dtype=str)
         self.headers = []
-
         if follInfo:
             self.if_follInfo = True
         else:
@@ -44,18 +44,23 @@ class Export:
                     columns = dic['column']
                     obj = obj_class_name()
                     self.headers.extend(obj.get_export_header(columns, self.buffer))
+                    # self.headers = np.append(self.headers, obj.get_export_header(columns, self.buffer))
             else:
                 if self.trementInfo:
                     self.headers.append('治疗信息' + str(treNum))
+                    # self.headers = np.append(self.headers, '治疗信息' + str(treNum))
                 for dic in self.trementInfo:
                     obj_class_name = dic['table']
                     columns = dic['column']
                     obj = obj_class_name()
                     self.headers.extend(obj.get_export_header(columns, self.buffer))
+                    # self.headers = np.append(self.headers, obj.get_export_header(columns, self.buffer))
 
         if self.follInfo:
             obj = FollInfo()
             self.headers.extend(obj.get_export_header(self.follInfo['column'], self.buffer, self.follInfoNum))
+            # self.headers = np.append(self.headers, obj.get_export_header(self.follInfo['column'], self.buffer, self.follInfoNum))
+        # self.headers = list(self.headers)
 
         # wb = Workbook()
         wb = Workbook(write_only=True)
@@ -65,6 +70,7 @@ class Export:
         ws.append(self.headers)
 
         for pid in self.pids:
+            # row = np.zeros(0, dtype=str)
             row = []
             for treNum in self.treNums:
                 if treNum == 0:
@@ -73,24 +79,25 @@ class Export:
                         columns = dic['column']
                         obj = obj_class_name()
                         row.extend(obj.get_export_row(columns, self.buffer, pid, treNum))
-
+                        # row = np.append(row, obj.get_export_row(columns, self.buffer, pid, treNum))
                 else:
                     if self.trementInfo:
                         row.append('')
+                        # row = np.append(row, '')
                     for dic in self.trementInfo:
                         obj_class_name = dic['table']
                         columns = dic['column']
                         obj = obj_class_name()
                         row.extend(obj.get_export_row(columns, self.buffer, pid, treNum))
-
+                        # row = np.append(row, obj.get_export_row(columns, self.buffer, pid, treNum))
             if self.follInfo:
                 obj = FollInfo()
                 row.extend(obj.get_export_row(self.follInfo['column'], self.buffer, pid, 0, self.follInfoNum))
-
+                # row = np.append(row, obj.get_export_row(self.follInfo['column'], self.buffer, pid, 0, self.follInfoNum))
+            # row = list(row)
             ws.append(row)
             gc.collect()
 
-        # wb.save('test.xlsx')
         content = save_virtual_workbook(wb)
         resp = make_response(content)
         resp.headers["Content-Disposition"] = 'attachment; filename=samples.xlsx'
