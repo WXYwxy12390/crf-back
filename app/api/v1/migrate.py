@@ -238,6 +238,14 @@ def migrate_4_2():
                 i = i + 1
     return 'ok'
 
+@api.route('/4_17')
+def migrate_4_17():
+    items = Patient.query.filter_by(researchCenter=23).all()
+    with db.auto_commit():
+        for item in items:
+            item.researchCenter = 1
+    return 'ok'
+
 def generate_value(str):
     if type(str) is list:
         strs = str
