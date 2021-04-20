@@ -38,49 +38,46 @@ class Patient(Base):
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        header = []
-        # header = np.zeros(0, dtype=str)
+        # header = []
+        header = np.zeros(0, dtype=str)
         for column in columns:
-            # header = np.append(header, self.export_header_map.get(column))
-            header.append(self.export_header_map.get(column))
-        # header = list(header)
+            header = np.append(header, self.export_header_map.get(column))
+            # header.append(self.export_header_map.get(column))
         Patient.header_num = len(header)
         return header
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         gender_map = {0: "女", 1: "男", "/": "/"}
-        row = []
-        # row = np.zeros(0, dtype=str)
+        # row = []
+        row = np.zeros(0, dtype=str)
         if buffer.get('Patient').get(pid) is None:
-            row.extend(['/']*Patient.header_num)
-            # row = np.append(row, ['/']*Patient.header_num)
-            # row = list(row)
+            # row.extend(['/']*Patient.header_num)
+            row = np.append(row, ['/']*Patient.header_num)
             return row
         obj = buffer.get('Patient').get(pid)
         for column in columns:
             if column == 'gender':
                 value = self.filter_none(obj, column)
                 value = gender_map.get(value)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             elif column == 'age':
                 idNumber = getattr(obj, 'idNumber')
                 age = get_age_by_birth(get_birth_date_by_id_card(idNumber))
                 value = age if age else '/'
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             elif column == 'researchCenter':
                 value = self.filter_none(obj, column)
                 if value != '/':
                     value = buffer.get('ResearchCenter').get(value)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
-                row.append(value)
-                # row = np.append(row, value)
-        # row = list(row)
+                # row.append(value)
+                row = np.append(row, value)
         return row
 
     def keys(self):
@@ -504,12 +501,11 @@ class PastHis(Base):
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
-        row = []
-        # row = np.zeros(0, dtype=str)
+        # row = []
+        row = np.zeros(0, dtype=str)
         if buffer.get('PastHis').get(pid) is None:
-            row.extend(['/']*PastHis.header_num)
-            # row = np.append(row, ['/']*PastHis.header_num)
-            # row = list(row)
+            # row.extend(['/']*PastHis.header_num)
+            row = np.append(row, ['/']*PastHis.header_num)
             return row
         obj = buffer.get('PastHis').get(pid)
 
@@ -518,34 +514,34 @@ class PastHis(Base):
 
             if column == 'basDisHis' or column == 'infDisHis':
                 value = self.format_radio_data(obj, column)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             elif column == 'tumHis':
                 if_tum = getattr(obj, 'tumor')
                 if if_tum:
                     value = self.format_radio_data(obj, column)
-                    row.append(value)
-                    # row = np.append(row, value)
+                    # row.append(value)
+                    row = np.append(row, value)
                 else:
-                    row.append('/')
-                    # row = np.append(row, '/')
+                    # row.append('/')
+                    row = np.append(row, '/')
             elif column == 'tumFamHis':
                 if_tumorFam = getattr(obj, 'tumorFam')
                 if if_tumorFam:
                     value = self.format_radio_data(obj, column)
-                    row.append(value)
-                    # row = np.append(row, value)
+                    # row.append(value)
+                    row = np.append(row, value)
                 else:
-                    row.append('/')
-                    # row = np.append(row, '/')
+                    # row.append('/')
+                    row = np.append(row, '/')
             elif column == 'drinkingHis':
                 value = self.format_drink_history(obj)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             elif column == 'smokingHis':
                 value = self.format_smoke_history(obj)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             elif column == 'hormoneUseHis':
                 if_hormone = getattr(obj, 'hormone')
                 if (if_hormone and buffer.get('DrugHistory') is not None and
@@ -558,8 +554,8 @@ class PastHis(Base):
                             value += str(self.filter_none(drug_history_obj.use_time)) + '月;'
                 else:
                     value = '/'
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
 
             elif column == 'drugUseHis':
                 if_drug = getattr(obj, 'drug')
@@ -573,27 +569,25 @@ class PastHis(Base):
                             value += str(self.filter_none(drug_history_obj.use_time)) + '月;'
                 else:
                     value = '/'
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             elif type(x) == bool:
                 value = self.filter_none(self.change_bool_to_yes_or_no(x))
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
-                row.append(value)
-                # row = np.append(row, value)
-        # row = list(row)
+                # row.append(value)
+                row = np.append(row, value)
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        header = []
-        # header = np.zeros(0, dtype=str)
+        # header = []
+        header = np.zeros(0, dtype=str)
         for column in columns:
-            header.append(self.export_header_map.get(column))
-            # header = np.append(header, self.export_header_map.get(column))
-        # header = list(header)
+            # header.append(self.export_header_map.get(column))
+            header = np.append(header, self.export_header_map.get(column))
         PastHis.header_num = len(header)
         return header
 
@@ -722,12 +716,11 @@ class IniDiaPro(Base, PatDia):
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        header = []
-        # header = np.zeros(0, dtype=str)
+        # header = []
+        header = np.zeros(0, dtype=str)
         for column in columns:
-            header.append(self.export_header_map.get(column))
-            # header = np.append(header, self.export_header_map.get(column))
-        # header = list(header)
+            # header.append(self.export_header_map.get(column))
+            header = np.append(header, self.export_header_map.get(column))
         IniDiaPro.header_num = len(header)
         return header
 
@@ -736,12 +729,11 @@ class IniDiaPro(Base, PatDia):
         videography_map = {0: '周围型', 1: '中央型', "/": "/"}
         stage_map = {'1': '未住院', '2': 'C/P/S均无法分期', '3': '仅C分期',
                      '4': '仅P分期', '5': 'C分期和P分期', "/": "/"}
-        row = []
-        # row = np.zeros(0, dtype=str)
+        # row = []
+        row = np.zeros(0, dtype=str)
         if buffer.get('IniDiaPro').get(pid) is None:
-            row.extend(['/']*IniDiaPro.header_num)
-            # row = np.append(row, ['/']*IniDiaPro.header_num)
-            # row = list(row)
+            # row.extend(['/']*IniDiaPro.header_num)
+            row = np.append(row, ['/']*IniDiaPro.header_num)
             return row
         obj = buffer.get('IniDiaPro').get(pid)
         for column in columns:
@@ -749,63 +741,62 @@ class IniDiaPro(Base, PatDia):
             if column == 'videography':
                 value = self.filter_none(obj, column)
                 value = videography_map.get(value)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             elif column == 'stage':
                 value = self.filter_none(obj, column)
                 value = stage_map.get(value)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             elif (column == 'cliniManifest' or column == 'part' or
                   column == 'bioMet' or column == 'traSite'):
                 value = self.format_radio_data(obj, column)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             elif column == 'patDia':
                 value = self.format_patDia(obj)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             elif column == 'cStage':
                 stage_value = self.filter_none(obj, 'stage')
                 if stage_value == '3' or stage_value == '5':
                     value = str(x) if x else '/'
                 else:
                     value = '/'
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             elif column == 'cliStage' or column == 'cRemark':
                 stage_value = self.filter_none(obj, 'stage')
                 if stage_value == '3' or stage_value == '5':
                     value = self.filter_none(obj, column)
                 else:
                     value = '/'
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             elif column == 'patStage' or column == 'pRemark':
                 stage_value = self.filter_none(obj, 'stage')
                 if stage_value == '4' or stage_value == '5':
                     value = self.filter_none(obj, column)
                 else:
                     value = '/'
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             elif column == 'pStage':
                 stage_value = self.filter_none(obj, 'stage')
                 if stage_value == '4' or stage_value == '5':
                     value = str(x) if x else '/'
                 else:
                     value = '/'
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             elif type(x) == bool:
                 value = self.filter_none(self.change_bool_to_yes_or_no(x))
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
-                row.append(value)
-                # row = np.append(row, value)
-        # row = list(row)
+                # row.append(value)
+                row = np.append(row, value)
         return row
 
 
@@ -826,8 +817,8 @@ class SpecimenInfo(Base):
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        header = []
-        # header = np.zeros(0, dtype=str)
+        # header = []
+        header = np.zeros(0, dtype=str)
         # 求最多有多少条
         max_num = 0
         for value in buffer.get('SpecimenInfo').values():
@@ -842,20 +833,18 @@ class SpecimenInfo(Base):
 
         for i in range(1, header_num + 1):
             for column in columns:
-                header.append(self.export_header_map.get(column) + str(i))
-                # header = np.append(header, self.export_header_map.get(column) + str(i))
-        # header = list(header)
+                # header.append(self.export_header_map.get(column) + str(i))
+                header = np.append(header, self.export_header_map.get(column) + str(i))
         SpecimenInfo.header_num = len(header)
         return header
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
-        row = []
-        # row = np.zeros(0, dtype=str)
+        # row = []
+        row = np.zeros(0, dtype=str)
         if buffer.get('SpecimenInfo').get(pid) is None:
-            row.extend(['/']*SpecimenInfo.header_num)
-            # row = np.append(row, ['/']*SpecimenInfo.header_num)
-            # row = list(row)
+            # row.extend(['/']*SpecimenInfo.header_num)
+            row = np.append(row, ['/']*SpecimenInfo.header_num)
             return row
         obj_array = buffer.get('SpecimenInfo').get(pid)
 
@@ -863,15 +852,14 @@ class SpecimenInfo(Base):
             for column in columns:
                 if column == 'type':
                     value = self.format_type(obj)
-                    row.append(value)
-                    # row = np.append(row, value)
+                    # row.append(value)
+                    row = np.append(row, value)
                 else:
                     value = self.filter_none(obj, column)
-                    row.append(value)
-                    # row = np.append(row, value)
-        row.extend(['/']*(SpecimenInfo.header_num - len(row)))
-        # row = np.append(row, ['/']*(SpecimenInfo.header_num - len(row)))
-        # row = list(row)
+                    # row.append(value)
+                    row = np.append(row, value)
+        # row.extend(['/']*(SpecimenInfo.header_num - len(row)))
+        row = np.append(row, ['/']*(SpecimenInfo.header_num - len(row)))
         return row
 
     def format_type(self, obj):

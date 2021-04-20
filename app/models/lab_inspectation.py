@@ -101,44 +101,41 @@ class BloodRoutine(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
-        row = []
-        # row = np.zeros(0, dtype=str)
+        # row = []
+        row = np.zeros(0, dtype=str)
         if buffer.get('BloodRoutine').get(pid) is None or buffer.get('BloodRoutine').get(pid).get(treNum) is None:
-            row.extend(['/'] * BloodRoutine.header_num)
-            # row = np.append(row, ['/']*BloodRoutine.header_num)
-            # row = list(row)
+            # row.extend(['/'] * BloodRoutine.header_num)
+            row = np.append(row, ['/']*BloodRoutine.header_num)
             return row
         obj = buffer.get('BloodRoutine').get(pid).get(treNum)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
-                row.extend([value, value_Mea, value_Note])
-                # row = np.append(row, [value, value_Mea, value_Note])
-        # row = list(row)
+                # row.extend([value, value_Mea, value_Note])
+                row = np.append(row, [value, value_Mea, value_Note])
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        header = []
-        # header = np.zeros(0, dtype=str)
+        # header = []
+        header = np.zeros(0, dtype=str)
         for column in columns:
             if column == 'samplingTime':
-                header.append(self.export_header_map.get(column))
-                # header = np.append(header, self.export_header_map.get(column))
+                # header.append(self.export_header_map.get(column))
+                header = np.append(header, self.export_header_map.get(column))
             else:
-                header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                               self.export_header_map.get(column) + '临床意义判断',
-                               self.export_header_map.get(column) + '备注'])
-                # header = np.append(header, [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                #                             self.export_header_map.get(column) + '临床意义判断',
-                #                             self.export_header_map.get(column) + '备注'])
-        # header = list(header)
+                # header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
+                #                self.export_header_map.get(column) + '临床意义判断',
+                #                self.export_header_map.get(column) + '备注'])
+                header = np.append(header, [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
+                                            self.export_header_map.get(column) + '临床意义判断',
+                                            self.export_header_map.get(column) + '备注'])
         BloodRoutine.header_num = len(header)
         return header
 
@@ -245,45 +242,42 @@ class BloodBio(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
-        row = []
-        # row = np.zeros(0, dtype=str)
+        # row = []
+        row = np.zeros(0, dtype=str)
         if buffer.get('BloodBio').get(pid) is None or buffer.get('BloodBio').get(pid).get(treNum) is None:
-            row.extend(['/'] * BloodBio.header_num)
-            # row = np.append(row, ['/']*BloodBio.header_num)
-            # row = list(row)
+            # row.extend(['/'] * BloodBio.header_num)
+            row = np.append(row, ['/']*BloodBio.header_num)
             return row
         obj = buffer.get('BloodBio').get(pid).get(treNum)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
-                row.extend([value, value_Mea, value_Note])
-                # row = np.append(row, [value, value_Mea, value_Note])
-        # row = list(row)
+                # row.extend([value, value_Mea, value_Note])
+                row = np.append(row, [value, value_Mea, value_Note])
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        header = []
-        # header = np.zeros(0, dtype=str)
+        # header = []
+        header = np.zeros(0, dtype=str)
         for column in columns:
             if column == 'samplingTime':
-                header.append(self.export_header_map.get(column))
-                # header = np.append(header, self.export_header_map.get(column))
+                # header.append(self.export_header_map.get(column))
+                header = np.append(header, self.export_header_map.get(column))
             else:
-                header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                               self.export_header_map.get(column) + '临床意义判断',
-                               self.export_header_map.get(column) + '备注'])
-                # header = np.append(header,
-                #                    [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                #                     self.export_header_map.get(column) + '临床意义判断',
-                #                     self.export_header_map.get(column) + '备注'])
-        # header = list(header)
+                # header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
+                #                self.export_header_map.get(column) + '临床意义判断',
+                #                self.export_header_map.get(column) + '备注'])
+                header = np.append(header,
+                                   [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
+                                    self.export_header_map.get(column) + '临床意义判断',
+                                    self.export_header_map.get(column) + '备注'])
         BloodBio.header_num = len(header)
         return header
 
@@ -327,45 +321,42 @@ class Thyroid(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
-        row = []
-        # row = np.zeros(0, dtype=str)
+        # row = []
+        row = np.zeros(0, dtype=str)
         if buffer.get('Thyroid').get(pid) is None or buffer.get('Thyroid').get(pid).get(treNum) is None:
-            row.extend(['/'] * Thyroid.header_num)
-            # row = np.append(row, ['/']*Thyroid.header_num)
-            # row = list(row)
+            # row.extend(['/'] * Thyroid.header_num)
+            row = np.append(row, ['/']*Thyroid.header_num)
             return row
         obj = buffer.get('Thyroid').get(pid).get(treNum)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
-                row.extend([value, value_Mea, value_Note])
-                # row = np.append(row, [value, value_Mea, value_Note])
-        # row = list(row)
+                # row.extend([value, value_Mea, value_Note])
+                row = np.append(row, [value, value_Mea, value_Note])
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        header = []
-        # header = np.zeros(0, dtype=str)
+        # header = []
+        header = np.zeros(0, dtype=str)
         for column in columns:
             if column == 'samplingTime':
-                header.append(self.export_header_map.get(column))
-                # header = np.append(header, self.export_header_map.get(column))
+                # header.append(self.export_header_map.get(column))
+                header = np.append(header, self.export_header_map.get(column))
             else:
-                header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                               self.export_header_map.get(column) + '临床意义判断',
-                               self.export_header_map.get(column) + '备注'])
-                # header = np.append(header,
-                #                    [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                #                     self.export_header_map.get(column) + '临床意义判断',
-                #                     self.export_header_map.get(column) + '备注'])
-        # header = list(header)
+                # header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
+                #                self.export_header_map.get(column) + '临床意义判断',
+                #                self.export_header_map.get(column) + '备注'])
+                header = np.append(header,
+                                   [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
+                                    self.export_header_map.get(column) + '临床意义判断',
+                                    self.export_header_map.get(column) + '备注'])
         Thyroid.header_num = len(header)
         return header
 
@@ -410,45 +401,42 @@ class Coagulation(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
-        row = []
-        # row = np.zeros(0, dtype=str)
+        # row = []
+        row = np.zeros(0, dtype=str)
         if buffer.get('Coagulation').get(pid) is None or buffer.get('Coagulation').get(pid).get(treNum) is None:
-            row.extend(['/'] * Coagulation.header_num)
-            # row = np.append(row, ['/']*Coagulation.header_num)
-            # row = list(row)
+            # row.extend(['/'] * Coagulation.header_num)
+            row = np.append(row, ['/']*Coagulation.header_num)
             return row
         obj = buffer.get('Coagulation').get(pid).get(treNum)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
-                row.extend([value, value_Mea, value_Note])
-                # row = np.append(row, [value, value_Mea, value_Note])
-        # row = list(row)
+                # row.extend([value, value_Mea, value_Note])
+                row = np.append(row, [value, value_Mea, value_Note])
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        header = []
-        # header = np.zeros(0, dtype=str)
+        # header = []
+        header = np.zeros(0, dtype=str)
         for column in columns:
             if column == 'samplingTime':
-                header.append(self.export_header_map.get(column))
-                # header = np.append(header, self.export_header_map.get(column))
+                # header.append(self.export_header_map.get(column))
+                header = np.append(header, self.export_header_map.get(column))
             else:
-                header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                               self.export_header_map.get(column) + '临床意义判断',
-                               self.export_header_map.get(column) + '备注'])
-                # header = np.append(header,
-                #                    [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                #                     self.export_header_map.get(column) + '临床意义判断',
-                #                     self.export_header_map.get(column) + '备注'])
-        # header = list(header)
+                # header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
+                #                self.export_header_map.get(column) + '临床意义判断',
+                #                self.export_header_map.get(column) + '备注'])
+                header = np.append(header,
+                                   [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
+                                    self.export_header_map.get(column) + '临床意义判断',
+                                    self.export_header_map.get(column) + '备注'])
         Coagulation.header_num = len(header)
         return header
 
@@ -500,46 +488,43 @@ class MyocardialEnzyme(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
-        row = []
-        # row = np.zeros(0, dtype=str)
+        # row = []
+        row = np.zeros(0, dtype=str)
         if buffer.get('MyocardialEnzyme').get(pid) is None or buffer.get('MyocardialEnzyme').get(pid).get(
                 treNum) is None:
-            row.extend(['/'] * MyocardialEnzyme.header_num)
-            # row = np.append(row, ['/'] * MyocardialEnzyme.header_num)
-            # row = list(row)
+            # row.extend(['/'] * MyocardialEnzyme.header_num)
+            row = np.append(row, ['/'] * MyocardialEnzyme.header_num)
             return row
         obj = buffer.get('MyocardialEnzyme').get(pid).get(treNum)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
-                row.extend([value, value_Mea, value_Note])
-                # row = np.append(row, [value, value_Mea, value_Note])
-        # row = list(row)
+                # row.extend([value, value_Mea, value_Note])
+                row = np.append(row, [value, value_Mea, value_Note])
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        header = []
-        # header = np.zeros(0, dtype=str)
+        # header = []
+        header = np.zeros(0, dtype=str)
         for column in columns:
             if column == 'samplingTime':
-                header.append(self.export_header_map.get(column))
-                # header = np.append(header, self.export_header_map.get(column))
+                # header.append(self.export_header_map.get(column))
+                header = np.append(header, self.export_header_map.get(column))
             else:
-                header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                               self.export_header_map.get(column) + '临床意义判断',
-                               self.export_header_map.get(column) + '备注'])
-                # header = np.append(header,
-                #                    [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                #                     self.export_header_map.get(column) + '临床意义判断',
-                #                     self.export_header_map.get(column) + '备注'])
-        # header = list(header)
+                # header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
+                #                self.export_header_map.get(column) + '临床意义判断',
+                #                self.export_header_map.get(column) + '备注'])
+                header = np.append(header,
+                                   [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
+                                    self.export_header_map.get(column) + '临床意义判断',
+                                    self.export_header_map.get(column) + '备注'])
         MyocardialEnzyme.header_num = len(header)
         return header
 
@@ -587,45 +572,42 @@ class Cytokines(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
-        row = []
-        # row = np.zeros(0, dtype=str)
+        # row = []
+        row = np.zeros(0, dtype=str)
         if buffer.get('Cytokines').get(pid) is None or buffer.get('Cytokines').get(pid).get(treNum) is None:
-            row.extend(['/'] * Cytokines.header_num)
-            # row = np.append(row, ['/'] * Cytokines.header_num)
-            # row = list(row)
+            # row.extend(['/'] * Cytokines.header_num)
+            row = np.append(row, ['/'] * Cytokines.header_num)
             return row
         obj = buffer.get('Cytokines').get(pid).get(treNum)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
-                row.extend([value, value_Mea, value_Note])
-                # row = np.append(row, [value, value_Mea, value_Note])
-        # row = list(row)
+                # row.extend([value, value_Mea, value_Note])
+                row = np.append(row, [value, value_Mea, value_Note])
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        header = []
-        # header = np.zeros(0, dtype=str)
+        # header = []
+        header = np.zeros(0, dtype=str)
         for column in columns:
             if column == 'samplingTime':
-                header.append(self.export_header_map.get(column))
-                # header = np.append(header, self.export_header_map.get(column))
+                # header.append(self.export_header_map.get(column))
+                header = np.append(header, self.export_header_map.get(column))
             else:
-                header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                               self.export_header_map.get(column) + '临床意义判断',
-                               self.export_header_map.get(column) + '备注'])
-                # header = np.append(header,
-                #                    [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                #                     self.export_header_map.get(column) + '临床意义判断',
-                #                     self.export_header_map.get(column) + '备注'])
-        # header = list(header)
+                # header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
+                #                self.export_header_map.get(column) + '临床意义判断',
+                #                self.export_header_map.get(column) + '备注'])
+                header = np.append(header,
+                                   [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
+                                    self.export_header_map.get(column) + '临床意义判断',
+                                    self.export_header_map.get(column) + '备注'])
         Cytokines.header_num = len(header)
         return header
 
@@ -748,45 +730,42 @@ class LymSubsets(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
-        row = []
-        # row = np.zeros(0, dtype=str)
+        # row = []
+        row = np.zeros(0, dtype=str)
         if buffer.get('LymSubsets').get(pid) is None or buffer.get('LymSubsets').get(pid).get(treNum) is None:
-            row.extend(['/'] * LymSubsets.header_num)
-            # row = np.append(row, ['/'] * LymSubsets.header_num)
-            # row = list(row)
+            # row.extend(['/'] * LymSubsets.header_num)
+            row = np.append(row, ['/'] * LymSubsets.header_num)
             return row
         obj = buffer.get('LymSubsets').get(pid).get(treNum)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
-                row.extend([value, value_Mea, value_Note])
-                # row = np.append(row, [value, value_Mea, value_Note])
-        # row = list(row)
+                # row.extend([value, value_Mea, value_Note])
+                row = np.append(row, [value, value_Mea, value_Note])
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        header = []
-        # header = np.zeros(0, dtype=str)
+        # header = []
+        header = np.zeros(0, dtype=str)
         for column in columns:
             if column == 'samplingTime':
-                header.append(self.export_header_map.get(column))
-                # header = np.append(header, self.export_header_map.get(column))
+                # header.append(self.export_header_map.get(column))
+                header = np.append(header, self.export_header_map.get(column))
             else:
-                header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                               self.export_header_map.get(column) + '临床意义判断',
-                               self.export_header_map.get(column) + '备注'])
-                # header = np.append(header,
-                #                    [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                #                     self.export_header_map.get(column) + '临床意义判断',
-                #                     self.export_header_map.get(column) + '备注'])
-        # header = list(header)
+                # header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
+                #                self.export_header_map.get(column) + '临床意义判断',
+                #                self.export_header_map.get(column) + '备注'])
+                header = np.append(header,
+                                   [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
+                                    self.export_header_map.get(column) + '临床意义判断',
+                                    self.export_header_map.get(column) + '备注'])
         LymSubsets.header_num = len(header)
         return header
 
@@ -865,45 +844,42 @@ class UrineRoutine(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
-        row = []
-        # row = np.zeros(0, dtype=str)
+        # row = []
+        row = np.zeros(0, dtype=str)
         if buffer.get('UrineRoutine').get(pid) is None or buffer.get('UrineRoutine').get(pid).get(treNum) is None:
-            row.extend(['/'] * UrineRoutine.header_num)
-            # row = np.append(row, ['/'] * UrineRoutine.header_num)
-            # row = list(row)
+            # row.extend(['/'] * UrineRoutine.header_num)
+            row = np.append(row, ['/'] * UrineRoutine.header_num)
             return row
         obj = buffer.get('UrineRoutine').get(pid).get(treNum)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
-                row.extend([value, value_Mea, value_Note])
-                # row = np.append(row, [value, value_Mea, value_Note])
-        # row = list(row)
+                # row.extend([value, value_Mea, value_Note])
+                row = np.append(row, [value, value_Mea, value_Note])
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        header = []
-        # header = np.zeros(0, dtype=str)
+        # header = []
+        header = np.zeros(0, dtype=str)
         for column in columns:
             if column == 'samplingTime':
-                header.append(self.export_header_map.get(column))
-                # header = np.append(header, self.export_header_map.get(column))
+                # header.append(self.export_header_map.get(column))
+                header = np.append(header, self.export_header_map.get(column))
             else:
-                header.extend([self.export_header_map.get(column) + '测定值',
-                               self.export_header_map.get(column) + '临床意义判断',
-                               self.export_header_map.get(column) + '备注'])
-                # header = np.append(header,
-                #                    [self.export_header_map.get(column) + '测定值',
-                #                     self.export_header_map.get(column) + '临床意义判断',
-                #                     self.export_header_map.get(column) + '备注'])
-        # header = list(header)
+                # header.extend([self.export_header_map.get(column) + '测定值',
+                #                self.export_header_map.get(column) + '临床意义判断',
+                #                self.export_header_map.get(column) + '备注'])
+                header = np.append(header,
+                                   [self.export_header_map.get(column) + '测定值',
+                                    self.export_header_map.get(column) + '临床意义判断',
+                                    self.export_header_map.get(column) + '备注'])
         UrineRoutine.header_num = len(header)
         return header
 
@@ -953,44 +929,41 @@ class TumorMarker(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
-        row = []
-        # row = np.zeros(0, dtype=str)
+        # row = []
+        row = np.zeros(0, dtype=str)
         if buffer.get('TumorMarker').get(pid) is None or buffer.get('TumorMarker').get(pid).get(treNum) is None:
-            row.extend(['/'] * TumorMarker.header_num)
-            # row = np.append(row, ['/'] * TumorMarker.header_num)
-            # row = list(row)
+            # row.extend(['/'] * TumorMarker.header_num)
+            row = np.append(row, ['/'] * TumorMarker.header_num)
             return row
         obj = buffer.get('TumorMarker').get(pid).get(treNum)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
-                row.extend([value, value_Mea, value_Note])
-                # row = np.append(row, [value, value_Mea, value_Note])
-        # row = list(row)
+                # row.extend([value, value_Mea, value_Note])
+                row = np.append(row, [value, value_Mea, value_Note])
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        header = []
-        # header = np.zeros(0, dtype=str)
+        # header = []
+        header = np.zeros(0, dtype=str)
         for column in columns:
             if column == 'samplingTime':
-                header.append(self.export_header_map.get(column))
-                # header = np.append(header, self.export_header_map.get(column))
+                # header.append(self.export_header_map.get(column))
+                header = np.append(header, self.export_header_map.get(column))
             else:
-                header.extend([self.export_header_map.get(column) + '测定值(NG/ML)',
-                               self.export_header_map.get(column) + '临床意义判断',
-                               self.export_header_map.get(column) + '备注'])
-                # header = np.append(header, [self.export_header_map.get(column) + '测定值(NG/ML)',
-                #                             self.export_header_map.get(column) + '临床意义判断',
-                #                             self.export_header_map.get(column) + '备注'])
-        # header = list(header)
+                # header.extend([self.export_header_map.get(column) + '测定值(NG/ML)',
+                #                self.export_header_map.get(column) + '临床意义判断',
+                #                self.export_header_map.get(column) + '备注'])
+                header = np.append(header, [self.export_header_map.get(column) + '测定值(NG/ML)',
+                                            self.export_header_map.get(column) + '临床意义判断',
+                                            self.export_header_map.get(column) + '备注'])
         TumorMarker.header_num = len(header)
         return header
 

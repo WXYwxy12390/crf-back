@@ -51,11 +51,13 @@ from time import time
 # print('使用numpy：' + str(time3-time2))
 
 time1 = time()
-a = ['/']*10
-a.extend(['/']*10000)
+a = ['/']*1000
+for i in range(0,100):
+    a.extend(['/']*100)
 print(time()-time1)
 
 time2 = time()
 b = np.array(['/']*10)
-b = np.append(b, ['/']*10000)
+for i in range(0,100):
+    b = np.append(b, ['/']*100)
 print(time()-time2)

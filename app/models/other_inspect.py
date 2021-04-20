@@ -90,17 +90,16 @@ class Lung(Base):
         row = []
         # row = np.zeros(0, dtype=str)
         if buffer.get('Lung').get(pid) is None or buffer.get('Lung').get(pid).get(treNum) is None:
-            row.extend(['/'] * Lung.header_num)
-            # row = np.append(row, ['/']*Lung.header_num)
-            # row = list(row)
+            # row.extend(['/'] * Lung.header_num)
+            row = np.append(row, ['/']*Lung.header_num)
             return row
 
         obj = buffer.get('Lung').get(pid).get(treNum)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
-                row.append(value)
-                # row = np.append(row, value)
+                # row.append(value)
+                row = np.append(row, value)
             else:
                 value_exp = self.filter_none(obj, column + '_exp')
                 value_best = self.filter_none(obj, column + '_best')
@@ -108,31 +107,29 @@ class Lung(Base):
                 value_ratio = str(value_ratio) + "%" if value_ratio != "/" else value_ratio
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
-                row.extend([value_exp, value_best, value_ratio, value_Mea, value_Note])
-                # row = np.append(row, [value_exp, value_best, value_ratio, value_Mea, value_Note])
-        # row = list(row)
+                # row.extend([value_exp, value_best, value_ratio, value_Mea, value_Note])
+                row = np.append(row, [value_exp, value_best, value_ratio, value_Mea, value_Note])
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        header = []
-        # header = np.zeros(0, dtype=str)
+        # header = []
+        header = np.zeros(0, dtype=str)
         for column in columns:
             if column == 'samplingTime':
-                header.append(self.export_header_map.get(column))
-                # header = np.append(header, self.export_header_map.get(column))
+                # header.append(self.export_header_map.get(column))
+                header = np.append(header, self.export_header_map.get(column))
             else:
-                header.extend([self.export_header_map.get(column) + '预计值',
-                               self.export_header_map.get(column) + '最佳值',
-                               self.export_header_map.get(column) + '最佳值/预计值(%)',
-                               self.export_header_map.get(column) + '临床意义判断',
-                               self.export_header_map.get(column) + '备注'])
-                # header = np.append(header, [self.export_header_map.get(column) + '预计值',
-                #                             self.export_header_map.get(column) + '最佳值',
-                #                             self.export_header_map.get(column) + '最佳值/预计值(%)',
-                #                             self.export_header_map.get(column) + '临床意义判断',
-                #                             self.export_header_map.get(column) + '备注'])
-        # header = list(header)
+                # header.extend([self.export_header_map.get(column) + '预计值',
+                #                self.export_header_map.get(column) + '最佳值',
+                #                self.export_header_map.get(column) + '最佳值/预计值(%)',
+                #                self.export_header_map.get(column) + '临床意义判断',
+                #                self.export_header_map.get(column) + '备注'])
+                header = np.append(header, [self.export_header_map.get(column) + '预计值',
+                                            self.export_header_map.get(column) + '最佳值',
+                                            self.export_header_map.get(column) + '最佳值/预计值(%)',
+                                            self.export_header_map.get(column) + '临床意义判断',
+                                            self.export_header_map.get(column) + '备注'])
         Lung.header_num = len(header)
         return header
 
@@ -172,29 +169,26 @@ class OtherExams(Base):
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
-        row = []
-        # row = np.zeros(0, dtype=str)
+        # row = []
+        row = np.zeros(0, dtype=str)
         if buffer.get('OtherExams').get(pid) is None or buffer.get('OtherExams').get(pid).get(treNum) is None:
-            row.extend(['/'] * OtherExams.header_num)
-            # row = np.append(row, ['/'] * OtherExams.header_num)
-            # row = list(row)
+            # row.extend(['/'] * OtherExams.header_num)
+            row = np.append(row, ['/'] * OtherExams.header_num)
             return row
         obj = buffer.get('OtherExams').get(pid).get(treNum)
         for column in columns:
             value = self.filter_none(obj, column)
-            row.append(value)
-            # row = np.append(row, value)
-        # row = list(row)
+            # row.append(value)
+            row = np.append(row, value)
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        header = []
-        # header = np.zeros(0, dtype=str)
+        # header = []
+        header = np.zeros(0, dtype=str)
         for column in columns:
-            header.append(self.export_header_map.get(column))
-            # header = np.append(header, self.export_header_map.get(column))
-        # header = list(header)
+            # header.append(self.export_header_map.get(column))
+            header = np.append(header, self.export_header_map.get(column))
         OtherExams.header_num = len(header)
         return header
 
@@ -219,36 +213,34 @@ class ImageExams(Base):
 
     # 和导出功能有关
     export_header_map = {'detectTime': '影像学检查检测时间', 'examArea': '检查部位', 'exmaMethod': '检查方法',
-                         'tumorLD': '肿瘤长径', 'tumorSD': '肿瘤短径', 'tumorDesc': '肿瘤描述', 'photoNumber':'影像号'}
+                         'tumorLD': '肿瘤长径', 'tumorSD': '肿瘤短径', 'tumorDesc': '肿瘤描述', 'photoNumber0':'影像号'}
 
     def keys(self):
         return ['id','pid','treNum','detectTime','examArea','exmaMethod','tumorLD','tumorSD','tumorDesc','path','photoNumber']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
-        row = []
-        # row = np.zeros(0, dtype=str)
+        # row = []
+        row = np.zeros(0, dtype=str)
         if buffer.get('ImageExams').get(pid) is None or buffer.get('ImageExams').get(pid).get(treNum) is None:
-            row.extend(['/'] * ImageExams.header_num)
-            # row = np.append(row, ['/'] * ImageExams.header_num)
-            # row = list(row)
+            # row.extend(['/'] * ImageExams.header_num)
+            row = np.append(row, ['/'] * ImageExams.header_num)
             return row
         obj_array = buffer.get('ImageExams').get(pid).get(treNum)
 
         for obj in obj_array:
             for column in columns:
                 value = self.filter_none(obj, column)
-                row.append(value)
-                # row = np.append(row, value)
-        row.extend(['/'] * (ImageExams.header_num - len(row)))
-        # row = np.append(row, ['/'] * (ImageExams.header_num - len(row)))
-        # row = list(row)
+                # row.append(value)
+                row = np.append(row, value)
+        # row.extend(['/'] * (ImageExams.header_num - len(row)))
+        row = np.append(row, ['/'] * (ImageExams.header_num - len(row)))
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        header = []
-        # header = np.zeros(0, dtype=str)
+        # header = []
+        header = np.zeros(0, dtype=str)
         # 求最多有多少条
         max_num = 0
         for value1 in buffer.get('ImageExams').values():
@@ -256,16 +248,11 @@ class ImageExams(Base):
                 num = len(value2)
                 if num > max_num:
                     max_num = num
-
-        if max_num > 1:
-            header_num = max_num
-        else:
-            header_num = 1
+        header_num = max_num if max_num > 1 else 1
 
         for i in range(1, header_num + 1):
             for column in columns:
-                header.append(self.export_header_map.get(column) + str(i))
-                # header = np.append(header, self.export_header_map.get(column) + str(i))
-        # header = list(header)
+                # header.append(self.export_header_map.get(column) + str(i))
+                header = np.append(header, self.export_header_map.get(column) + str(i))
         ImageExams.header_num = len(header)
         return header

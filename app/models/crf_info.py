@@ -35,12 +35,11 @@ class FollInfo(Base):
         imaFilType_map = {1:'X光', 2:'超声', 3:'CT',4:'MRI', 5:'PET/CT', '/':'/',
                           '1': 'X光', '2': '超声', '3': 'CT', '4': 'MRI', '5': 'PET/CT'}
         nextFollowupTime_flag = False
-        row = []
-        # row = np.zeros(0, dtype=str)
+        # row = []
+        row = np.zeros(0, dtype=str)
         if buffer.get('FollInfo').get(pid) is None:
-            row.extend(['/']*FollInfo.header_num)
-            # row = np.append(row, ['/']*FollInfo.header_num)
-            # row = list(row)
+            # row.extend(['/']*FollInfo.header_num)
+            row = np.append(row, ['/']*FollInfo.header_num)
             return row
         obj_array = buffer.get('FollInfo').get(pid)
         obj_array_size = len(obj_array)
@@ -56,18 +55,18 @@ class FollInfo(Base):
                 if column == 'folMet':
                     value = self.filter_none(obj_array[k], column)
                     value = folMet_map.get(value)
-                    row.append(value)
-                    # row = np.append(row, value)
+                    # row.append(value)
+                    row = np.append(row, value)
                 elif column == 'effEva':
                     value = self.filter_none(obj_array[k], column)
                     value = effEva_map.get(value)
-                    row.append(value)
-                    # row = np.append(row, value)
+                    # row.append(value)
+                    row = np.append(row, value)
                 elif column == 'livSta':
                     value = self.filter_none(obj_array[k], column)
                     value = livSta_map.get(value)
-                    row.append(value)
-                    # row = np.append(row, value)
+                    # row.append(value)
+                    row = np.append(row, value)
                 elif column == 'dieDate':
                     livSta = self.filter_none(obj_array[k], 'livSta')
                     livSta = livSta_map.get(livSta)
@@ -75,44 +74,43 @@ class FollInfo(Base):
                         value = str(obj_array[k].dieDate) if obj_array[k].dieDate else '/'
                     else:
                         value = '/'
-                    row.append(value)
-                    # row = np.append(row, value)
+                    # row.append(value)
+                    row = np.append(row, value)
                 elif column == 'imaFilType':
                     value = self.filter_none(obj_array[k], column)
                     value = imaFilType_map.get(value)
-                    row.append(value)
-                    # row = np.append(row, value)
+                    # row.append(value)
+                    row = np.append(row, value)
                 elif column == 'nextFollowupTime':
                     if not nextFollowupTime_flag:
                         value = self.filter_none(patient_obj, column) if patient_obj else '/'
-                        row.append(value)
-                        # row = np.append(row, value)
+                        # row.append(value)
+                        row = np.append(row, value)
                         nextFollowupTime_flag = True
                 else:
                     value = self.filter_none(obj_array[k], column)
-                    row.append(value)
-                    # row = np.append(row, value)
-        row.extend(['/']*(FollInfo.header_num - len(row)))
-        # row = np.append(row, ['/']*(FollInfo.header_num - len(row)))
+                    # row.append(value)
+                    row = np.append(row, value)
+        # row.extend(['/']*(FollInfo.header_num - len(row)))
+        row = np.append(row, ['/']*(FollInfo.header_num - len(row)))
 
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer, follInfoNum):
         nextFollowupTime_flag = False
-        header = []
-        # header = np.zeros(0, dtype=str)
+        # header = []
+        header = np.zeros(0, dtype=str)
         for i in range(1, follInfoNum + 1):
             for column in columns:
                 if column == 'nextFollowupTime':
                     if not nextFollowupTime_flag:
-                        header.append(self.export_header_map.get(column))
-                        # header = np.append(header, self.export_header_map.get(column))
+                        # header.append(self.export_header_map.get(column))
+                        header = np.append(header, self.export_header_map.get(column))
                         nextFollowupTime_flag = True
                 else:
-                    header.append(self.export_header_map.get(column) + str(i))
-                    # header = np.append(header, self.export_header_map.get(column) + str(i))
-        # header = list(header)
+                    # header.append(self.export_header_map.get(column) + str(i))
+                    header = np.append(header, self.export_header_map.get(column) + str(i))
         FollInfo.header_num = len(header)
         return header
 
