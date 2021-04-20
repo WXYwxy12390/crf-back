@@ -43,99 +43,58 @@ class FollInfo(Base):
             # row = list(row)
             return row
         obj_array = buffer.get('FollInfo').get(pid)
-
+        obj_array_size = len(obj_array)
         if buffer.get('Patient').get(pid) is None:
             patient_obj = None
         else:
             patient_obj = buffer.get('Patient').get(pid)
 
-        if len(obj_array) < follInfoNum:
-            for k in range(0, len(obj_array)):
-                for column in columns:
-                    if column == 'folMet':
-                        value = self.filter_none(obj_array[k], column)
-                        value = folMet_map.get(value)
-                        row.append(value)
-                        # row = np.append(row, value)
-                    elif column == 'effEva':
-                        value = self.filter_none(obj_array[k], column)
-                        value = effEva_map.get(value)
-                        row.append(value)
-                        # row = np.append(row, value)
-                    elif column == 'livSta':
-                        value = self.filter_none(obj_array[k], column)
-                        value = livSta_map.get(value)
-                        row.append(value)
-                        # row = np.append(row, value)
-                    elif column == 'dieDate':
-                        livSta = self.filter_none(obj_array[k], 'livSta')
-                        livSta = livSta_map.get(livSta)
-                        if livSta == '死亡':
-                            value = str(obj_array[k].dieDate) if obj_array[k].dieDate else '/'
-                        else:
-                            value = '/'
-                        row.append(value)
-                        # row = np.append(row, value)
-                    elif column == 'imaFilType':
-                        value = self.filter_none(obj_array[k], column)
-                        value = imaFilType_map.get(value)
-                        row.append(value)
-                        # row = np.append(row, value)
-                    elif column == 'nextFollowupTime':
-                        if not nextFollowupTime_flag:
-                            value = self.filter_none(patient_obj, column) if patient_obj else '/'
-                            row.append(value)
-                            # row = np.append(row, value)
-                            nextFollowupTime_flag = True
-                    else:
-                        value = self.filter_none(obj_array[k], column)
-                        row.append(value)
-                        # row = np.append(row, value)
-            row.extend(['/']*(FollInfo.header_num - len(row)))
-            # row = np.append(row, ['/']*(FollInfo.header_num - len(row)))
+        num = obj_array_size if obj_array_size < follInfoNum else follInfoNum
 
-        else:
-            for k in range(0, follInfoNum):
-                for column in columns:
-                    if column == 'folMet':
-                        value = self.filter_none(obj_array[k], column)
-                        value = folMet_map.get(value)
-                        row.append(value)
-                        # row = np.append(row, value)
-                    elif column == 'effEva':
-                        value = self.filter_none(obj_array[k], column)
-                        value = effEva_map.get(value)
-                        row.append(value)
-                        # row = np.append(row, value)
-                    elif column == 'livSta':
-                        value = self.filter_none(obj_array[k], column)
-                        value = livSta_map.get(value)
-                        row.append(value)
-                        # row = np.append(row, value)
-                    elif column == 'dieDate':
-                        livSta = self.filter_none(obj_array[k], 'livSta')
-                        livSta = livSta_map.get(livSta)
-                        if livSta == '死亡':
-                            value = str(obj_array[k].dieDate) if obj_array[k].dieDate else '/'
-                        else:
-                            value = '/'
-                        row.append(value)
-                        # row = np.append(row, value)
-                    elif column == 'imaFilType':
-                        value = self.filter_none(obj_array[k], column)
-                        value = imaFilType_map.get(value)
-                        row.append(value)
-                        # row = np.append(row, value)
-                    elif column == 'nextFollowupTime':
-                        if not nextFollowupTime_flag:
-                            value = self.filter_none(patient_obj, column) if patient_obj else '/'
-                            row.append(value)
-                            # row = np.append(row, value)
-                            nextFollowupTime_flag = True
+        for k in range(0, num):
+            for column in columns:
+                if column == 'folMet':
+                    value = self.filter_none(obj_array[k], column)
+                    value = folMet_map.get(value)
+                    row.append(value)
+                    # row = np.append(row, value)
+                elif column == 'effEva':
+                    value = self.filter_none(obj_array[k], column)
+                    value = effEva_map.get(value)
+                    row.append(value)
+                    # row = np.append(row, value)
+                elif column == 'livSta':
+                    value = self.filter_none(obj_array[k], column)
+                    value = livSta_map.get(value)
+                    row.append(value)
+                    # row = np.append(row, value)
+                elif column == 'dieDate':
+                    livSta = self.filter_none(obj_array[k], 'livSta')
+                    livSta = livSta_map.get(livSta)
+                    if livSta == '死亡':
+                        value = str(obj_array[k].dieDate) if obj_array[k].dieDate else '/'
                     else:
-                        value = self.filter_none(obj_array[k], column)
+                        value = '/'
+                    row.append(value)
+                    # row = np.append(row, value)
+                elif column == 'imaFilType':
+                    value = self.filter_none(obj_array[k], column)
+                    value = imaFilType_map.get(value)
+                    row.append(value)
+                    # row = np.append(row, value)
+                elif column == 'nextFollowupTime':
+                    if not nextFollowupTime_flag:
+                        value = self.filter_none(patient_obj, column) if patient_obj else '/'
                         row.append(value)
                         # row = np.append(row, value)
+                        nextFollowupTime_flag = True
+                else:
+                    value = self.filter_none(obj_array[k], column)
+                    row.append(value)
+                    # row = np.append(row, value)
+        row.extend(['/']*(FollInfo.header_num - len(row)))
+        # row = np.append(row, ['/']*(FollInfo.header_num - len(row)))
+
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头

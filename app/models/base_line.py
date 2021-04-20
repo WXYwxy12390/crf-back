@@ -1,5 +1,3 @@
-import time
-
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime, SmallInteger, and_
 from app.models.base import Base, db
 # 病人基本信息表

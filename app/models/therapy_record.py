@@ -1,6 +1,3 @@
-from time import time
-import numpy as np
-from numba import jit
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime, SmallInteger
 from app.models.base import Base, db
 
@@ -353,7 +350,6 @@ class OneToFive(Base, PatDia):
                          'note': '其他', 'begDate': '开始日期', 'endDate': '结束日期',
                          'treatName': '治疗名称', 'currPeriod': '周期', 'treSche': '药物方案',
                          'drugs': '药物', 'detailBegDate': '给药/治疗开始日期', 'detailEndDate': '给药/治疗结束日期', 'detailNote': '备注'}
-    detail_header = ['treatName', 'currPeriod', 'treSche', 'drugs', 'detailBegDate', 'detailEndDate', 'detailNote']
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'isTre', 'clinTri', 'treSolu', 'spePlan', 'begDate',
@@ -362,6 +358,8 @@ class OneToFive(Base, PatDia):
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treNum):
+        detail_header = ['treatName', 'currPeriod', 'treSche', 'drugs', 'detailBegDate', 'detailEndDate',
+                         'detailNote']
         isTre_map = {0: '否', 1: '是', -1: '不详', "/": "/"}
         chemo_detail_trePlan_array = None
         targeted_detail_trePlan_array = None
@@ -378,10 +376,16 @@ class OneToFive(Base, PatDia):
             return row
         obj = buffer.get('OneToFive').get(pid).get(treNum)
 
-        detail_columns = []
-        for k in range(0, len(columns)):
-            if columns[k] in self.detail_header:
-                detail_columns.append(columns[k])
+        my_detail_headers = []
+        for column in columns:
+            if column == 'detailBegDate':
+                my_detail_headers.append('begDate')
+            elif column == 'detailEndDate':
+                my_detail_headers.append('endDate')
+            elif column == 'detailNote':
+                my_detail_headers.append('note')
+            elif column in ['treatName','currPeriod','treSche','drugs']:
+                my_detail_headers.append(column)
 
         if buffer.get('DetailTrePlan').get(pid) is None or buffer.get('DetailTrePlan').get(pid).get(treNum) is None:
             detail_trePlan_array = None
@@ -415,12 +419,11 @@ class OneToFive(Base, PatDia):
                     value += '其他 '
                 row.append(value)
                 # row = np.append(row, value)
-            elif column in detail_columns and not detail_flag:
+            elif (not detail_flag) and (column in detail_header):
                 detail_flag = True
                 treSolu_value = self.filter_none(obj, 'treSolu')
-
+                size = len(my_detail_headers)
                 if not detail_trePlan_array:
-                    size = len(detail_columns)
                     times = OneToFive.chemo_detail_num + OneToFive.targeted_detail_num + OneToFive.immunity_detail_num + OneToFive.antivascular_detail_num
                     row.extend(['/']*size*times)
                     # row = np.append(row, ['/']*size*times)
@@ -434,168 +437,60 @@ class OneToFive(Base, PatDia):
                         chemo_detail_trePlan_array = detail_trePlan_array['Chemotherapy']
                         chemo_detail_num = len(chemo_detail_trePlan_array)
                         for detail_trePlan in chemo_detail_trePlan_array:
-                            for detail_column in detail_columns:
+                            for detail_column in my_detail_headers:
                                 if detail_column == 'drugs':
-                                    value_drugs = self.filter_none(detail_trePlan, 'drugs')
-                                    drugs = ''
-                                    if type(value_drugs) == dict:
-                                        for key, value in value_drugs.items():
-                                            drugs += key + ':'
-                                            if 'drugDosa' in value.keys():
-                                                drugs += str(self.filter_none(value['drugDosa']))
-                                            if 'unit' in value.keys():
-                                                drugs += self.filter_none(value['unit'])
-                                            drugs += '  '
-                                    elif type(value_drugs) == list:
-                                        for each in value_drugs:
-                                            if 'name' in each.keys():
-                                                drugs += self.filter_none(each['name']) + ':'
-                                            if 'dose' in each.keys():
-                                                drugs += self.filter_none(each['dose'])
-                                            drugs += '  '
-                                    else:
-                                        drugs = str(value_drugs)
-                                    row.append(drugs)
+                                    value_drugs = self.filter_none(detail_trePlan, detail_column)
+                                    row.append(self.format_drugs_of_detailTrePlan(value_drugs))
                                     # row = np.append(row, drugs)
-                                elif detail_column == 'detailBegDate':
-                                    row.append(self.filter_none(detail_trePlan, 'begDate'))
-                                    # row = np.append(row, self.filter_none(detail_trePlan, 'begDate'))
-                                elif detail_column == 'detailEndDate':
-                                    row.append(self.filter_none(detail_trePlan, 'endDate'))
-                                    # row = np.append(row, self.filter_none(detail_trePlan, 'endDate'))
-                                elif detail_column == 'detailNote':
-                                    row.append(self.filter_none(detail_trePlan, 'note'))
-                                    # row = np.append(row, self.filter_none(detail_trePlan, 'note'))
                                 else:
                                     row.append(self.filter_none(detail_trePlan, detail_column))
                                     # row = np.append(row, self.filter_none(detail_trePlan, detail_column))
-                    row.extend(['/']*len(detail_columns)*(OneToFive.chemo_detail_num - chemo_detail_num))
+                    row.extend(['/']*size*(OneToFive.chemo_detail_num - chemo_detail_num))
                     # row = np.append(row, ['/']*len(detail_columns)*(OneToFive.chemo_detail_num - chemo_detail_num))
 
                     if 'TargetedTherapy' in treSolu_value and detail_trePlan_array.get('TargetedTherapy'):
                         targeted_detail_trePlan_array = detail_trePlan_array['TargetedTherapy']
                         targeted_detail_num = len(targeted_detail_trePlan_array)
                         for detail_trePlan in targeted_detail_trePlan_array:
-                            for detail_column in detail_columns:
+                            for detail_column in my_detail_headers:
                                 if detail_column == 'drugs':
-                                    value_drugs = self.filter_none(detail_trePlan, 'drugs')
-                                    drugs = ''
-                                    if type(value_drugs) == dict:
-                                        for key, value in value_drugs.items():
-                                            drugs += key + ':'
-                                            if 'drugDosa' in value.keys():
-                                                drugs += str(self.filter_none(value['drugDosa']))
-                                            if 'unit' in value.keys():
-                                                drugs += self.filter_none(value['unit'])
-                                            drugs += '  '
-                                    elif type(value_drugs) == list:
-                                        for each in value_drugs:
-                                            if 'name' in each.keys():
-                                                drugs += self.filter_none(each['name']) + ':'
-                                            if 'dose' in each.keys():
-                                                drugs += self.filter_none(each['dose'])
-                                            drugs += '  '
-                                    else:
-                                        drugs = str(value_drugs)
-                                    row.append(drugs)
+                                    value_drugs = self.filter_none(detail_trePlan, detail_column)
+                                    row.append(self.format_drugs_of_detailTrePlan(value_drugs))
                                     # row = np.append(row, drugs)
-                                elif detail_column == 'detailBegDate':
-                                    row.append(self.filter_none(detail_trePlan, 'begDate'))
-                                    # row = np.append(row, self.filter_none(detail_trePlan, 'begDate'))
-                                elif detail_column == 'detailEndDate':
-                                    row.append(self.filter_none(detail_trePlan, 'endDate'))
-                                    # row = np.append(row, self.filter_none(detail_trePlan, 'endDate'))
-                                elif detail_column == 'detailNote':
-                                    row.append(self.filter_none(detail_trePlan, 'note'))
-                                    # row = np.append(row, self.filter_none(detail_trePlan, 'note'))
                                 else:
                                     row.append(self.filter_none(detail_trePlan, detail_column))
                                     # row = np.append(row, self.filter_none(detail_trePlan, detail_column))
-                    row.extend(['/']*len(detail_columns)*(OneToFive.targeted_detail_num - targeted_detail_num))
+                    row.extend(['/']*size*(OneToFive.targeted_detail_num - targeted_detail_num))
                     # row = np.append(row, ['/']*len(detail_columns)*(OneToFive.targeted_detail_num - targeted_detail_num))
 
                     if 'ImmunityTherapy' in treSolu_value and detail_trePlan_array.get('ImmunityTherapy'):
                         immunity_detail_trePlan_array = detail_trePlan_array['ImmunityTherapy']
                         immunity_detail_num = len(immunity_detail_trePlan_array)
                         for detail_trePlan in immunity_detail_trePlan_array:
-                            for detail_column in detail_columns:
+                            for detail_column in my_detail_headers:
                                 if detail_column == 'drugs':
-                                    value_drugs = self.filter_none(detail_trePlan, 'drugs')
-                                    drugs = ''
-                                    if type(value_drugs) == dict:
-                                        for key, value in value_drugs.items():
-                                            drugs += key + ':'
-                                            if 'drugDosa' in value.keys():
-                                                drugs += str(self.filter_none(value['drugDosa']))
-                                            if 'unit' in value.keys():
-                                                drugs += self.filter_none(value['unit'])
-                                            drugs += '  '
-                                    elif type(value_drugs) == list:
-                                        for each in value_drugs:
-                                            if 'name' in each.keys():
-                                                drugs += self.filter_none(each['name']) + ':'
-                                            if 'dose' in each.keys():
-                                                drugs += self.filter_none(each['dose'])
-                                            drugs += '  '
-                                    else:
-                                        drugs = str(value_drugs)
-                                    row.append(drugs)
+                                    value_drugs = self.filter_none(detail_trePlan, detail_column)
+                                    row.append(self.format_drugs_of_detailTrePlan(value_drugs))
                                     # row = np.append(row, drugs)
-                                elif detail_column == 'detailBegDate':
-                                    row.append(self.filter_none(detail_trePlan, 'begDate'))
-                                    # row = np.append(row, self.filter_none(detail_trePlan, 'begDate'))
-                                elif detail_column == 'detailEndDate':
-                                    row.append(self.filter_none(detail_trePlan, 'endDate'))
-                                    # row = np.append(row, self.filter_none(detail_trePlan, 'endDate'))
-                                elif detail_column == 'detailNote':
-                                    row.append(self.filter_none(detail_trePlan, 'note'))
-                                    # row = np.append(row, self.filter_none(detail_trePlan, 'note'))
                                 else:
                                     row.append(self.filter_none(detail_trePlan, detail_column))
                                     # row = np.append(row, self.filter_none(detail_trePlan, detail_column))
-                    row.extend(['/']*len(detail_columns)*(OneToFive.immunity_detail_num - immunity_detail_num))
+                    row.extend(['/']*size*(OneToFive.immunity_detail_num - immunity_detail_num))
                     # row = np.append(row, ['/']*len(detail_columns)*(OneToFive.immunity_detail_num - immunity_detail_num))
 
                     if 'AntivascularTherapy' in treSolu_value and detail_trePlan_array.get('AntivascularTherapy'):
                         antivascular_detail_trePlan_array = detail_trePlan_array['AntivascularTherapy']
                         antivascular_detail_num = len(antivascular_detail_trePlan_array)
                         for detail_trePlan in antivascular_detail_trePlan_array:
-                            for detail_column in detail_columns:
+                            for detail_column in my_detail_headers:
                                 if detail_column == 'drugs':
-                                    value_drugs = self.filter_none(detail_trePlan, 'drugs')
-                                    drugs = ''
-                                    if type(value_drugs) == dict:
-                                        for key, value in value_drugs.items():
-                                            drugs += key + ':'
-                                            if 'drugDosa' in value.keys():
-                                                drugs += str(self.filter_none(value['drugDosa']))
-                                            if 'unit' in value.keys():
-                                                drugs += self.filter_none(value['unit'])
-                                            drugs += '  '
-                                    elif type(value_drugs) == list:
-                                        for each in value_drugs:
-                                            if 'name' in each.keys():
-                                                drugs += self.filter_none(each['name']) + ':'
-                                            if 'dose' in each.keys():
-                                                drugs += self.filter_none(each['dose'])
-                                            drugs += '  '
-                                    else:
-                                        drugs = str(value_drugs)
-                                    row.append(drugs)
+                                    value_drugs = self.filter_none(detail_trePlan, detail_column)
+                                    row.append(self.format_drugs_of_detailTrePlan(value_drugs))
                                     # row = np.append(row, drugs)
-                                elif detail_column == 'detailBegDate':
-                                    row.append(self.filter_none(detail_trePlan, 'begDate'))
-                                    # row = np.append(row, self.filter_none(detail_trePlan, 'begDate'))
-                                elif detail_column == 'detailEndDate':
-                                    row.append(self.filter_none(detail_trePlan, 'endDate'))
-                                    # row = np.append(row, self.filter_none(detail_trePlan, 'endDate'))
-                                elif detail_column == 'detailNote':
-                                    row.append(self.filter_none(detail_trePlan, 'note'))
-                                    # row = np.append(row, self.filter_none(detail_trePlan, 'note'))
                                 else:
                                     row.append(self.filter_none(detail_trePlan, detail_column))
                                     # row = np.append(row, self.filter_none(detail_trePlan, detail_column))
-                    row.extend(['/']*len(detail_columns)*(OneToFive.antivascular_detail_num - antivascular_detail_num))
+                    row.extend(['/']*size*(OneToFive.antivascular_detail_num - antivascular_detail_num))
                     # row = np.append(row, ['/']*len(detail_columns)*(OneToFive.antivascular_detail_num - antivascular_detail_num))
             elif column == 'note':
                 value_treSolu = self.filter_none(obj, 'treSolu')
@@ -605,7 +500,7 @@ class OneToFive(Base, PatDia):
                     value = '/'
                 row.append(value)
                 # row = np.append(row, value)
-            elif not (column in detail_columns):
+            elif not (column in detail_header):
                 value = self.filter_none(obj, column)
                 row.append(value)
                 # row = np.append(row, value)
@@ -616,6 +511,8 @@ class OneToFive(Base, PatDia):
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
+        detail_header = ['treatName', 'currPeriod', 'treSche', 'drugs', 'detailBegDate', 'detailEndDate',
+                         'detailNote']
         header = []
         # header = np.zeros(0, dtype=str)
         # 求最多有多少条
@@ -624,10 +521,10 @@ class OneToFive(Base, PatDia):
         max_immunity_detail_num = 0
         max_antivascular_detail_num = 0
 
-        detail_columns = []
-        for k in range(0, len(columns)):
-            if columns[k] in self.detail_header:
-                detail_columns.append(columns[k])
+        my_detail_headers = []
+        for column in columns:
+            if column in detail_header:
+                my_detail_headers.append(column)
 
         for value1 in buffer.get('DetailTrePlan').values():
             for value2 in value1.values():
@@ -649,28 +546,25 @@ class OneToFive(Base, PatDia):
 
         detail_flag = False #标志是否已经处理详细治疗方案字段
         for column in columns:
-            if column == 'treSolu':
-                header.append(self.export_header_map.get(column))
-                # header = np.append(header, self.export_header_map.get(column))
-            elif column in detail_columns and not detail_flag:
+            if (not detail_flag) and (column in my_detail_headers):
                 detail_flag = True
                 for k in range(1, max_chemo_detail_num + 1):
-                    for detail_column in detail_columns:
+                    for detail_column in my_detail_headers:
                         header.append('化疗:' + self.export_header_map.get(detail_column) + str(k))
                         # header = np.append(header, '化疗:' + self.export_header_map.get(detail_column) + str(k))
                 for k in range(1, max_targeted_detail_num + 1):
-                    for detail_column in detail_columns:
+                    for detail_column in my_detail_headers:
                         header.append('靶向治疗:' + self.export_header_map.get(detail_column) + str(k))
                         # header = np.append(header, '靶向治疗:' + self.export_header_map.get(detail_column) + str(k))
                 for k in range(1, max_immunity_detail_num + 1):
-                    for detail_column in detail_columns:
+                    for detail_column in my_detail_headers:
                         header.append('免疫治疗:' + self.export_header_map.get(detail_column) + str(k))
                         # header = np.append(header, '免疫治疗:' + self.export_header_map.get(detail_column) + str(k))
                 for k in range(1, max_antivascular_detail_num + 1):
-                    for detail_column in detail_columns:
+                    for detail_column in my_detail_headers:
                         header.append('抗血管治疗:' + self.export_header_map.get(detail_column) + str(k))
                         # header = np.append(header, '抗血管治疗:' + self.export_header_map.get(detail_column) + str(k))
-            elif not (column in detail_columns):
+            elif not (column in my_detail_headers):
                 header.append(self.export_header_map.get(column))
                 # header = np.append(header, self.export_header_map.get(column))
 
@@ -681,6 +575,27 @@ class OneToFive(Base, PatDia):
         OneToFive.antivascular_detail_num = max_antivascular_detail_num
         OneToFive.header_num = len(header)
         return header
+
+    def format_drugs_of_detailTrePlan(self, value_drugs):
+        drugs = ''
+        if type(value_drugs) == dict:
+            for key, value in value_drugs.items():
+                drugs += key + ':'
+                if 'drugDosa' in value.keys():
+                    drugs += self.filter_none(str(value['drugDosa']))
+                if 'unit' in value.keys():
+                    drugs += self.filter_none(str(value['unit']))
+                drugs += '  '
+        elif type(value_drugs) == list:
+            for each in value_drugs:
+                if 'name' in each.keys():
+                    drugs += self.filter_none(each['name']) + ':'
+                if 'dose' in each.keys():
+                    drugs += self.filter_none(each['dose'])
+                drugs += '  '
+        else:
+            drugs = str(value_drugs)
+        return drugs
 
 
 # 详细治疗方案
@@ -731,10 +646,10 @@ class Surgery(Base, PatDia):
                          'cleGro': '清扫组数', 'surDate': '手术日期', 'posAdjChem': '术后辅助化疗',
                          'treatName': '治疗名称', 'currPeriod': '周期', 'treSche': '药物方案',
                          'drugs': '药物', 'detailBegDate': '给药/治疗开始日期', 'detailEndDate': '给药/治疗结束日期', 'detailNote': '备注'}
-    detail_header = ['treatName', 'currPeriod', 'treSche', 'drugs', 'detailBegDate', 'detailEndDate',
-                     'detailNote']  # 和导出功能有关
 
     def get_export_row(self, columns, buffer, pid, treNum):
+        detail_header = ['treatName', 'currPeriod', 'treSche', 'drugs', 'detailBegDate', 'detailEndDate',
+                         'detailNote']
         row = []
         # row = np.zeros(0, dtype=str)
         if (buffer.get('Surgery').get(pid) is None or buffer.get('Surgery').get(pid).get(treNum) is None
@@ -746,10 +661,16 @@ class Surgery(Base, PatDia):
             return row
         obj = buffer.get('Surgery').get(pid).get(treNum)
 
-        detail_columns = []
-        for k in range(0, len(columns)):
-            if columns[k] in self.detail_header:
-                detail_columns.append(columns[k])
+        my_detail_headers = []
+        for column in columns:
+            if column == 'detailBegDate':
+                my_detail_headers.append('begDate')
+            elif column == 'detailEndDate':
+                my_detail_headers.append('endDate')
+            elif column == 'detailNote':
+                my_detail_headers.append('note')
+            elif column in ['treatName', 'currPeriod', 'treSche', 'drugs']:
+                my_detail_headers.append(column)
 
         if buffer.get('DetailTrePlan').get(pid) is None or buffer.get('DetailTrePlan').get(pid).get(treNum) is None:
             detail_trePlan_array = None
@@ -766,54 +687,28 @@ class Surgery(Base, PatDia):
                 value = self.filter_none(self.change_bool_to_yes_or_no(getattr(obj, column)))
                 row.append(value)
                 # row = np.append(row, value)
-            elif column in detail_columns and not detail_flag:
+            elif (not detail_flag) and (column in detail_header):
                 detail_flag = True
+                size = len(my_detail_headers)
                 posAdjChem_value = self.filter_none(self.change_bool_to_yes_or_no(getattr(obj, 'posAdjChem')))
                 if posAdjChem_value != '是' or not detail_trePlan_array or not detail_trePlan_array.get('Chemotherapy'):
-                    row.extend(['/']*len(detail_columns)*Surgery.detail_header_num)
+                    row.extend(['/']*size*Surgery.detail_header_num)
                     # row = np.append(row, ['/']*len(detail_columns)*Surgery.detail_header_num)
                 else:
                     surgery_detail_trePlan_array = detail_trePlan_array.get('Chemotherapy')
                     detail_num = len(surgery_detail_trePlan_array)
                     for detail_trePlan in surgery_detail_trePlan_array:
-                        for detail_column in detail_columns:
+                        for detail_column in my_detail_headers:
                             if detail_column == 'drugs':
                                 value_drugs = self.filter_none(detail_trePlan, detail_column)
-                                drugs = ''
-                                if type(value_drugs) == dict:
-                                    for key, value in value_drugs.items():
-                                        drugs += key + ':'
-                                        if 'drugDosa' in value.keys():
-                                            drugs += self.filter_none(str(value['drugDosa']))
-                                        if 'unit' in value.keys():
-                                            drugs += self.filter_none(str(value['drugDosa']))
-                                        drugs += '  '
-                                elif type(value_drugs) == list:
-                                    for each in value_drugs:
-                                        if 'name' in each.keys():
-                                            drugs += self.filter_none(each['name']) + ':'
-                                        if 'dose' in each.keys():
-                                            drugs += self.filter_none(each['name'])
-                                        drugs += '  '
-                                else:
-                                    drugs = str(value_drugs)
-                                row.append(drugs)
+                                row.append(self.format_drugs_of_detailTrePlan(value_drugs))
                                 # row = np.append(row, drugs)
-                            elif detail_column == 'detailBegDate':
-                                row.append(self.filter_none(detail_trePlan, 'begDate'))
-                                # row = np.append(row, self.filter_none(detail_trePlan, 'begDate'))
-                            elif detail_column == 'detailEndDate':
-                                row.append(self.filter_none(detail_trePlan, 'endDate'))
-                                # row = np.append(row, self.filter_none(detail_trePlan, 'endDate'))
-                            elif detail_column == 'detailNote':
-                                row.append(self.filter_none(detail_trePlan, 'note'))
-                                # row = np.append(row, self.filter_none(detail_trePlan, 'note'))
                             else:
                                 row.append(self.filter_none(detail_trePlan, detail_column))
                                 # row = np.append(row, self.filter_none(detail_trePlan, detail_column))
-                    row.extend(['/']*len(detail_columns)*(Surgery.detail_header_num - detail_num))
+                    row.extend(['/']*size*(Surgery.detail_header_num - detail_num))
                     # row = np.append(row, ['/']*len(detail_columns)*(Surgery.detail_header_num - detail_num))
-            elif not (column in detail_columns):
+            elif not (column in detail_header):
                 value = self.filter_none(obj, column)
                 row.append(value)
                 # row = np.append(row, value)
@@ -822,12 +717,14 @@ class Surgery(Base, PatDia):
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
+        detail_header = ['treatName', 'currPeriod', 'treSche', 'drugs', 'detailBegDate', 'detailEndDate',
+                         'detailNote']
         header = []
         # header = np.zeros(0, dtype=str)
-        detail_columns = []
-        for k in range(0, len(columns)):
-            if columns[k] in self.detail_header:
-                detail_columns.append(columns[k])
+        my_detail_headers = []
+        for column in columns:
+            if column in detail_header:
+                my_detail_headers.append(column)
 
         # 求最多有多少条
         max_num = 0
@@ -846,22 +743,40 @@ class Surgery(Base, PatDia):
 
         detail_flag = False  # 标志是否已经处理详细治疗方案字段
         for column in columns:
-            if column == 'posAdjChem':
-                header.append(self.export_header_map.get(column))
-                # header = np.append(header, self.export_header_map.get(column))
-            elif column in detail_columns and not detail_flag:
+            if (not detail_flag) and (column in my_detail_headers):
                 detail_flag = True
                 for k in range(1, header_num + 1):
-                    for detail_column in detail_columns:
+                    for detail_column in my_detail_headers:
                         header.append('术后辅助化疗:' + self.export_header_map.get(detail_column) + str(k))
                         # header = np.append(header, '术后辅助化疗:' + self.export_header_map.get(detail_column) + str(k))
-            elif not (column in detail_columns):
+            elif not (column in my_detail_headers):
                 header.append(self.export_header_map.get(column))
                 # header = np.append(header, self.export_header_map.get(column))
         # header = list(header)
         Surgery.detail_header_num = header_num
         Surgery.header_num = len(header)
         return header
+
+    def format_drugs_of_detailTrePlan(self, value_drugs):
+        drugs = ''
+        if type(value_drugs) == dict:
+            for key, value in value_drugs.items():
+                drugs += key + ':'
+                if 'drugDosa' in value.keys():
+                    drugs += self.filter_none(str(value['drugDosa']))
+                if 'unit' in value.keys():
+                    drugs += self.filter_none(str(value['unit']))
+                drugs += '  '
+        elif type(value_drugs) == list:
+            for each in value_drugs:
+                if 'name' in each.keys():
+                    drugs += self.filter_none(each['name']) + ':'
+                if 'dose' in each.keys():
+                    drugs += self.filter_none(each['dose'])
+                drugs += '  '
+        else:
+            drugs = str(value_drugs)
+        return drugs
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'surSco', 'lymDis', 'cleGro', 'surDate', 'posAdjChem', 'isPro', 'proDate',
