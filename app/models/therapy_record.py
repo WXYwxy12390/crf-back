@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime, SmallInteger
 from app.models.base import Base, db
 import numpy as np
+from time import time
 # 治疗记录及疗效评估表
 from app.models.cycle import Immunohis, MoleDetec, Signs, SideEffect
 from app.models.lab_inspectation import BloodRoutine, BloodBio, Thyroid, Coagulation, MyocardialEnzyme, Cytokines, \
@@ -501,8 +502,6 @@ class OneToFive(Base, PatDia):
                 value = self.filter_none(obj, column)
                 # row.append(value)
                 row = np.append(row, value)
-        # time2 = time()
-        # print("oneTofive  " + str(time2-time1))
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头

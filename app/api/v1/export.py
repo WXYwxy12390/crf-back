@@ -23,52 +23,49 @@ def export():
     baseLine = []
     trementInfo = []
     follInfo = {}
-    if_baseLine_ok = True
-    if_trementInfo_ok = True
-    if_follInfo_ok = True
+    baseLine_error_info = ''
+    trementInfo_error_info = ''
+    follInfo_error_info = ''
     if 'baseLine' in keys:
         baseLine = data['baseLine']
-        if_baseLine_ok = check_tables_and_columns(baseLine)
+        baseLine_error_info = check_tables_and_columns(baseLine)
     if 'trementInfo' in keys:
         trementInfo = data['trementInfo']
-        if_trementInfo_ok = check_tables_and_columns(trementInfo)
+        trementInfo_error_info = check_tables_and_columns(trementInfo)
     if 'follInfo' in keys:
         follInfo = data['follInfo']
-        if if_table_exist(follInfo['table']) and if_columns_exist(if_table_exist(follInfo['table']),
-                                                                  follInfo['column']):
-            if_follInfo_ok = True
+        if_table_right = if_table_exist(follInfo['table'])
+        if if_table_right:
+            error_columns = if_columns_exist(if_table_right, follInfo['column'])
+            if error_columns:
+                follInfo_error_info += '随访信息错误的字段名名：' + str(error_columns)
         else:
-            if_follInfo_ok = False
+            follInfo_error_info += '随访信息表名错误'
 
-    if if_baseLine_ok and if_trementInfo_ok and if_follInfo_ok:
+    if not (baseLine_error_info or trementInfo_error_info or follInfo_error_info):
         return Export3(pids, treNums, follInfoNum, baseLine, trementInfo, follInfo).work()
     else:
-        print('接收的表名或者字段名存在错误')
+        return baseLine_error_info + '\n' + trementInfo_error_info + '\n' + follInfo_error_info
 
 
 # 检查json中的表名和字段名是否正确.
 # 若正确返回tables,columns两个数组，若不正确返回None
 def check_tables_and_columns(data):
-    flag = True
-
+    error_info = ''
     for k in range(0, len(data)):
         table = data[k].get('table')
         column = data[k].get('column')
         obj_class_name = if_table_exist(table)
         if obj_class_name:
             data[k]['table'] = obj_class_name
-            if not if_columns_exist(obj_class_name, column):
-                print('字段名不存在！')
-                flag = False
+            error_columns = if_columns_exist(obj_class_name, column)
+            if error_columns:
+                error_info += table + '表中错误的字段名：' + str(error_columns)
                 break
         else:
-            print('表名不存在！')
-            flag = False
+            error_info += '错误的表名：' + table
             break
-    if flag:
-        return data
-    else:
-        return []
+    return error_info
 
 
 # 判断该名称的表在数据库中是否存在。
@@ -99,11 +96,10 @@ def if_table_exist(tableName):
 # 判断数组中的字段名是否都正确，
 # obj为表对应的模型类；columns是字符串数组，存放若干个字段名
 def if_columns_exist(obj_class_name, columns):
-    flag = True
+    error_columns = []
+    export_header_map = getattr(obj_class_name, 'export_header_map')
+    keys = export_header_map.keys()
     for column in columns:
-        export_header_map = getattr(obj_class_name, 'export_header_map')
-        if not (column in export_header_map.keys()):
-            flag = False
-            break
-
-    return flag
+        if not (column in keys):
+            error_columns.append(column)
+    return error_columns

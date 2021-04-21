@@ -1,5 +1,3 @@
-from time import time
-
 from flask import make_response
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
@@ -11,7 +9,6 @@ from app.models.lab_inspectation import BloodRoutine, BloodBio, Thyroid, Coagula
 from app.models.other_inspect import Lung, OtherExams, ImageExams
 from app.models.therapy_record import DetailTrePlan, Surgery, OneToFive, Radiotherapy, TreRec
 from app.spider.research_center import ResearchCenterSpider
-import gc
 
 
 class Export:
@@ -50,7 +47,6 @@ class Export:
                     columns = dic['column']
                     obj = obj_class_name()
                     self.headers.extend(obj.get_export_header(columns, self.buffer))
-
         if self.follInfo:
             obj = FollInfo()
             self.headers.extend(obj.get_export_header(self.follInfo['column'], self.buffer, self.follInfoNum))
@@ -83,7 +79,6 @@ class Export:
                 obj = FollInfo()
                 row.extend(obj.get_export_row(self.follInfo['column'], self.buffer, pid, 0, self.follInfoNum))
             ws.append(row)
-            gc.collect()
 
         content = save_virtual_workbook(wb)
         resp = make_response(content)
