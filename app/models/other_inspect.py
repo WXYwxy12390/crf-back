@@ -213,7 +213,7 @@ class ImageExams(Base):
 
     # 和导出功能有关
     export_header_map = {'detectTime': '影像学检查检测时间', 'examArea': '检查部位', 'exmaMethod': '检查方法',
-                         'tumorLD': '肿瘤长径', 'tumorSD': '肿瘤短径', 'tumorDesc': '肿瘤描述', 'photoNumber0':'影像号'}
+                         'tumorLD': '肿瘤长径', 'tumorSD': '肿瘤短径', 'tumorDesc': '肿瘤描述', 'photoNumber':'影像号'}
 
     def keys(self):
         return ['id','pid','treNum','detectTime','examArea','exmaMethod','tumorLD','tumorSD','tumorDesc','path','photoNumber']
