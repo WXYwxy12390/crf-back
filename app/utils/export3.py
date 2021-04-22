@@ -2,9 +2,10 @@ import os
 from time import time
 import numpy as np
 import pandas as pd
-from flask import make_response
+from flask import make_response, url_for, send_from_directory
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
+
 from app.models.base_line import DrugHistory, Patient, IniDiaPro, PastHis, SpecimenInfo
 from app.models.crf_info import FollInfo
 from app.models.cycle import Signs, SideEffect, MoleDetec, Immunohis
@@ -106,14 +107,16 @@ class Export:
         from crf import app
         path = os.path.join(app.static_folder, 'sample.csv')
         df.to_csv(path, index=False, header=False)
-        # df.to_excel('sample.xlsx', sheet_name='导出样本数据', index=False, header=False)
+        try:
+            return send_from_directory(path.replace('sample.csv', ''), filename='sample.csv')
+        except:
+            return '该文件不存在或无法下载'
 
         # content = save_virtual_workbook(wb)
         # resp = make_response(content)
-        # resp.headers["Content-Disposition"] = 'attachment; filename=samples.csv'
-        # resp.headers['Content-Type'] = 'text/csv'
+        # resp.headers["Content-Disposition"] = 'attachment; filename=samples.xlsx'
+        # resp.headers['Content-Type'] = 'application/x-xlsx'
         # return resp
-        return path
 
     def __init_buffer(self):
         # 缓存研究中心信息
@@ -128,7 +131,8 @@ class Export:
         iniDiaPro_array = IniDiaPro.query.filter(IniDiaPro.pid.in_(self.pids), IniDiaPro.is_delete == 0).all()
         pastHis_array = PastHis.query.filter(PastHis.pid.in_(self.pids), PastHis.is_delete == 0).all()
         drugHistory_array = DrugHistory.query.filter(DrugHistory.pid.in_(self.pids), DrugHistory.is_delete == 0).all()
-        specimenInfo_array = SpecimenInfo.query.filter(SpecimenInfo.pid.in_(self.pids), SpecimenInfo.is_delete == 0).all()
+        specimenInfo_array = SpecimenInfo.query.filter(SpecimenInfo.pid.in_(self.pids),
+                                                       SpecimenInfo.is_delete == 0).all()
 
         treRec_array = TreRec.query.filter(TreRec.pid.in_(self.pids), TreRec.treNum.in_(self.treNums),
                                            TreRec.is_delete == 0).all()
@@ -179,7 +183,8 @@ class Export:
                                                  Immunohis.is_delete == 0).all()
         moleDetec_array = MoleDetec.query.filter(MoleDetec.pid.in_(self.pids), MoleDetec.treNum.in_(self.treNums),
                                                  MoleDetec.is_delete == 0).all()
-        follinfo_array = FollInfo.query.filter(FollInfo.pid.in_(self.pids), FollInfo.is_delete == 0).order_by(FollInfo.date.desc()).all()
+        follinfo_array = FollInfo.query.filter(FollInfo.pid.in_(self.pids), FollInfo.is_delete == 0).order_by(
+            FollInfo.date.desc()).all()
 
         self.add_buffer('Patient', self.classify_by_pid(patient_array))
         self.add_buffer('PastHis', self.classify_by_pid(pastHis_array))
