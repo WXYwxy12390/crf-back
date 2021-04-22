@@ -1,3 +1,7 @@
+import os
+from time import time
+import numpy as np
+import pandas as pd
 from flask import make_response
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
@@ -23,7 +27,6 @@ class Export:
         self.trementInfo = trementInfo
         self.follInfo = follInfo
 
-        self.headers = []
         if follInfo:
             self.if_follInfo = True
         else:
@@ -32,59 +35,85 @@ class Export:
         self.__init_buffer()
 
     def work(self):
+        array = []
+        # array = np.array([])
+
+        # headers = []
+        headers = np.array([])
         for treNum in self.treNums:
             if treNum == 0:
                 for dic in self.baseLine:
                     obj_class_name = dic['table']
                     columns = dic['column']
                     obj = obj_class_name()
-                    self.headers.extend(obj.get_export_header(columns, self.buffer))
+                    # headers.extend(obj.get_export_header(columns, self.buffer))
+                    headers = np.append(headers, obj.get_export_header(columns, self.buffer))
             else:
                 if self.trementInfo:
-                    self.headers.append('治疗信息' + str(treNum))
+                    # headers.append('治疗信息' + str(treNum))
+                    headers = np.append(headers, '治疗信息' + str(treNum))
                 for dic in self.trementInfo:
                     obj_class_name = dic['table']
                     columns = dic['column']
                     obj = obj_class_name()
-                    self.headers.extend(obj.get_export_header(columns, self.buffer))
+                    # headers.extend(obj.get_export_header(columns, self.buffer))
+                    headers = np.append(headers, obj.get_export_header(columns, self.buffer))
         if self.follInfo:
             obj = FollInfo()
-            self.headers.extend(obj.get_export_header(self.follInfo['column'], self.buffer, self.follInfoNum))
+            # headers.extend(obj.get_export_header(self.follInfo['column'], self.buffer, self.follInfoNum))
+            headers = np.append(headers, obj.get_export_header(self.follInfo['column'], self.buffer, self.follInfoNum))
 
-        # wb = Workbook()
-        wb = Workbook(write_only=True)
-        # ws = wb.active
-        ws = wb.create_sheet(title='导出样本数据')
-        # ws.title = '导出样本数据'
-        ws.append(self.headers)
+        # wb = Workbook(write_only=True)
+        # ws = wb.create_sheet(title='导出样本数据')
+        # ws.append(headers)
+
+        array.append(headers)
+        # array = np.append(array, headers)
 
         for pid in self.pids:
-            row = []
+            # time1 = time()
+            # row = []
+            row = np.array([])
             for treNum in self.treNums:
                 if treNum == 0:
                     for dic in self.baseLine:
                         obj_class_name = dic['table']
                         columns = dic['column']
                         obj = obj_class_name()
-                        row.extend(obj.get_export_row(columns, self.buffer, pid, treNum))
+                        # row.extend(obj.get_export_row(columns, self.buffer, pid, treNum))
+                        row = np.append(row, obj.get_export_row(columns, self.buffer, pid, treNum))
                 else:
                     if self.trementInfo:
-                        row.append('')
+                        # row.append('')
+                        row = np.append(row, '')
                     for dic in self.trementInfo:
                         obj_class_name = dic['table']
                         columns = dic['column']
                         obj = obj_class_name()
-                        row.extend(obj.get_export_row(columns, self.buffer, pid, treNum))
+                        # row.extend(obj.get_export_row(columns, self.buffer, pid, treNum))
+                        row = np.append(row, obj.get_export_row(columns, self.buffer, pid, treNum))
             if self.follInfo:
                 obj = FollInfo()
-                row.extend(obj.get_export_row(self.follInfo['column'], self.buffer, pid, 0, self.follInfoNum))
-            ws.append(row)
+                # row.extend(obj.get_export_row(self.follInfo['column'], self.buffer, pid, 0, self.follInfoNum))
+                row = np.append(row, obj.get_export_row(self.follInfo['column'], self.buffer, pid, 0, self.follInfoNum))
+            # ws.append(row)
+            # time2 = time()
+            array.append(row)
+            # array = np.row_stack((array, row))
+            # print(pid, time2-time1, time()-time2)
 
-        content = save_virtual_workbook(wb)
-        resp = make_response(content)
-        resp.headers["Content-Disposition"] = 'attachment; filename=samples.xlsx'
-        resp.headers['Content-Type'] = 'application/x-xlsx'
-        return resp
+        df = pd.DataFrame(array)
+        from crf import app
+        path = os.path.join(app.static_folder, 'sample.csv')
+        df.to_csv(path, index=False, header=False)
+        # df.to_excel('sample.xlsx', sheet_name='导出样本数据', index=False, header=False)
+
+        # content = save_virtual_workbook(wb)
+        # resp = make_response(content)
+        # resp.headers["Content-Disposition"] = 'attachment; filename=samples.csv'
+        # resp.headers['Content-Type'] = 'text/csv'
+        # return resp
+        return path
 
     def __init_buffer(self):
         # 缓存研究中心信息

@@ -369,7 +369,7 @@ class SideEffect(Base):
         row = np.zeros(0, dtype=str)
         if buffer.get('SideEffect').get(pid) is None or buffer.get('SideEffect').get(pid).get(treNum) is None:
             # row.extend(['/'] * SideEffect.header_num)
-            row = np.append(row, '/')
+            row = np.append(row, ['/'] * SideEffect.header_num)
             return row
         obj_array = buffer.get('SideEffect').get(pid).get(treNum)
 
@@ -403,7 +403,7 @@ class SideEffect(Base):
                     # row.append(value)
                     row = np.append(row, value)
         # row.extend(['/'] * (SideEffect.header_num - len(row)))
-        row = np.append(row, value)
+        row = np.append(row, ['/'] * (SideEffect.header_num - len(row)))
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头

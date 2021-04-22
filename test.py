@@ -25,39 +25,11 @@ from time import time
 # arr = strs.split('*')
 # print(arr)
 
-# a = []
-# b = np.zeros(0,dtype=str)
-# time1 = time()
-# for i in range(0, 10000):
-#     a.append('/')
-# time2 = time()
-# for i in range(0, 10000):
-#     b = np.append(b, '/')
-# time3 = time()
-# print('append操作')
-# print('使用列表：' + str(time2-time1))
-# print('使用numpy：' + str(time3-time2))
-# a = []
-# b = np.zeros(0,dtype=str)
-# time1 = time()
-# for i in range(0, 1000):
-#     a.extend(['/']*1000)
-# time2 = time()
-# for i in range(0, 1000):
-#     b = np.append(b, np.array(['/']*1000))
-# time3 = time()
-# print('extend操作')
-# print('使用列表：' + str(time2-time1))
-# print('使用numpy：' + str(time3-time2))
-
-time1 = time()
-a = ['/']*1000
-for i in range(0,100):
-    a.extend(['/']*100)
-print(time()-time1)
-
-time2 = time()
-b = np.array(['/']*10)
-for i in range(0,100):
-    b = np.append(b, ['/']*100)
-print(time()-time2)
+a = np.array([])
+b = np.array(['a','b','c'])
+c = np.append(a,b)
+d = np.row_stack((c,b))
+e = np.row_stack((d,b))
+print(c)
+print(d)
+print(e)
