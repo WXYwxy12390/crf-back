@@ -3,10 +3,10 @@ from app.libs.httper import HTTP
 
 
 class ResearchCenterSpider:
-    project_url = 'http://127.0.0.1:81/v1/research_centers?project_id={}'
-    center_url = 'http://127.0.0.1:81/v1/research_centers?research_center_id={}'
-    user_center_url = 'http://127.0.0.1:81/v1/research_centers?project_id={}&user_id={}'
-    all_center_url = 'http://127.0.0.1:81/v1/research_centers'
+    project_url = 'http://127.0.0.1:40581/v1/research_centers?project_id={}'
+    center_url = 'http://127.0.0.1:40581/v1/research_centers?research_center_id={}'
+    user_center_url = 'http://127.0.0.1:40581/v1/research_centers?project_id={}&user_id={}'
+    all_center_url = 'http://127.0.0.1:40581/v1/research_centers'
     def search_by_project(self, project_id):
         url = self.project_url.format(project_id)
         result = HTTP.get(url)

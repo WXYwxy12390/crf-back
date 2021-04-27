@@ -5,7 +5,7 @@ from app.libs.httper import HTTP
 
 
 class Project:
-    url = 'http://127.0.0.1:81/v1/project/{}'
+    url = 'http://127.0.0.1:40581/v1/project/{}'
 
     def search_by_id(self, project_id):
         url = self.url.format(project_id)
