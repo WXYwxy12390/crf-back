@@ -1,10 +1,7 @@
-import os
-from time import time
+import csv
+from io import StringIO
 import numpy as np
-import pandas as pd
-from flask import make_response, url_for, send_from_directory
-from openpyxl import Workbook
-from openpyxl.writer.excel import save_virtual_workbook
+from flask import Response, stream_with_context
 
 from app.models.base_line import DrugHistory, Patient, IniDiaPro, PastHis, SpecimenInfo
 from app.models.crf_info import FollInfo
@@ -37,9 +34,7 @@ class Export:
 
     def work(self):
         array = []
-        # array = np.array([])
 
-        # headers = []
         headers = np.array([])
         for treNum in self.treNums:
             if treNum == 0:
@@ -47,33 +42,22 @@ class Export:
                     obj_class_name = dic['table']
                     columns = dic['column']
                     obj = obj_class_name()
-                    # headers.extend(obj.get_export_header(columns, self.buffer))
                     headers = np.append(headers, obj.get_export_header(columns, self.buffer))
             else:
                 if self.trementInfo:
-                    # headers.append('治疗信息' + str(treNum))
                     headers = np.append(headers, '治疗信息' + str(treNum))
                 for dic in self.trementInfo:
                     obj_class_name = dic['table']
                     columns = dic['column']
                     obj = obj_class_name()
-                    # headers.extend(obj.get_export_header(columns, self.buffer))
                     headers = np.append(headers, obj.get_export_header(columns, self.buffer))
         if self.follInfo:
             obj = FollInfo()
-            # headers.extend(obj.get_export_header(self.follInfo['column'], self.buffer, self.follInfoNum))
             headers = np.append(headers, obj.get_export_header(self.follInfo['column'], self.buffer, self.follInfoNum))
 
-        # wb = Workbook(write_only=True)
-        # ws = wb.create_sheet(title='导出样本数据')
-        # ws.append(headers)
-
         array.append(headers)
-        # array = np.append(array, headers)
 
         for pid in self.pids:
-            # time1 = time()
-            # row = []
             row = np.array([])
             for treNum in self.treNums:
                 if treNum == 0:
@@ -81,42 +65,33 @@ class Export:
                         obj_class_name = dic['table']
                         columns = dic['column']
                         obj = obj_class_name()
-                        # row.extend(obj.get_export_row(columns, self.buffer, pid, treNum))
                         row = np.append(row, obj.get_export_row(columns, self.buffer, pid, treNum))
                 else:
                     if self.trementInfo:
-                        # row.append('')
                         row = np.append(row, '')
                     for dic in self.trementInfo:
                         obj_class_name = dic['table']
                         columns = dic['column']
                         obj = obj_class_name()
-                        # row.extend(obj.get_export_row(columns, self.buffer, pid, treNum))
                         row = np.append(row, obj.get_export_row(columns, self.buffer, pid, treNum))
             if self.follInfo:
                 obj = FollInfo()
-                # row.extend(obj.get_export_row(self.follInfo['column'], self.buffer, pid, 0, self.follInfoNum))
                 row = np.append(row, obj.get_export_row(self.follInfo['column'], self.buffer, pid, 0, self.follInfoNum))
-            # ws.append(row)
-            # time2 = time()
             array.append(row)
-            # array = np.row_stack((array, row))
-            # print(pid, time2-time1, time()-time2)
 
-        df = pd.DataFrame(array)
-        from crf import app
-        path = os.path.join(app.static_folder, 'sample.csv')
-        df.to_csv(path, index=False, header=False)
-        try:
-            return send_from_directory(path.replace('sample.csv', ''), filename='sample.csv')
-        except:
-            return '该文件不存在或无法下载'
+        def generate():
+            data = StringIO()
+            w = csv.writer(data)
+            for i in array:
+                w.writerow(i)
+                yield data.getvalue()
+                data.seek(0)
+                data.truncate(0)
 
-        # content = save_virtual_workbook(wb)
-        # resp = make_response(content)
-        # resp.headers["Content-Disposition"] = 'attachment; filename=samples.xlsx'
-        # resp.headers['Content-Type'] = 'application/x-xlsx'
-        # return resp
+        response = Response(stream_with_context(generate()), mimetype='text/csv')
+        response.headers.set("Content-Disposition",
+                             "attachment", filename="sample.csv")
+        return response
 
     def __init_buffer(self):
         # 缓存研究中心信息
