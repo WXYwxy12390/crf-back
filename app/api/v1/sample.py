@@ -82,7 +82,6 @@ def get_sample_updated():
     for patient in all_patients:
         if patient.create_time == patient.update_time:
             updated_patients.append(patient)
-    pids = [patient.id for patient in updated_patients]
     res, total = get_paging(updated_patients, page, limit)
     res = [patient.get_fotmat_info() for patient in res]
     data = {
@@ -90,7 +89,6 @@ def get_sample_updated():
         "msg": "获取样本成功",
         "data": res,
         "total": total,
-        "all_pids": pids
     }
     return jsonify(data)
 
