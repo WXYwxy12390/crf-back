@@ -58,6 +58,43 @@ def get_sample_all():
     return jsonify(data)
 
 
+@api.route('/updated', methods=['GET','POST'])
+@auth.login_required
+def get_sample_updated():
+    args = request.args.to_dict()
+    page = int(args['page'])
+    limit = int(args['limit'])
+    all_patients = []
+    updated_patients = []
+    if 'OperateAllCRF' in g.user.scopes:
+        all_patients = Patient.query.filter_by().order_by(Patient.update_time.desc()).all()
+    elif 'CheckCenterCRF' in g.user.scopes:
+        centers = ResearchCenterSpider().search_by_uid_project(current_app.config['PROJECT_ID'], g.user.user_id)['data']
+        center_ids = [center['id'] for center in centers]
+        all_patients = Patient.query.filter(Patient.is_delete == 0, Patient.researchCenter.in_(center_ids)
+                                        ).order_by(Patient.update_time.desc()).all()
+    else:
+        items = Patient.query.filter(Patient.is_delete == 0).order_by(Patient.update_time.desc()).all()
+        for item in items:
+            if item.account and g.user.user_id in item.account:
+                all_patients.append(item)
+
+    for patient in all_patients:
+        if patient.create_time == patient.update_time:
+            updated_patients.append(patient)
+    pids = [patient.id for patient in updated_patients]
+    res, total = get_paging(updated_patients, page, limit)
+    res = [patient.get_fotmat_info() for patient in res]
+    data = {
+        "code": 200,
+        "msg": "获取样本成功",
+        "data": res,
+        "total": total,
+        "all_pids": pids
+    }
+    return jsonify(data)
+
+
 # 新增样本
 @api.route('', methods=['POST'])
 @auth.login_required
@@ -125,5 +162,3 @@ def export():
     data = request.get_json()
     pids = data.get('pids')
     return Export(pids).work()
-
-
