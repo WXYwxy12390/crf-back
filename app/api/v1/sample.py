@@ -58,7 +58,7 @@ def get_sample_all():
     return jsonify(data)
 
 
-@api.route('/updated', methods=['GET','POST'])
+@api.route('/unchanged', methods=['GET','POST'])
 @auth.login_required
 def get_sample_updated():
     args = request.args.to_dict()
