@@ -25,11 +25,4 @@ from time import time
 # arr = strs.split('*')
 # print(arr)
 
-a = np.array([])
-b = np.array(['a','b','c'])
-c = np.append(a,b)
-d = np.row_stack((c,b))
-e = np.row_stack((d,b))
-print(c)
-print(d)
-print(e)
+print(None.date())
