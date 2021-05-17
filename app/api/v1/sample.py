@@ -86,15 +86,18 @@ def get_sample_updated():
     if (not args.get('page')) and (not args.get('limit')):
         page = 1
         limit = len(updated_patients)
-    res, total = get_paging(updated_patients, page, limit)
-    res = [patient.get_fotmat_info() for patient in res]
+    patient_list, total = get_paging(updated_patients, page, limit)
+    patient_list = [patient.get_fotmat_info() for patient in patient_list]
     data = {
+        "total": total,
+        "patients": patient_list
+    }
+    res = {
         "code": 200,
         "msg": "获取样本成功",
-        "data": res,
-        "total": total,
+        "data": data
     }
-    return jsonify(data)
+    return jsonify(res)
 
 
 # 新增样本
