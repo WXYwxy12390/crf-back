@@ -62,8 +62,8 @@ def get_sample_all():
 @auth.login_required
 def get_sample_updated():
     args = request.args.to_dict()
-    page = int(args['page'])
-    limit = int(args['limit'])
+    page = int(args['page']) if args.get('page') else 1
+    limit = int(args['limit']) if args.get('limit') else 10
     all_patients = []
     updated_patients = []
     if 'OperateAllCRF' in g.user.scopes:
@@ -82,6 +82,10 @@ def get_sample_updated():
     for patient in all_patients:
         if patient.create_time == patient.update_time:
             updated_patients.append(patient)
+
+    if (not args.get('page')) and (not args.get('limit')):
+        page = 1
+        limit = len(updated_patients)
     res, total = get_paging(updated_patients, page, limit)
     res = [patient.get_fotmat_info() for patient in res]
     data = {
@@ -127,7 +131,8 @@ def add_sample():
         'idNumber': data.get('idNumber'),
         'hospitalNumber': data.get('hospitalNumber'),
         'patientName': data.get('patientName'),
-        'birthday': data.get('birthday')
+        'birthday': data.get('birthday'),
+        'phoneNumber1': data.get('phoneNumber1')
     }
     patient = json2db_add(model_data, Patient)
     return_data['pid'] = patient.id
