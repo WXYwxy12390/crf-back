@@ -135,7 +135,8 @@ def add_sample():
         'hospitalNumber': data.get('hospitalNumber'),
         'patientName': data.get('patientName'),
         'birthday': data.get('birthday'),
-        'phoneNumber1': data.get('phoneNumber1')
+        'phoneNumber1': data.get('phoneNumber1'),
+        'patNumber': data.get('patNumber')
     }
     patient = json2db_add(model_data, Patient)
     return_data['pid'] = patient.id
