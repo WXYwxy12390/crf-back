@@ -1,5 +1,6 @@
 from app.libs.error_code import NotFound
 from app.libs.httper import HTTP
+from app.config.common import RBAC_SCHEME, RBAC_IP, RBAC_PORT
 
 
 class ResearchCenterSpider:
