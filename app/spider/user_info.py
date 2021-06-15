@@ -5,8 +5,8 @@ from app.libs.httper import HTTP
 
 
 class UserInfo:
-    uid_url = 'http://127.0.0.1:40581/v1/user?user_id={}'
-    center_url = 'http://127.0.0.1:40581/v1/user?research_center_id={}'
+    uid_url = '{}://{}:{}/v1/user'.format(RBAC_SCHEME, RBAC_IP, RBAC_PORT) + '?user_id={}'
+    center_url = '{}://{}:{}/v1/user'.format(RBAC_SCHEME, RBAC_IP, RBAC_PORT) + '?research_center_id={}'
 
     def search_by_uid(self, uid):
         url = self.uid_url.format(uid)
