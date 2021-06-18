@@ -5,9 +5,9 @@ from app.config.common import RBAC_SCHEME, RBAC_IP, RBAC_PORT
 
 class ResearchCenterSpider:
     project_url = '{}://{}:{}/v1/research_centers'.format(RBAC_SCHEME, RBAC_IP, RBAC_PORT) + '?project_id={}'
-    center_url = '{}://{}:{}/research_centers'.format(RBAC_SCHEME, RBAC_IP, RBAC_PORT) + '?research_center_id={}'
-    user_center_url = '{}://{}:{}/research_centers'.format(RBAC_SCHEME, RBAC_IP, RBAC_PORT) + '?project_id={}&user_id={}'
-    all_center_url = '{}://{}:{}/research_centers'.format(RBAC_SCHEME, RBAC_IP, RBAC_PORT)
+    center_url = '{}://{}:{}/v1/research_centers'.format(RBAC_SCHEME, RBAC_IP, RBAC_PORT) + '?research_center_id={}'
+    user_center_url = '{}://{}:{}/v1/research_centers'.format(RBAC_SCHEME, RBAC_IP, RBAC_PORT) + '?project_id={}&user_id={}'
+    all_center_url = '{}://{}:{}/v1/research_centers'.format(RBAC_SCHEME, RBAC_IP, RBAC_PORT)
     def search_by_project(self, project_id):
         url = self.project_url.format(project_id)
         result = HTTP.get(url)
@@ -24,6 +24,7 @@ class ResearchCenterSpider:
 
     def search_by_uid_project(self,project_id,center_id):
         url = self.user_center_url.format(project_id,center_id)
+        print(url)
         result = HTTP.get(url)
         if result == {}:
             raise NotFound(msg='未找到研究中心信息')
