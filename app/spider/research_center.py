@@ -24,7 +24,6 @@ class ResearchCenterSpider:
 
     def search_by_uid_project(self,project_id,center_id):
         url = self.user_center_url.format(project_id,center_id)
-        print(url)
         result = HTTP.get(url)
         if result == {}:
             raise NotFound(msg='未找到研究中心信息')
