@@ -25,7 +25,7 @@ def create_app():
     # 导入配置文件
     app.config.from_object('app.config.setting')
     app.config.from_object('app.config.secure')
-    CORS(app)
+    CORS(app, supports_credentials=True)
     register_blueprints(app)
     register_plugin(app)
     return app
