@@ -1,5 +1,7 @@
 
 def get_paging(items, page, limit=10):
+    if limit <= 0:
+        return [], 0
     page = int(page)
     limit = int(limit)
     pages = len(items) // limit
