@@ -1,13 +1,21 @@
-# from flask import jsonify, g
-#
-# from app.libs.error_code import DeleteSuccess
-# from app.libs.redprint import Redprint
-# from app.libs.token_auth import auth
-# from app.models.base import db
-# from app.models.user import User
-#
-# api = Redprint('user')
-#
+from flask import jsonify, g, current_app
+
+from app.libs.error import Success
+from app.libs.redprint import Redprint
+from app.libs.token_auth import auth
+from app.models.base import db
+from app.models.user import User
+from app.spider.research_center import ResearchCenterSpider
+
+api = Redprint('user')
+
+
+@api.route('/research_centers', methods=['GET'])
+@auth.login_required
+def get_all_research_centers():
+    user_id = g.user.user_id
+    centers = ResearchCenterSpider().search_by_uid_project(current_app.config['PROJECT_ID'], user_id)['data']
+    return Success(data=centers)
 # @api.route('/<int:uid>',methods=['GET'])
 # @auth.login_required
 # def super_get_user(uid):

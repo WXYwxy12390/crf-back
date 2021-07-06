@@ -58,7 +58,7 @@ def get_sample_all():
     return jsonify(data)
 
 
-@api.route('/unchanged', methods=['GET','POST'])
+@api.route('/unchanged', methods=['GET', 'POST'])
 @auth.login_required
 def get_sample_updated():
     args = request.args.to_dict()
@@ -72,7 +72,7 @@ def get_sample_updated():
         centers = ResearchCenterSpider().search_by_uid_project(current_app.config['PROJECT_ID'], g.user.user_id)['data']
         center_ids = [center['id'] for center in centers]
         all_patients = Patient.query.filter(Patient.is_delete == 0, Patient.researchCenter.in_(center_ids)
-                                        ).order_by(Patient.update_time.desc()).all()
+                                            ).order_by(Patient.update_time.desc()).all()
     else:
         items = Patient.query.filter(Patient.is_delete == 0).order_by(Patient.update_time.desc()).all()
         for item in items:
@@ -106,26 +106,43 @@ def get_sample_updated():
 def add_sample():
     data = request.get_json()
     user = UserInfo().search_by_uid(g.user.user_id)['data']
-    patients = None
+    id_patients = None
+    hos_patients = None
+    name_patients = None
     if 'idNumber' in data:
-        patients = Patient.query.filter_by(idNumber=data['idNumber'], researchCenter=user['research_center_id']).all()
+        id_patients = Patient.query.filter_by(idNumber=data['idNumber'],
+                                              researchCenter=user['research_center_id']).all()
     if 'hospitalNumber' in data:
-        patients = Patient.query.filter_by(hospitalNumber=data['hospitalNumber'],
-                                           researchCenter=user['research_center_id']).all()
+        hos_patients = Patient.query.filter_by(hospitalNumber=data['hospitalNumber'],
+                                               researchCenter=user['research_center_id']).all()
     if 'patientName' in data:
-        patients = Patient.query.filter_by(patientName=data['patientName'],
-                                           researchCenter=user['research_center_id']).all()
+        name_patients = Patient.query.filter_by(patientName=data['patientName'],
+                                                researchCenter=user['research_center_id']).all()
     return_data = {
         "status": 0,
         "pid": None,
         "samples": []
     }
-    if patients:
+    if id_patients:
         return_data['status'] = 1
-        for patient in patients:
+        for patient in id_patients:
             return_data['samples'].append(patient)
             if g.user.user_id in patient.account:
                 return_data['status'] = -1
+        return Success(data=return_data)
+    elif hos_patients:
+        return_data['status'] = 1
+        for patient in hos_patients:
+            return_data['samples'].append(patient)
+            if g.user.user_id in patient.account:
+                return_data['status'] = -1
+        return Success(data=return_data)
+    elif name_patients:
+        return_data['status'] = 1
+        for patient in name_patients:
+            return_data['samples'].append(patient)
+            if g.user.user_id in patient.account:
+                return_data['status'] = 2
         return Success(data=return_data)
 
     model_data = {
