@@ -118,6 +118,11 @@ def add_sample():
     if 'patientName' in data:
         name_patients = Patient.query.filter_by(patientName=data['patientName'],
                                                 researchCenter=user['research_center_id']).all()
+    # status值的含义
+    # 0表示该样本不存在，直接添加
+    # 1表示该样本存在，但是不由当前账号录入
+    # -1表示该样本存在，由当前账号录入，让用户选择是否直接进入
+    # 2表示该样本存在，由当前账号录入，让用户选择是新建还是进入
     return_data = {
         "status": 0,
         "pid": None,
@@ -137,9 +142,11 @@ def add_sample():
             if g.user.user_id in patient.account:
                 return_data['status'] = -1
         return Success(data=return_data)
-    elif name_patients:
+    # 当请求中有"if_create"表示新建一个同名样本；没有"if_create"则不新建
+    elif name_patients and 'if_create' not in data:
         return_data['status'] = 2
         for patient in name_patients:
+            # 当得到同名已存在的样本时，直接将这些样本改为当前账号录入
             if not (g.user.user_id in patient.account):
                 account = patient.account[:]
                 account.append(g.user.user_id)
