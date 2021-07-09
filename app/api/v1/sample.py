@@ -138,11 +138,14 @@ def add_sample():
                 return_data['status'] = -1
         return Success(data=return_data)
     elif name_patients:
-        return_data['status'] = 1
+        return_data['status'] = 2
         for patient in name_patients:
+            if not (g.user.user_id in patient.account):
+                account = patient.account[:]
+                account.append(g.user.user_id)
+                with db.auto_commit():
+                    patient.account = account
             return_data['samples'].append(patient)
-            if g.user.user_id in patient.account:
-                return_data['status'] = 2
         return Success(data=return_data)
 
     model_data = {
