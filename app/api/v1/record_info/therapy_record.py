@@ -15,21 +15,22 @@ from app.models.therapy_record import TreRec, OneToFive, Surgery, Radiotherapy, 
 
 api = Redprint('therapy_record')
 
-@api.route('/<int:pid>/<int:treNum>',methods=['GET'])
-def get_therapy_record(pid,treNum):
-    tre_rec = TreRec.query.filter_by(pid=pid,treNum=treNum).first()
+
+@api.route('/<int:pid>/<int:treIndex>', methods=['GET'])
+def get_therapy_record(pid, treIndex):
+    tre_rec = TreRec.query.filter_by(pid=pid, treIndex=treIndex).first()
     data = {}
-    if tre_rec :
+    if tre_rec:
         data['parent'] = tre_rec.get_parent()
         data['child'] = tre_rec.get_child()
     return Success(data=data)
 
 
-@api.route('/<int:pid>/<int:treNum>',methods=['POST'])
+@api.route('/<int:pid>/<int:treNum>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
 @update_time
-def add_therapy_record(pid,treNum):
+def add_therapy_record(pid, treNum):
     data = request.get_json()
     if 'parent' in data:
         data['parent']['pid'] = pid
@@ -41,8 +42,8 @@ def add_therapy_record(pid,treNum):
         trement = tre_rec.trement
         data['child']['pid'] = pid
         data['child']['treNum'] = treNum
-        if trement in ['one','two','three','four','five','other']:
-            json2db(data['child'],OneToFive)
+        if trement in ['one', 'two', 'three', 'four', 'five', 'other']:
+            json2db(data['child'], OneToFive)
         elif trement == 'surgery':
             json2db(data['child'], Surgery)
         elif trement == 'radiotherapy':
@@ -50,12 +51,11 @@ def add_therapy_record(pid,treNum):
     return Success()
 
 
-
-@api.route('/therapy_plan/<int:pid>/<int:treNum>',methods=['GET'])
-def get_therapy_plan(pid,treNum):
-    items = DetailTrePlan.query.filter_by(pid=pid,treNum=treNum).all()
+@api.route('/therapy_plan/<int:pid>/<int:treNum>', methods=['GET'])
+def get_therapy_plan(pid, treNum):
+    items = DetailTrePlan.query.filter_by(pid=pid, treNum=treNum).all()
     data = {}
-    data['Chemotherapy'] ,data['TargetedTherapy'],data['ImmunityTherapy'],data['AntivascularTherapy']= [],[],[],[]
+    data['Chemotherapy'], data['TargetedTherapy'], data['ImmunityTherapy'], data['AntivascularTherapy'] = [], [], [], []
     for item in items:
         if item.treSolu:
             data[item.treSolu].append(item)
@@ -63,25 +63,25 @@ def get_therapy_plan(pid,treNum):
     return Success(data=data)
 
 
-@api.route('/therapy_plan/<int:pid>/<int:treNum>',methods=['POST'])
+@api.route('/therapy_plan/<int:pid>/<int:treNum>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
 @update_time
-def add_therapy_plan(pid,treNum):
+def add_therapy_plan(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
     data['treNum'] = treNum
-    json2db(data,DetailTrePlan)
+    json2db(data, DetailTrePlan)
     return Success()
 
 
-@api.route('/therapy_plan/<int:pid>/<int:treNum>',methods=['DELETE'])
+@api.route('/therapy_plan/<int:pid>/<int:treNum>', methods=['DELETE'])
 @auth.login_required
 @edit_need_auth
 @update_time
-def del_therapy_plan(pid,treNum):
+def del_therapy_plan(pid, treNum):
     data = request.get_json()
-    items = DetailTrePlan.query.filter(DetailTrePlan.is_delete==0,DetailTrePlan.id.in_(data['ids'])).all()
+    items = DetailTrePlan.query.filter(DetailTrePlan.is_delete == 0, DetailTrePlan.id.in_(data['ids'])).all()
     delete_array(items)
 
     return Success()
