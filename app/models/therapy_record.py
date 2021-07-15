@@ -232,7 +232,9 @@ class TreRec(Base, PatDia):
     def get_parent(self):
         data = {
             'id': self.id,
-            'trement': self.trement
+            'trement': self.trement,
+            'treNum': self.treNum,
+            'treIndex': self.treIndex
         }
         return data
 
