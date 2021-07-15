@@ -16,9 +16,9 @@ from app.models.therapy_record import TreRec, OneToFive, Surgery, Radiotherapy, 
 api = Redprint('therapy_record')
 
 
-@api.route('/<int:pid>/<int:treIndex>', methods=['GET'])
-def get_therapy_record(pid, treIndex):
-    tre_rec = TreRec.query.filter_by(pid=pid, treIndex=treIndex).first()
+@api.route('/<int:pid>/<int:treNum>', methods=['GET'])
+def get_therapy_record(pid, treNum):
+    tre_rec = TreRec.query.filter_by(pid=pid, treNum=treNum).first()
     data = {}
     if tre_rec:
         data['parent'] = tre_rec.get_parent()

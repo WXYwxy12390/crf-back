@@ -18,8 +18,10 @@ api = Redprint('record_info')
 
 @api.route('/nav/<int:pid>', methods=['GET'])
 def get_record_info_nav(pid):
-    tre_recs = TreRec.query.filter_by(pid=pid).all()
-    return Success(data=len(tre_recs))
+    tre_recs = TreRec.query.filter(TreRec.pid == pid,
+                                   TreRec.is_delete == 0).order_by(TreRec.treIndex).all()
+    treNum_array = [tre_rec.treNum for tre_rec in tre_recs]
+    return Success(data=treNum_array)
 
 
 @api.route('/<int:pid>/<int:treIndex>', methods=['POST'])
