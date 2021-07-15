@@ -30,16 +30,19 @@ def get_record_info_nav(pid):
 @update_time
 def add_record_info(pid, treIndex):
     tre_recs = TreRec.query.filter_by(pid=pid).all()
+    max_treNum = 0
     if treIndex > len(tre_recs) + 1 or treIndex < 1:
         return ParameterException(msg='treIndex wrong')
     for tre_rec in tre_recs:
+        if tre_rec.treNum > max_treNum:
+            max_treNum = tre_rec.treNum
         if tre_rec.treIndex >= treIndex:
             with db.auto_commit():
                 tre_rec.treIndex += 1
     data = request.get_json()
     json2db({
         'pid': pid,
-        'treNum': len(tre_recs) + 1,
+        'treNum': max_treNum + 1,
         'treIndex': treIndex,
         'trement': data.get('trement')
     }, TreRec)
