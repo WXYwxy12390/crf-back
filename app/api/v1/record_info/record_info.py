@@ -22,7 +22,7 @@ def get_record_info_nav(pid):
                                    TreRec.is_delete == 0).order_by(TreRec.treIndex).all()
     all_treIndex_treNum = []
     for tre_rec in tre_recs:
-        dic = {'treIndex': tre_rec.treIndex, 'treNum': tre_rec.treNum}
+        dic = {'treIndex': tre_rec.trement, 'treNum': tre_rec.treNum}
         all_treIndex_treNum.append(dic)
     return Success(data=all_treIndex_treNum)
 
@@ -32,30 +32,17 @@ def get_record_info_nav(pid):
 @edit_need_auth
 @update_time
 def add_record_info(pid, treIndex):
-    tre_recs = TreRec.query.filter(TreRec.pid == pid,
-                                   TreRec.is_delete == 0).order_by(TreRec.treIndex).all()
+    tre_recs = TreRec.query.filter_by(pid=pid).all()
     max_treNum = 0
-    max_treIndex = tre_recs[-1].treIndex if tre_recs else 0
-    if treIndex < 1 or treIndex > max_treIndex + 1:
+    if treIndex > len(tre_recs) + 1 or treIndex < 1:
         return ParameterException(msg='treIndex wrong')
     for tre_rec in tre_recs:
         if tre_rec.treNum > max_treNum:
             max_treNum = tre_rec.treNum
+        if tre_rec.treIndex >= treIndex:
+            with db.auto_commit():
+                tre_rec.treIndex += 1
 
-    begin = 0  # 第二层循环的起始位置
-    flag = True  # 当不再有旧的治疗信息更改序号时，第一层循环结束
-    for i in range(treIndex, max_treIndex + 1):
-        if flag:
-            for j in range(begin, len(tre_recs)):
-                flag = False
-                if tre_recs[j].treIndex == i:
-                    begin = j + 1
-                    flag = True
-                    with db.auto_commit():
-                        tre_recs[j].treIndex += 1
-                    break
-        else:
-            break
     data = request.get_json()
     json2db({
         'pid': pid,
@@ -78,9 +65,11 @@ def del_record_info(pid, treIndex):
         return ParameterException(msg='treIndex wrong')
 
     for tre_rec in tre_recs:
-        if tre_rec.treIndex == treIndex:
+        if tre_rec.treIndex > treIndex:
+            with db.auto_commit():
+                tre_rec.treIndex -= 1
+        elif tre_rec.treIndex == treIndex:
             with db.auto_commit():
                 tre_rec.delete()
-            break
 
     return Success()
