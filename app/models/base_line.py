@@ -805,7 +805,7 @@ class SpecimenInfo(Base):
     pid = Column(Integer, comment='病人id', index=True)
     number = Column(Text, comment="样本编号")
     type = Column(JSON, comment="样本类型")
-    amount = Column(Integer, comment="样本数量")
+    amount = Column(Text, comment="样本数量")
     samplingTime = Column(Date, comment='取样时间')
     storeSite = Column(Text, comment="存储位置")
     note = Column(Text)
