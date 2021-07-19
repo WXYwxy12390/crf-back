@@ -85,16 +85,16 @@ class Lung(Base):
                          'DLCO_sb': 'DLCO-sb(mL/mmHg/Mi)', 'KCO': 'KCO'}
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
         row = []
         # row = np.zeros(0, dtype=str)
-        if buffer.get('Lung').get(pid) is None or buffer.get('Lung').get(pid).get(treNum) is None:
+        if buffer.get('Lung').get(pid) is None or buffer.get('Lung').get(pid).get(treIndex) is None:
             # row.extend(['/'] * Lung.header_num)
             row = np.append(row, ['/']*Lung.header_num)
             return row
 
-        obj = buffer.get('Lung').get(pid).get(treNum)
+        obj = buffer.get('Lung').get(pid).get(treIndex)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
@@ -168,14 +168,14 @@ class OtherExams(Base):
                          'UCGDetTime': '超声心动图检测时间', 'UCGDesc': '超声心动图结果描述'}
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         # row = []
         row = np.zeros(0, dtype=str)
-        if buffer.get('OtherExams').get(pid) is None or buffer.get('OtherExams').get(pid).get(treNum) is None:
+        if buffer.get('OtherExams').get(pid) is None or buffer.get('OtherExams').get(pid).get(treIndex) is None:
             # row.extend(['/'] * OtherExams.header_num)
             row = np.append(row, ['/'] * OtherExams.header_num)
             return row
-        obj = buffer.get('OtherExams').get(pid).get(treNum)
+        obj = buffer.get('OtherExams').get(pid).get(treIndex)
         for column in columns:
             value = self.filter_none(obj, column)
             # row.append(value)
@@ -219,14 +219,14 @@ class ImageExams(Base):
         return ['id','pid','treNum','detectTime','examArea','exmaMethod','tumorLD','tumorSD','tumorDesc','path','photoNumber']
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         # row = []
         row = np.zeros(0, dtype=str)
-        if buffer.get('ImageExams').get(pid) is None or buffer.get('ImageExams').get(pid).get(treNum) is None:
+        if buffer.get('ImageExams').get(pid) is None or buffer.get('ImageExams').get(pid).get(treIndex) is None:
             # row.extend(['/'] * ImageExams.header_num)
             row = np.append(row, ['/'] * ImageExams.header_num)
             return row
-        obj_array = buffer.get('ImageExams').get(pid).get(treNum)
+        obj_array = buffer.get('ImageExams').get(pid).get(treIndex)
 
         for obj in obj_array:
             for column in columns:

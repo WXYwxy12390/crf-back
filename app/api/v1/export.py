@@ -18,7 +18,7 @@ def export():
     data = request.get_json()
     keys = data.keys()
     pids = data['pids'] if 'pids' in keys else []
-    treNums = data['treNums'] if 'treNums' in keys else []
+    treIndexes = data['treNums'] if 'treNums' in keys else []
     follInfoNum = data['follInfoNum'] if 'follInfoNum' in keys else 0
     baseLine = []
     trementInfo = []
@@ -43,7 +43,7 @@ def export():
             follInfo_error_info += '随访信息表名错误'
 
     if not (baseLine_error_info or trementInfo_error_info or follInfo_error_info):
-        return Export3(pids, treNums, follInfoNum, baseLine, trementInfo, follInfo).work()
+        return Export3(pids, treIndexes, follInfoNum, baseLine, trementInfo, follInfo).work()
     else:
         return baseLine_error_info + '\n' + trementInfo_error_info + '\n' + follInfo_error_info
 

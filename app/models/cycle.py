@@ -73,15 +73,15 @@ class Immunohis(Base):
                 'CD516', 'detectTime', 'patNum']
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         immunohis_map = {0: '无', 1: '-', 2: '±', 3: '+', 4: '++', 5: '+++', "/": "/"}
         # row = []
         row = np.zeros(0, dtype=str)
-        if buffer.get('Immunohis').get(pid) is None or buffer.get('Immunohis').get(pid).get(treNum) is None:
+        if buffer.get('Immunohis').get(pid) is None or buffer.get('Immunohis').get(pid).get(treIndex) is None:
             # row.extend(['/'] * Immunohis.header_num)
             row = np.append(row, ['/']*Immunohis.header_num)
             return row
-        obj = buffer.get('Immunohis').get(pid).get(treNum)
+        obj = buffer.get('Immunohis').get(pid).get(treIndex)
         for column in columns:
             if column == 'Ki67' or column == 'other':
                 value = self.filter_none(obj, column)
@@ -199,7 +199,7 @@ class MoleDetec(Base):
                 'PD1KT', 'sampleType', 'detectTime']
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         moleDetec_map = {0: '阴性', 1: '阳性', 2: '无', "/": "/"}
         moleDetec_DetMed_map = {1: 'ARMS', 2: 'FISH', 3: 'NGS', "/": "/"}
         moleDetec_MSI_map = {0: 'MSS', 1: 'MSIH', 2: 'MSIL', "/": "/"}
@@ -207,11 +207,11 @@ class MoleDetec(Base):
                             'PIK3CA', 'ROS1', 'RET', 'UGT1A1', 'NTRK']
         # row = []
         row = np.zeros(0, dtype=str)
-        if buffer.get('MoleDetec').get(pid) is None or buffer.get('MoleDetec').get(pid).get(treNum) is None:
+        if buffer.get('MoleDetec').get(pid) is None or buffer.get('MoleDetec').get(pid).get(treIndex) is None:
             # row.extend(['/'] * MoleDetec.header_num)
             row = np.append(row, ['/']*MoleDetec.header_num)
             return row
-        obj = buffer.get('MoleDetec').get(pid).get(treNum)
+        obj = buffer.get('MoleDetec').get(pid).get(treIndex)
         for column in columns:
             if column in moleDetec_fields:
                 value = self.filter_none(obj, column)
@@ -283,15 +283,15 @@ class Signs(Base):
                          'isExe': '目前是否存在', 'endDate': '结束日期'}
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         isExe_map = {0: '否', 1: '是', '/': '/'}
         # row = []
         row = np.zeros(0, dtype=str)
-        if buffer.get('Signs').get(pid) is None or buffer.get('Signs').get(pid).get(treNum) is None:
+        if buffer.get('Signs').get(pid) is None or buffer.get('Signs').get(pid).get(treIndex) is None:
             # row.extend(['/'] * Signs.header_num)
             row = np.append(row, ['/']*Signs.header_num)
             return row
-        obj_array = buffer.get('Signs').get(pid).get(treNum)
+        obj_array = buffer.get('Signs').get(pid).get(treIndex)
 
         for obj in obj_array:
             for column in columns:
@@ -363,15 +363,15 @@ class SideEffect(Base):
                          'isExe': '目前是否存在', 'endDate': '结束日期', 'treatment': '治疗情况'}
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         isExe_map = {0: '否', 1: '是', '/': '/'}
         # row = []
         row = np.zeros(0, dtype=str)
-        if buffer.get('SideEffect').get(pid) is None or buffer.get('SideEffect').get(pid).get(treNum) is None:
+        if buffer.get('SideEffect').get(pid) is None or buffer.get('SideEffect').get(pid).get(treIndex) is None:
             # row.extend(['/'] * SideEffect.header_num)
             row = np.append(row, ['/'] * SideEffect.header_num)
             return row
-        obj_array = buffer.get('SideEffect').get(pid).get(treNum)
+        obj_array = buffer.get('SideEffect').get(pid).get(treIndex)
 
         for obj in obj_array:
             for column in columns:

@@ -47,7 +47,7 @@ class Patient(Base):
         return header
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         gender_map = {0: "女", 1: "男", "/": "/"}
         # row = []
         row = np.zeros(0, dtype=str)
@@ -500,7 +500,7 @@ class PastHis(Base):
                          'hormone': '是否长期使用激素', 'hormoneUseHis': '激素使用史', 'drug': '是否长期使用药物', 'drugUseHis': '药物使用史'}
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         # row = []
         row = np.zeros(0, dtype=str)
         if buffer.get('PastHis').get(pid) is None:
@@ -725,7 +725,7 @@ class IniDiaPro(Base, PatDia):
         return header
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         videography_map = {0: '周围型', 1: '中央型', "/": "/"}
         stage_map = {'1': '未住院', '2': 'C/P/S均无法分期', '3': '仅C分期',
                      '4': '仅P分期', '5': 'C分期和P分期', "/": "/"}
@@ -839,7 +839,7 @@ class SpecimenInfo(Base):
         return header
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         # row = []
         row = np.zeros(0, dtype=str)
         if buffer.get('SpecimenInfo').get(pid) is None:

@@ -99,15 +99,15 @@ class BloodRoutine(Base):
                 'NEUTNote', 'filePath']
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
         # row = []
         row = np.zeros(0, dtype=str)
-        if buffer.get('BloodRoutine').get(pid) is None or buffer.get('BloodRoutine').get(pid).get(treNum) is None:
+        if buffer.get('BloodRoutine').get(pid) is None or buffer.get('BloodRoutine').get(pid).get(treIndex) is None:
             # row.extend(['/'] * BloodRoutine.header_num)
             row = np.append(row, ['/']*BloodRoutine.header_num)
             return row
-        obj = buffer.get('BloodRoutine').get(pid).get(treNum)
+        obj = buffer.get('BloodRoutine').get(pid).get(treIndex)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
@@ -240,15 +240,15 @@ class BloodBio(Base):
                 'Cl': 'mmol/L', 'Ca': 'mmol/L', 'Mg': 'mmol/L', 'P': 'mmol/L'}
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
         # row = []
         row = np.zeros(0, dtype=str)
-        if buffer.get('BloodBio').get(pid) is None or buffer.get('BloodBio').get(pid).get(treNum) is None:
+        if buffer.get('BloodBio').get(pid) is None or buffer.get('BloodBio').get(pid).get(treIndex) is None:
             # row.extend(['/'] * BloodBio.header_num)
             row = np.append(row, ['/']*BloodBio.header_num)
             return row
-        obj = buffer.get('BloodBio').get(pid).get(treNum)
+        obj = buffer.get('BloodBio').get(pid).get(treIndex)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
@@ -319,15 +319,15 @@ class Thyroid(Base):
     unit_map = {'FT3': 'pmol/L', 'FT4': 'pmol/L', 'TSH': 'UIU/ML'}
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
         # row = []
         row = np.zeros(0, dtype=str)
-        if buffer.get('Thyroid').get(pid) is None or buffer.get('Thyroid').get(pid).get(treNum) is None:
+        if buffer.get('Thyroid').get(pid) is None or buffer.get('Thyroid').get(pid).get(treIndex) is None:
             # row.extend(['/'] * Thyroid.header_num)
             row = np.append(row, ['/']*Thyroid.header_num)
             return row
-        obj = buffer.get('Thyroid').get(pid).get(treNum)
+        obj = buffer.get('Thyroid').get(pid).get(treIndex)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
@@ -399,15 +399,15 @@ class Coagulation(Base):
                 'INR': '/', 'D_dimer': 'mg/L'}
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
         # row = []
         row = np.zeros(0, dtype=str)
-        if buffer.get('Coagulation').get(pid) is None or buffer.get('Coagulation').get(pid).get(treNum) is None:
+        if buffer.get('Coagulation').get(pid) is None or buffer.get('Coagulation').get(pid).get(treIndex) is None:
             # row.extend(['/'] * Coagulation.header_num)
             row = np.append(row, ['/']*Coagulation.header_num)
             return row
-        obj = buffer.get('Coagulation').get(pid).get(treNum)
+        obj = buffer.get('Coagulation').get(pid).get(treIndex)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
@@ -486,16 +486,16 @@ class MyocardialEnzyme(Base):
                 'cTnT': 'U/L', 'MYO': 'U/L', 'BNP': 'U/L', 'NT_proBNP': 'U/L'}
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
         # row = []
         row = np.zeros(0, dtype=str)
         if buffer.get('MyocardialEnzyme').get(pid) is None or buffer.get('MyocardialEnzyme').get(pid).get(
-                treNum) is None:
+                treIndex) is None:
             # row.extend(['/'] * MyocardialEnzyme.header_num)
             row = np.append(row, ['/'] * MyocardialEnzyme.header_num)
             return row
-        obj = buffer.get('MyocardialEnzyme').get(pid).get(treNum)
+        obj = buffer.get('MyocardialEnzyme').get(pid).get(treIndex)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
@@ -570,15 +570,15 @@ class Cytokines(Base):
                 'IL_6': 'pg/ml', 'IL_8': 'pg/ml', 'IL_10': 'pg/ml'}
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
         # row = []
         row = np.zeros(0, dtype=str)
-        if buffer.get('Cytokines').get(pid) is None or buffer.get('Cytokines').get(pid).get(treNum) is None:
+        if buffer.get('Cytokines').get(pid) is None or buffer.get('Cytokines').get(pid).get(treIndex) is None:
             # row.extend(['/'] * Cytokines.header_num)
             row = np.append(row, ['/'] * Cytokines.header_num)
             return row
-        obj = buffer.get('Cytokines').get(pid).get(treNum)
+        obj = buffer.get('Cytokines').get(pid).get(treIndex)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
@@ -728,15 +728,15 @@ class LymSubsets(Base):
                 'CD3_HLA_DR3': '%', 'CD4_CD25_CD127low': '%'}
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
         # row = []
         row = np.zeros(0, dtype=str)
-        if buffer.get('LymSubsets').get(pid) is None or buffer.get('LymSubsets').get(pid).get(treNum) is None:
+        if buffer.get('LymSubsets').get(pid) is None or buffer.get('LymSubsets').get(pid).get(treIndex) is None:
             # row.extend(['/'] * LymSubsets.header_num)
             row = np.append(row, ['/'] * LymSubsets.header_num)
             return row
-        obj = buffer.get('LymSubsets').get(pid).get(treNum)
+        obj = buffer.get('LymSubsets').get(pid).get(treIndex)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
@@ -842,15 +842,15 @@ class UrineRoutine(Base):
                          'BLD': 'BLD', 'PRO': 'PRO', 'UBG': 'UBG', 'COL': 'COL', 'CLA': 'CLA'}
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
         # row = []
         row = np.zeros(0, dtype=str)
-        if buffer.get('UrineRoutine').get(pid) is None or buffer.get('UrineRoutine').get(pid).get(treNum) is None:
+        if buffer.get('UrineRoutine').get(pid) is None or buffer.get('UrineRoutine').get(pid).get(treIndex) is None:
             # row.extend(['/'] * UrineRoutine.header_num)
             row = np.append(row, ['/'] * UrineRoutine.header_num)
             return row
-        obj = buffer.get('UrineRoutine').get(pid).get(treNum)
+        obj = buffer.get('UrineRoutine').get(pid).get(treIndex)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
@@ -927,15 +927,15 @@ class TumorMarker(Base):
                          'CYFRA': 'CYFRA', 'FERR': 'FERR', 'AFP': 'AFP', 'SCCA': 'SCCA'}
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum):
+    def get_export_row(self, columns, buffer, pid, treIndex):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
         # row = []
         row = np.zeros(0, dtype=str)
-        if buffer.get('TumorMarker').get(pid) is None or buffer.get('TumorMarker').get(pid).get(treNum) is None:
+        if buffer.get('TumorMarker').get(pid) is None or buffer.get('TumorMarker').get(pid).get(treIndex) is None:
             # row.extend(['/'] * TumorMarker.header_num)
             row = np.append(row, ['/'] * TumorMarker.header_num)
             return row
-        obj = buffer.get('TumorMarker').get(pid).get(treNum)
+        obj = buffer.get('TumorMarker').get(pid).get(treIndex)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)

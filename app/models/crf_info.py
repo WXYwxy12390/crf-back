@@ -27,7 +27,7 @@ class FollInfo(Base):
                          'livSta':'生存状态','dieDate':'死亡时间','imaFilType':'影像类型', 'remarks':'备注'}
 
     # 和导出功能有关
-    def get_export_row(self, columns, buffer, pid, treNum, follInfoNum):
+    def get_export_row(self, columns, buffer, pid, treIndex, follInfoNum):
         folMet_map = {1:'电话', 2:'门诊', 3:'住院', '/':'/'}
         effEva_map = {1:'PD-进展', 2:'SD-稳定' , 3:'PR-部分缓解',
                       4:'CR-完全缓解', 5:'术后未发现新病灶', '/':'/'}
