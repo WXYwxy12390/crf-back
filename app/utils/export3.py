@@ -27,6 +27,9 @@ class Export:
 
         # treRec表中，根据treNum和pid映射到treIndex
         self.get_treIndex_from_treNum_and_pid = {}
+        for pid in self.pids:
+            self.get_treIndex_from_treNum_and_pid[pid] = {}
+            self.get_treIndex_from_treNum_and_pid[pid][0] = 0
 
         if follInfo:
             self.if_follInfo = True
@@ -206,14 +209,13 @@ class Export:
         self.buffer[key] = value
 
     def format_map_of_treIndex(self, treRec_array):
-        dic = {}
         for treRec in treRec_array:
             pid = getattr(treRec, 'pid')
-            if dic.get(pid) is None:
-                dic[pid] = {}
-            if dic.get(pid).get(treRec.treNum) is None:
-                dic[pid][treRec.treNum] = treRec.treIndex
-        self.get_treIndex_from_treNum_and_pid = dic
+            if self.get_treIndex_from_treNum_and_pid.get(pid) is None:
+                self.get_treIndex_from_treNum_and_pid[pid] = {}
+                self.get_treIndex_from_treNum_and_pid[pid][0] = 0
+            if self.get_treIndex_from_treNum_and_pid.get(pid).get(treRec.treNum) is None:
+                self.get_treIndex_from_treNum_and_pid[pid][treRec.treNum] = treRec.treIndex
 
     def classify_by_pid(self, items):
         data = {}
@@ -248,8 +250,7 @@ class Export:
             pid = getattr(item, 'pid')
             if data.get(pid) is None:
                 data[pid] = {}
-            treIndex = self.get_treIndex_from_treNum_and_pid.get(pid).get(item.treNum) \
-                if self.get_treIndex_from_treNum_and_pid.get(pid) else None
+            treIndex = self.get_treIndex_from_treNum_and_pid.get(pid).get(item.treNum)
             if data.get(pid).get(treIndex) is None:
                 data[pid][treIndex] = item
         return data
@@ -268,8 +269,7 @@ class Export:
             pid = getattr(item, 'pid')
             if data.get(pid) is None:
                 data[pid] = {}
-            treIndex = self.get_treIndex_from_treNum_and_pid.get(pid).get(item.treNum) \
-                if self.get_treIndex_from_treNum_and_pid.get(pid) else None
+            treIndex = self.get_treIndex_from_treNum_and_pid.get(pid).get(item.treNum)
             if data.get(pid).get(treIndex) is None:
                 data[pid][treIndex] = []
             data[pid][treIndex].append(item)
@@ -291,8 +291,7 @@ class Export:
             pid = getattr(item, 'pid')
             if data.get(pid) is None:
                 data[pid] = {}
-            treIndex = self.get_treIndex_from_treNum_and_pid.get(pid).get(item.treNum) \
-                if self.get_treIndex_from_treNum_and_pid.get(pid) else None
+            treIndex = self.get_treIndex_from_treNum_and_pid.get(pid).get(item.treNum)
             if data.get(pid).get(treIndex) is None:
                 data[pid][treIndex] = {}
             if data.get(pid).get(treIndex).get(item.treSolu) is None:
