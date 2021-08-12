@@ -53,7 +53,7 @@ class Patient(Base):
         row = np.zeros(0, dtype=str)
         if buffer.get('Patient').get(pid) is None:
             # row.extend(['/']*Patient.header_num)
-            row = np.append(row, ['/']*Patient.header_num)
+            row = np.append(row, ['/'] * Patient.header_num)
             return row
         obj = buffer.get('Patient').get(pid)
         for column in columns:
@@ -505,7 +505,7 @@ class PastHis(Base):
         row = np.zeros(0, dtype=str)
         if buffer.get('PastHis').get(pid) is None:
             # row.extend(['/']*PastHis.header_num)
-            row = np.append(row, ['/']*PastHis.header_num)
+            row = np.append(row, ['/'] * PastHis.header_num)
             return row
         obj = buffer.get('PastHis').get(pid)
 
@@ -680,6 +680,8 @@ class IniDiaPro(Base, PatDia):
     _patDia = Column(String(10000), comment='病理诊断,多个以逗号分隔')
     _patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
 
+    cliniDia = Column(JSON, comment='临床诊断')
+
     mitIma = Column(String(255), comment='核分裂像')
     comCar = Column(String(255), comment='复合性癌')  # 长度
     necArea = Column(Float, comment='坏死面积')
@@ -702,7 +704,7 @@ class IniDiaPro(Base, PatDia):
     export_header_map = {'PSScore': 'PS评分', 'cliniManifest': '临床表现', 'videography': '影像学', 'part': '部位',
                          'bioMet': '活检方式', 'pleInv': '是否胸膜侵犯',
                          'speSite': '标本部位', 'firVisDate': '初诊日期', 'patReDate': '病理报告日期', 'patNum': '病理号',
-                         'patDia': '病理诊断', 'mitIma': '核分裂像',
+                         'patDia': '病理诊断', 'mitIma': '核分裂像', 'cliniDia': '临床诊断',
                          'comCar': '复合性癌', 'necArea': '坏死面积', 'massSize': '肿块大小', 'traSite': '转移部位',
                          'TSize': 'TSize', 'stage': '分期情况',
                          'cStage': 'C分期(T,N,M)', 'pStage': 'P分期(T,N,M)', 'cliStage': '临床分期', 'patStage': '病理分期',
@@ -712,15 +714,18 @@ class IniDiaPro(Base, PatDia):
         return ["id", "PSScore", "cliniManifest", "videography", "part", "bioMet", "pleInv", "speSite", "firVisDate",
                 "patReDate", "patNum", "patDia", "mitIma", "comCar", "necArea", "massSize", "Ki67",
                 "traSite", "TSize", "stage", "cStage", "cliStage", "pStage", "patStage", 'cRemark', 'pRemark',
-                '_cliniManifest', '_part', '_bioMet', '_traSite', '_patDia', '_patDiaOthers']
+                '_cliniManifest', '_part', '_bioMet', '_traSite', '_patDia', '_patDiaOthers', 'cliniDia']
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        # header = []
         header = np.zeros(0, dtype=str)
         for column in columns:
-            # header.append(self.export_header_map.get(column))
-            header = np.append(header, self.export_header_map.get(column))
+            if column == 'cliniDia':
+                header = np.append(header, ['临床诊断', '临床诊断:肺癌', '临床诊断:食道癌', '临床诊断:乳腺癌',
+                                            '临床诊断:胸腺癌', '临床诊断:消化系统肿瘤', '临床诊断:头颈部肿瘤', '临床诊断:血液系统肿瘤',
+                                            '临床诊断:泌尿生殖系统肿瘤', '临床诊断:骨肿瘤', '临床诊断:软组织肉瘤', '临床诊断:其他'])
+            else:
+                header = np.append(header, self.export_header_map.get(column))
         IniDiaPro.header_num = len(header)
         return header
 
@@ -729,11 +734,10 @@ class IniDiaPro(Base, PatDia):
         videography_map = {0: '周围型', 1: '中央型', "/": "/"}
         stage_map = {'1': '未住院', '2': 'C/P/S均无法分期', '3': '仅C分期',
                      '4': '仅P分期', '5': 'C分期和P分期', "/": "/"}
-        # row = []
+
         row = np.zeros(0, dtype=str)
         if buffer.get('IniDiaPro').get(pid) is None:
-            # row.extend(['/']*IniDiaPro.header_num)
-            row = np.append(row, ['/']*IniDiaPro.header_num)
+            row = np.append(row, ['/'] * IniDiaPro.header_num)
             return row
         obj = buffer.get('IniDiaPro').get(pid)
         for column in columns:
@@ -741,21 +745,20 @@ class IniDiaPro(Base, PatDia):
             if column == 'videography':
                 value = self.filter_none(obj, column)
                 value = videography_map.get(value)
-                # row.append(value)
                 row = np.append(row, value)
             elif column == 'stage':
                 value = self.filter_none(obj, column)
                 value = stage_map.get(value)
-                # row.append(value)
                 row = np.append(row, value)
             elif (column == 'cliniManifest' or column == 'part' or
                   column == 'bioMet' or column == 'traSite'):
                 value = self.format_radio_data(obj, column)
-                # row.append(value)
                 row = np.append(row, value)
             elif column == 'patDia':
                 value = self.format_patDia(obj)
-                # row.append(value)
+                row = np.append(row, value)
+            elif column == 'cliniDia':
+                value = self.format_cliniDia(obj)
                 row = np.append(row, value)
             elif column == 'cStage':
                 stage_value = self.filter_none(obj, 'stage')
@@ -763,7 +766,6 @@ class IniDiaPro(Base, PatDia):
                     value = str(x) if x else '/'
                 else:
                     value = '/'
-                # row.append(value)
                 row = np.append(row, value)
             elif column == 'cliStage' or column == 'cRemark':
                 stage_value = self.filter_none(obj, 'stage')
@@ -771,7 +773,6 @@ class IniDiaPro(Base, PatDia):
                     value = self.filter_none(obj, column)
                 else:
                     value = '/'
-                # row.append(value)
                 row = np.append(row, value)
             elif column == 'patStage' or column == 'pRemark':
                 stage_value = self.filter_none(obj, 'stage')
@@ -779,7 +780,6 @@ class IniDiaPro(Base, PatDia):
                     value = self.filter_none(obj, column)
                 else:
                     value = '/'
-                # row.append(value)
                 row = np.append(row, value)
             elif column == 'pStage':
                 stage_value = self.filter_none(obj, 'stage')
@@ -787,17 +787,36 @@ class IniDiaPro(Base, PatDia):
                     value = str(x) if x else '/'
                 else:
                     value = '/'
-                # row.append(value)
                 row = np.append(row, value)
             elif type(x) == bool:
                 value = self.filter_none(self.change_bool_to_yes_or_no(x))
-                # row.append(value)
                 row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
-                # row.append(value)
                 row = np.append(row, value)
         return row
+
+    def format_cliniDia(self, obj):
+        cliniDia_map = {'lung_can': '肺癌', 'eso_can': '食道癌', 'bre_can': '乳腺癌', 'thy_can': '胸腺癌',
+                        'dig_tum': '消化系统肿瘤', 'head_neck_tum': '头颈部肿瘤', 'blo_tum': '血液系统肿瘤',
+                        'gen_tum': '泌尿生殖系统肿瘤', 'bone_tum': '骨肿瘤', 'soft_tis_sar': '软组织肉瘤',
+                        'other': '其他'}
+        cliniDia_key = ['lung_can', 'eso_can', 'bre_can', 'thy_can', 'dig_tum', 'head_neck_tum',
+                        'blo_tum', 'gen_tum', 'bone_tum', 'soft_tis_sar', 'other']
+
+        dic_value = self.filter_none(obj, 'cliniDia')
+        array_value = ['']
+        if not dic_value:
+            return ['/'] * 12
+
+        for key in cliniDia_key:
+            value = dic_value.get(key)
+            if value:
+                array_value[0] += cliniDia_map.get(key) + ' '
+                array_value.append(value)
+            else:
+                array_value.append('/')
+        return array_value
 
 
 class SpecimenInfo(Base):
@@ -844,7 +863,7 @@ class SpecimenInfo(Base):
         row = np.zeros(0, dtype=str)
         if buffer.get('SpecimenInfo').get(pid) is None:
             # row.extend(['/']*SpecimenInfo.header_num)
-            row = np.append(row, ['/']*SpecimenInfo.header_num)
+            row = np.append(row, ['/'] * SpecimenInfo.header_num)
             return row
         obj_array = buffer.get('SpecimenInfo').get(pid)
 
@@ -859,7 +878,7 @@ class SpecimenInfo(Base):
                     # row.append(value)
                     row = np.append(row, value)
         # row.extend(['/']*(SpecimenInfo.header_num - len(row)))
-        row = np.append(row, ['/']*(SpecimenInfo.header_num - len(row)))
+        row = np.append(row, ['/'] * (SpecimenInfo.header_num - len(row)))
         return row
 
     def format_type(self, obj):

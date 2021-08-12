@@ -14,13 +14,14 @@ from app.models.base_line import IniDiaPro, Patient
 
 api = Redprint('first_diagnose')
 
-@api.route('/<int:pid>',methods = ['GET'])
+
+@api.route('/<int:pid>', methods=['GET'])
 def get_first_diagnose(pid):
     first_diagnose = IniDiaPro.query.filter_by(pid=pid).first()
     return Success(data=first_diagnose if first_diagnose else {})
 
 
-@api.route('/<int:pid>',methods = ['POST'])
+@api.route('/<int:pid>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
 @update_time
