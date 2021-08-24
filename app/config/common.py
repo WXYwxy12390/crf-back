@@ -1,3 +1,3 @@
 RBAC_SCHEME = 'https'
-RBAC_IP = '127.0.0.1'
-RBAC_PORT = '81'
+RBAC_IP = 'www.rayplus.top'
+RBAC_PORT = '90'

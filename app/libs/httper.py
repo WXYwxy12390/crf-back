@@ -20,6 +20,6 @@ class HTTP:
                         return ''
         """
         if r.status_code != 200 or r.json()['code'] != 200:
-            return {} if return_json else r.text
+            return {} if return_json else ''
         else:
             return r.json() if return_json else r.text
