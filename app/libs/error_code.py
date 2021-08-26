@@ -1,5 +1,5 @@
-
 from app.libs.error import APIException
+
 
 # class Success(APIException):
 #     code = 201 #新增成功
@@ -14,6 +14,7 @@ class ServerError(APIException):
     msg = 'sorry, we made a mistake ^_^'
     error_code = 999
 
+
 # class ClientTypeError(APIException):
 #     # 原HTTPException 会返回html,我们需要json格式的
 #     # 我们自定义一个APIExcetion ,然后让其继承
@@ -21,7 +22,7 @@ class ServerError(APIException):
 #     msg = 'client is invalid'
 #     error_code = 1006
 
-#为我们自定义的validator验证器,定制错误码
+# 为我们自定义的validator验证器,定制错误码
 
 class ParameterException(APIException):
     # code = 400
@@ -80,10 +81,12 @@ class SubmitError(Forbidden):
     error_code = 1007
     msg = '已提交,无法进行修改'
 
+
 class SampleStatusError(Forbidden):
     # code = 403
     error_code = 1008
     msg = '样本状态有误'
+
 
 class SignatureError(Forbidden):
     # code = 403
@@ -95,6 +98,7 @@ class NoProjectId(Forbidden):
     # code = 403
     error_code = 10041
     msg = '无法获取项目id'
+
 
 class PostError(Forbidden):
     error_code = 10021
