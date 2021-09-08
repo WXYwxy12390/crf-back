@@ -5,7 +5,7 @@ from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
 from app.models import json2db, db, delete_array
 from app.models.base_line import SpecimenInfo, Patient
-from app.utils.export3 import Export
+from app.utils.export import Export
 
 api = Redprint('specimen_info')
 

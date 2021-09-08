@@ -62,7 +62,6 @@ def get_signs(pid, treNum):
 @update_time
 def add_signs(pid, treNum):
     data = request.get_json()
-    print(data)
     for _data in data['data']:
         _data['pid'] = pid
         _data['treNum'] = treNum

@@ -5,19 +5,16 @@
 """
 
 from flask import request, jsonify, g, current_app
-from sqlalchemy import func
 
-from app.libs.decorator import edit_need_auth
 from app.libs.error import Success
-from app.libs.error_code import PostError
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
 from app.models import json2db, db, delete_array, json2db_add
 from app.models.base_line import Patient
 from app.spider.research_center import ResearchCenterSpider
 from app.spider.user_info import UserInfo
-from app.utils.export import Export
 from app.utils.paging import get_paging
+from app.utils.sort import sort_samples_while_query
 
 api = Redprint('sample')
 
@@ -29,19 +26,26 @@ def get_sample_all():
     data = request.get_json()
     page = int(args['page'])
     limit = int(args['limit'])
+    sort = int(args.get('sort')) if args.get('sort') else None
     patients = []
     if 'OperateAllCRF' in g.user.scopes:
-        patients = Patient.query.filter_by().order_by(Patient.update_time.desc()).all()
+        # patients = Patient.query.filter_by().order_by(Patient.update_time.desc()).all()
+        patients = sort_samples_while_query(Patient.query.filter_by(), sort)
+
     elif 'CheckCenterCRF' in g.user.scopes:
         centers = ResearchCenterSpider().search_by_uid_project(current_app.config['PROJECT_ID'], g.user.user_id)['data']
         center_ids = [center['id'] for center in centers]
-        patients = Patient.query.filter(Patient.is_delete == 0, Patient.researchCenter.in_(center_ids)
-                                        ).order_by(Patient.update_time.desc()).all()
+        # patients = Patient.query.filter(Patient.is_delete == 0, Patient.researchCenter.in_(center_ids)
+        #                                 ).order_by(Patient.update_time.desc()).all()
+        patients = sort_samples_while_query(Patient.query.filter(Patient.is_delete == 0,
+                                                                 Patient.researchCenter.in_(center_ids)), sort)
     else:
-        items = Patient.query.filter(Patient.is_delete == 0).order_by(Patient.update_time.desc()).all()
+        # items = Patient.query.filter(Patient.is_delete == 0).order_by(Patient.update_time.desc()).all()
+        items = sort_samples_while_query(Patient.query.filter(Patient.is_delete == 0), sort)
         for item in items:
             if item.account and g.user.user_id in item.account:
                 patients.append(item)
+
     all_pids = [patient.id for patient in patients]
     if data and len(data) > 0:
         res, total, all_pids = Patient.search(patients, data, page, limit)
@@ -189,10 +193,3 @@ def del_sample():
     patients = Patient.query.filter(Patient.is_delete == 0, Patient.id.in_(data['ids'])).all()
     delete_array(patients)
     return Success()
-
-
-@api.route('/export', methods=['POST'])
-def export():
-    data = request.get_json()
-    pids = data.get('pids')
-    return Export(pids).work()

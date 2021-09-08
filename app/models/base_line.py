@@ -83,7 +83,7 @@ class Patient(Base):
     def keys(self):
         return ['id', 'patNumber', 'account', 'researchCenter', 'idNumber', 'hospitalNumber',
                 'patientName', 'gender', 'birthday', 'phoneNumber1', 'phoneNumber2', 'updateTime', 'nextFollowupTime',
-                'finishFollowup', 'update_time',
+                'finishFollowup', 'update_time'
                 '_researchCenter', '_account', '_gender']
 
     def get_fotmat_info(self):
@@ -109,6 +109,7 @@ class Patient(Base):
             'age': get_age_by_birth(get_birth_date_by_id_card(self.idNumber)),
             'patDia': pat_dia[self.id] if pat_dia else None,
             'update_time': self.update_time,
+            'create_time': self.create_time,
             'research_center_id': self.researchCenter,
             'livSta': liv_sta_info
         }

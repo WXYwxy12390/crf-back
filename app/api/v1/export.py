@@ -1,6 +1,6 @@
 from flask import request
 from app.libs.redprint import Redprint
-from app.utils.export3 import Export as Export3
+from app.utils.export import Export
 
 api = Redprint('export')
 
@@ -43,7 +43,7 @@ def export():
             follInfo_error_info += '随访信息表名错误'
 
     if not (baseLine_error_info or trementInfo_error_info or follInfo_error_info):
-        return Export3(pids, treIndexes, follInfoNum, baseLine, trementInfo, follInfo).work()
+        return Export(pids, treIndexes, follInfoNum, baseLine, trementInfo, follInfo).work()
     else:
         return baseLine_error_info + '\n' + trementInfo_error_info + '\n' + follInfo_error_info
 
