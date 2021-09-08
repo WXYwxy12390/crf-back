@@ -1,13 +1,12 @@
-
 class Scope:
     allow_api = []
     allow_module = []
     forbidden = []
 
-    #运算符重载  实现对象和对象直接相加
-    def __add__(self,other):
+    # 运算符重载  实现对象和对象直接相加
+    def __add__(self, other):
         self.allow_api = self.allow_api + other.allow_api
-        self.allow_api = list(set(self.allow_api)) #转成集合去重
+        self.allow_api = list(set(self.allow_api))  # 转成集合去重
 
         self.allow_module = self.allow_module + other.allow_module
         self.allow_module = list(set(self.allow_module))  # 转成集合去重
@@ -15,7 +14,7 @@ class Scope:
         self.forbidden = self.forbidden + other.forbidden
         self.forbidden = list(set(self.forbidden))  # 转成集合去重
 
-        return self  #返回实例对象，使其能够支持链式调用
+        return self  # 返回实例对象，使其能够支持链式调用
 
 
 # class AdminScope(Scope):
@@ -37,25 +36,31 @@ class Scope:
 #         self +  UserScope()+ AdminScope()
 
 class OperateUserCRF(Scope):
-    allow_api = ['v1.sample+add_sample','v1.sample+get_sample_all','v1.sample+get_sample_updated','v1.sample+sample_add_account']
+    allow_api = ['v1.sample+add_sample', 'v1.sample+get_sample_all', 'v1.sample+get_sample_updated',
+                 'v1.sample+sample_add_account']
     allow_module = ['v1.first_diagnose', 'v1.past_history', 'v1.patient', 'v1.record_info', 'v1.therapy_record',
-                    'v1.file', 'v1.immunohis', 'v1.lab_inspectation', 'v1.mole_detec', 'v1.other_inspect','v1.treatment_info','v1.specimen_info',
+                    'v1.file', 'v1.immunohis', 'v1.lab_inspectation', 'v1.mole_detec', 'v1.other_inspect',
+                    'v1.treatment_info', 'v1.specimen_info',
                     'v1.user']
 
+
 class CheckCenterCRF(Scope):
-    allow_api = ['v1.sample+get_sample_all','v1.sample+get_sample_updated']
+    allow_api = ['v1.sample+get_sample_all', 'v1.sample+get_sample_updated']
 
 
 class EditCenterCRF(Scope):
     def __init__(self):
         self + OperateUserCRF()
 
+
 class OperateAllCRF(Scope):
     def __init__(self):
         self + OperateUserCRF()
 
+
 class DeleteCRF(Scope):
     allow_api = ['v1.sample+del_sample']
+
 
 class Export(Scope):
     # 导出
@@ -64,19 +69,22 @@ class Export(Scope):
 
 class InputCRF(Scope):
     # 8 多中心录入CRF
-    allow_module = ['v1.adverse_event','v1.concomitant_medication','v1.criteria','v1.cycle','v1.demography','v1.ecog',
-                    'v1.effect_evaluation','v1.file','v1.lab_inspection','v1.medicine_usage_research',
-                    'v1.other_inspect','v1.other_tumor_therapy','v1.past_history','v1.physical_examination','v1.QoL',
-                    'v1.relative_inspect','v1.sample','v1.stop_modify_dose','v1.summary','v1.survival_cycle','v1.vital_sign',
-                    'v1.action_record','v1.specimen_info'
-        ]
+    allow_module = ['v1.adverse_event', 'v1.concomitant_medication', 'v1.criteria', 'v1.cycle', 'v1.demography',
+                    'v1.ecog',
+                    'v1.effect_evaluation', 'v1.file', 'v1.lab_inspection', 'v1.medicine_usage_research',
+                    'v1.other_inspect', 'v1.other_tumor_therapy', 'v1.past_history', 'v1.physical_examination',
+                    'v1.QoL',
+                    'v1.relative_inspect', 'v1.sample', 'v1.stop_modify_dose', 'v1.summary', 'v1.survival_cycle',
+                    'v1.vital_sign',
+                    'v1.action_record', 'v1.specimen_info'
+                    ]
 
 
 class CheckCRF(Scope):
     allow_api = ["v1.adverse_event+get_adverse_event",
                  "v1.concomitant_medication+get_concomitant_medication",
                  'v1.criteria+get_inclusion_criteria', 'v1.criteria+get_exclusion_criteria',
-                 'v1.cycle+get_cycle_nav', 'v1.cycle+get_cycle_info','v1.cycle+get_cycle_status',
+                 'v1.cycle+get_cycle_nav', 'v1.cycle+get_cycle_info', 'v1.cycle+get_cycle_status',
                  'v1.demography+get_demography',
                  'v1.ecog+get_ecog',
                  'v1.effect_evaluation+get_effect_evaluation', 'v1.effect_evaluation+get_targeted_lesion',
@@ -110,31 +118,32 @@ class CheckCRF(Scope):
                  ]
 
 
-
 # 能够查看全部样本
 class CheckAllCrf(Scope):
     forbidden = []
 
-#统计分析
+
+# 统计分析
 class Analysis(Scope):
     forbidden = []
 
 
+# 查看编辑所有标本信息
+class OperateAllSpeciInfo(Scope):
+    allow_api = ['v1.sample+add_sample']
+    allow_module = ['v1.specimen_info']
 
 
-
-
-
-#这里的endpoint 会带有蓝图v1 例如  v1.super_get_user
-def is_in_scope(scopes,endpoint):
+# 这里的endpoint 会带有蓝图v1 例如  v1.super_get_user
+def is_in_scope(scopes, endpoint):
     # endpoint = blueprint.view_function
-    #globals() 实现'反射'
+    # globals() 实现'反射'
     # globals 会将当前模块下的类转换为字典
     # scope = globals()[scope]() #根据scope 实例化一个权限对象scope
     scope = Scope()
     for scopeStr in scopes:
         scope += globals()[scopeStr]()
-    #分离出 模块名，以便进行模块级别的验证
+    # 分离出 模块名，以便进行模块级别的验证
     splits = endpoint.split('+')
     red_name = splits[0]
 
@@ -147,4 +156,4 @@ def is_in_scope(scopes,endpoint):
     if red_name in scope.allow_module:
         return True
     else:
-        return  False
+        return False

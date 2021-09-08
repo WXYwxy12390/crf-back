@@ -217,7 +217,8 @@ class Export:
             if self.get_treIndex_from_treNum_and_pid.get(pid).get(treRec.treNum) is None:
                 self.get_treIndex_from_treNum_and_pid[pid][treRec.treNum] = treRec.treIndex
 
-    def classify_by_pid(self, items):
+    @staticmethod
+    def classify_by_pid(items):
         data = {}
         for item in items:
             if getattr(item, 'pid', None):
@@ -226,7 +227,8 @@ class Export:
                 data[item.id] = item
         return data
 
-    def array_classify_by_pid(self, items):
+    @staticmethod
+    def array_classify_by_pid(items):
         data = {}
         for item in items:
             pid = getattr(item, 'pid')

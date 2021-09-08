@@ -113,7 +113,8 @@ def del_side_effect(pid,se_id):
 # 随访信息表的获取、提交、删除
 @api.route('/follInfo/<int:pid>', methods=['GET'])
 def get_follInfo(pid):
-    follInfo = FollInfo.query.filter_by(pid=pid).all()
+    follInfo = FollInfo.query.filter(FollInfo.pid == pid,
+                                     FollInfo.is_delete == 0).order_by(FollInfo.date.desc()).all()
     return Success(data=follInfo if follInfo else [])
 
 
