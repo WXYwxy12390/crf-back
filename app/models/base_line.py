@@ -116,7 +116,7 @@ class Patient(Base):
         return data
 
     @classmethod
-    def search(cls, patients, search_data, page, limit):
+    def search(cls, patients, search_data, page, limit, sort=None):
         pids = [patient.id for patient in patients]
         # 与patient表查询相关的。
         if 'patientName' in search_data or 'patNumber' in search_data \
@@ -167,6 +167,23 @@ class Patient(Base):
         pids = list(set(pids))
         pagination = Patient.query.filter(Patient.is_delete == 0, Patient.id.in_(pids)).order_by(
             Patient.update_time.desc()).paginate(page=page, per_page=limit)
+
+        if sort == 1:
+            # 按患者编号倒序
+            pagination = Patient.query.filter(Patient.is_delete == 0, Patient.id.in_(pids)).order_by(
+                Patient.patNumber.desc()).paginate(page=page, per_page=limit)
+        elif sort == 2:
+            # 按患者编号正序
+            pagination = Patient.query.filter(Patient.is_delete == 0, Patient.id.in_(pids)).order_by(
+                Patient.patNumber.asc()).paginate(page=page, per_page=limit)
+        elif sort == 3:
+            # 按创建时间倒序排列
+            pagination = Patient.query.filter(Patient.is_delete == 0, Patient.id.in_(pids)).order_by(
+                Patient.create_time.desc()).paginate(page=page, per_page=limit)
+        elif sort == 4:
+            # 按创建时间正序排列
+            pagination = Patient.query.filter(Patient.is_delete == 0, Patient.id.in_(pids)).order_by(
+                Patient.create_time.asc()).paginate(page=page, per_page=limit)
 
         return pagination.items, pagination.total, pids
 

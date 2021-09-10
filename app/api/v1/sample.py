@@ -48,7 +48,7 @@ def get_sample_all():
 
     all_pids = [patient.id for patient in patients]
     if data and len(data) > 0:
-        res, total, all_pids = Patient.search(patients, data, page, limit)
+        res, total, all_pids = Patient.search(patients, data, page, limit, sort)
     else:
         res, total = get_paging(patients, page, limit)
     res = [patient.get_fotmat_info() for patient in res]

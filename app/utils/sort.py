@@ -2,9 +2,7 @@ from app.models.base_line import Patient
 
 
 def sort_samples_while_query(after_filter, way):
-    if not way:
-        return after_filter.order_by(Patient.update_time.desc()).all()
-    elif way == 1:
+    if way == 1:
         # 按患者编号倒序
         return after_filter.order_by(Patient.patNumber.desc()).all()
     elif way == 2:
@@ -16,3 +14,5 @@ def sort_samples_while_query(after_filter, way):
     elif way == 4:
         # 按创建时间正序排列
         return after_filter.order_by(Patient.create_time.asc()).all()
+    else:
+        return after_filter.order_by(Patient.update_time.desc()).all()

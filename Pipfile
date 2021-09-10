@@ -24,6 +24,7 @@ werkzeug = "==2.0.0"
 lxml = "*"
 numpy = "*"
 pandas = "*"
+sqlalchemy = "==1.3.23"
 
 [requires]
 python_version = "3"
