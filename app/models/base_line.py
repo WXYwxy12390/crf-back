@@ -83,7 +83,7 @@ class Patient(Base):
     def keys(self):
         return ['id', 'patNumber', 'account', 'researchCenter', 'idNumber', 'hospitalNumber',
                 'patientName', 'gender', 'birthday', 'phoneNumber1', 'phoneNumber2', 'updateTime', 'nextFollowupTime',
-                'finishFollowup', 'update_time'
+                'finishFollowup', 'update_time',
                 '_researchCenter', '_account', '_gender']
 
     def get_fotmat_info(self):
