@@ -20,14 +20,14 @@ blood_bio_item_to_code = {'总蛋白': 'TP', '白蛋白': 'ALB', '球蛋白': 'G
 thyroid_item_to_code = {'游离T3': 'FT3', '游离T4': 'FT4', '游离T3.': 'FT3', '游离T4.': 'FT4', '促甲状腺素': 'TSH', '促甲状腺素.': 'TSH'}
 
 coagulation_item_to_code = {'凝血酶原时间': 'PT', '活化部分凝血活酶时间': 'APTT', '凝血酶时间': 'TT',
-                            '纤维蛋白原': 'FIB', '国际标准化比值': 'INR', 'D-D二聚体定量': 'D-dimer'}
+                            '纤维蛋白原': 'FIB', '国际标准化比值': 'INR', 'D-D二聚体定量': 'D_dimer'}
 
-myocardialEnzyme_item_to_code = {'乳酸脱氢酶': 'LDH', '肌酸激酶': 'CK', '肌酸激酶同工酶': 'CK-MB', '肌酸激酶MB型同工酶': 'CK-MB',
-                                 '高敏心肌肌钙蛋白I': 'cTnI', '超敏肌钙蛋白I': 'cTnT','高敏心肌肌钙蛋白T': 'cTnT', '超敏肌钙蛋白T': 'cTnT',
-                                 '肌红蛋白': 'MYO', '脑钠肽': 'BNP', '氨基末端脑钠肽前体': 'NT-proBNP'}
+myocardial_enzyme_item_to_code = {'乳酸脱氢酶': 'LDH', '肌酸激酶': 'CK', '肌酸激酶同工酶': 'CK_MB', '肌酸激酶MB型同工酶': 'CK_MB',
+                                  '高敏心肌肌钙蛋白I': 'cTnI', '超敏肌钙蛋白I': 'cTnT', '高敏心肌肌钙蛋白T': 'cTnT', '超敏肌钙蛋白T': 'cTnT',
+                                  '肌红蛋白': 'MYO', '脑钠肽': 'BNP', '氨基末端脑钠肽前体': 'NT_proBNP'}
 
-cytokines_item_to_code = {'肿瘤坏死因子α': 'TNF-alpha', '白细胞介素1β': 'IL-1beta',
-                          '白细胞介素2受体': 'IL-2R', '白细胞介素6': 'IL-6', '白细胞介素8': 'IL-8', '白细胞介素10': 'IL-10'}
+cytokines_item_to_code = {'肿瘤坏死因子α': 'TNF-a', '白细胞介素1β': 'IL_1b',
+                          '白细胞介素2受体': 'IL_2R', '白细胞介素6': 'IL_6', '白细胞介素8': 'IL_8', '白细胞介素10': 'IL_10'}
 
 lymSubsets_item_to_code = {'总B淋巴细胞(CD3-CD19+)(#)': 'CD19_', '总T淋巴细胞(CD3+CD19-)(#)': 'CD3_',
                            '总B淋巴细胞(CD3-CD19+)(%)': 'CD19', '总T淋巴细胞(CD3+CD19-)(%)': 'CD3',
@@ -199,7 +199,7 @@ if __name__ == "__main__":
     # print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/blood_bio/微信图片_20201208153935.jpg', 'blood_bio'))
     # print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/thyroid/微信图片_20201225123222.jpg', 'thyroid'))
     # print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/coagulation/微信图片_20201216153633.jpg', 'coagulation'))
-    print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/myocardialEnzyme/2019.06.15.jpg', 'myocardialEnzyme'))
+    print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/myocardialEnzyme/2019.06.15.jpg', 'myocardial_enzyme'))
     # print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/cytokines/微信图片_20201108145817.jpg', 'cytokines'))
     # print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/lymSubsets/微信图片_20201108104503.jpg', 'lymSubsets'))
     # print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/urineRoutine/25.jpg', 'urineRoutine'))

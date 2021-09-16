@@ -18,8 +18,6 @@ class StaticFile():
         self.file_folder= self.static_folder + '/' + file_folder
         self.folder = file_folder
 
-        print(self.file_folder)
-
     # 判断是否存在用户签名，如果有，返回签名路径
     def has_folder(self,id):
         path = os.path.join(self.file_folder, str(id))
