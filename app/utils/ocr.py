@@ -43,7 +43,10 @@ urineRoutine_item_to_code = {'酸碱度': 'UPH', '尿葡萄糖': 'UGLU', '白细
 tumorMarker_item_to_code = {'癌胚抗原': 'CEA', '神经元特异性烯醇化酶': 'NSE',
                             '胃泌素释放肽前体': 'pro-GPR', '鳞状细胞癌相关抗原': 'SCCA'}
 
-lung_item_to_code = {}
+lung_item_to_code = {'FVC':'FVC',
+                     'FEV1/FVC':'FEV1_FVC','FEV 1%FVC':'FEV1_FVC',
+                     'MEF'
+                     'TLC-sb':'TLC_sb'}
 
 
 def posturl(url, data={}):
@@ -193,13 +196,13 @@ def lab_inspectation_ocr(path, table_name):
 
 
 if __name__ == "__main__":
-    # ocr('C:/Users/dell/Desktop/fsdownload/blood_routine/微信图片_20201118152459.jpg')
+    ocr('C:/Users/dell/Desktop/fsdownload/lung/微信图片_20210106145126.jpg')
 
     # print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/blood_routine/微信图片_20201118152459.jpg','blood_routine'))
     # print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/blood_bio/微信图片_20201208153935.jpg', 'blood_bio'))
     # print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/thyroid/微信图片_20201225123222.jpg', 'thyroid'))
     # print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/coagulation/微信图片_20201216153633.jpg', 'coagulation'))
-    print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/myocardialEnzyme/2019.06.15.jpg', 'myocardial_enzyme'))
+    # print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/myocardialEnzyme/2019.06.15.jpg', 'myocardial_enzyme'))
     # print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/cytokines/微信图片_20201108145817.jpg', 'cytokines'))
     # print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/lymSubsets/微信图片_20201108104503.jpg', 'lymSubsets'))
     # print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/urineRoutine/25.jpg', 'urineRoutine'))

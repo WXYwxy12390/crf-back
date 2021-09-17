@@ -822,16 +822,17 @@ class IniDiaPro(Base, PatDia):
         cliniDia_key = ['lung_can', 'eso_can', 'bre_can', 'thy_can', 'dig_tum', 'head_neck_tum',
                         'blo_tum', 'gen_tum', 'bone_tum', 'soft_tis_sar', 'other']
 
-        dic_value = self.filter_none(obj, 'cliniDia')
-        array_value = ['']
+        dic_value = obj.cliniDia
+
         if not dic_value:
             return ['/'] * 12
 
+        dic_value_keys = dic_value.keys()
+        array_value = ['']
         for key in cliniDia_key:
-            value = dic_value.get(key)
-            if value:
+            if key in dic_value_keys:
                 array_value[0] += cliniDia_map.get(key) + ' '
-                array_value.append(value)
+                array_value.append(self.filter_none(dic_value.get(key)))
             else:
                 array_value.append('/')
         return array_value
