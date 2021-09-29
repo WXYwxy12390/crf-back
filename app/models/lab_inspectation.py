@@ -80,7 +80,17 @@ class BloodRoutine(Base):
                          'MCH': 'MCH', 'MCHC': 'MCHC', 'RDWCV': 'RDWCV', 'RDWSD': 'RDWSD', 'WBC': 'WBC',
                          'GRAN_': 'GRAN#', 'LYM_': 'LYM#', 'EOS_': 'EOS#', 'MID_': 'MID#', 'BASO_': 'BASO#',
                          'PLT': 'PLT', 'LYM': 'LYM', 'MID': 'MID', 'GRAN': 'GRAN', 'EOS': 'EOS', 'BASO': 'BASO',
-                         'NEUT': 'NEUT'}
+                         'NEUT': 'NEUT',
+                         'RBCMea': 'RBC临床意义判定', 'HGbMea': 'HGb临床意义判定', 'HCTMea': 'HCT临床意义判定', 'MCVMea': 'MCV临床意义判定',
+                         'MCHMea': 'MCH临床意义判定', 'MCHCMea': 'MCHC临床意义判定', 'RDWCVMea': 'RDWCV临床意义判定', 'RDWSDMea': 'RDWSD临床意义判定', 'WBCMea': 'WBC临床意义判定',
+                         'GRAN_Mea': 'GRAN#临床意义判定', 'LYM_Mea': 'LYM#临床意义判定', 'EOS_Mea': 'EOS#临床意义判定', 'MID_Mea': 'MID#临床意义判定', 'BASO_Mea': 'BASO#临床意义判定',
+                         'PLTMea': 'PLT临床意义判定', 'LYMMea': 'LYM临床意义判定', 'MIDMea': 'MID临床意义判定', 'GRANMea': 'GRAN临床意义判定', 'EOSMea': 'EOS临床意义判定', 'BASOMea': 'BASO临床意义判定',
+                         'NEUTMea': 'NEUT临床意义判定',
+                         'MCHNote': 'MCH备注', 'MCHCNote': 'MCHC备注', 'RDWCVNote': 'RDWCV备注', 'RDWSDNote': 'RDWSD备注', 'WBCNote': 'WBC备注',
+                         'GRAN_Note': 'GRAN#备注', 'LYM_Note': 'LYM#备注', 'EOS_Note': 'EOS#备注', 'MID_Note': 'MID#备注', 'BASO_Note': 'BASO#备注',
+                         'PLTNote': 'PLT备注', 'LYMNote': 'LYM备注', 'MIDNote': 'MID备注', 'GRANNote': 'GRAN备注', 'EOSNote': 'EOS备注', 'BASONote': 'BASO备注',
+                         'NEUTNote': 'NEUT备注'
+                         }
     unit_map = {'RBC': '×10^12/L', 'HGb': 'G/L', 'HCT': '%', 'MCV': 'FL', 'MCH': 'PG', 'MCHC': 'G/L',
                 'RDWCV': '%', 'RDWSD': 'FL', 'WBC': '×10^9/L', 'GRAN_': '×10^9/L', 'LYM_': '×10^9/L',
                 'EOS_': '×10^9/L', 'MID_': '×10^9/L', 'BASO_': '×10^9/L', 'PLT': '×10^9/L', 'LYM': '%',
@@ -232,7 +242,18 @@ class BloodBio(Base):
                          'AST': 'AST', 'LDH': 'LDH', 'GGT': 'GGT', 'TBIL': 'TBIL', 'DBIL': 'DBIL', 'IBIL': 'IBIL',
                          'GLU': 'GLU', 'TC': 'TC', 'LDL': 'LDL', 'hDL': 'HDL', 'TG': 'TG', 'UREA': 'UREA',
                          'ALP': 'ALP', 'CREA': 'CREA', 'UA': 'UA', 'CO2': 'CO2', 'K': 'K', 'Na': 'Na',
-                         'Cl': 'Cl', 'Ca': 'Ca', 'Mg': 'Mg', 'P': 'P'}
+                         'Cl': 'Cl', 'Ca': 'Ca', 'Mg': 'Mg', 'P': 'P',
+                         'TPMea': 'TP临床意义判定', 'ALBMea': 'ALB临床意义判定', 'GLOMea': 'GLO临床意义判定', 'ALTMea': 'ALT临床意义判定',
+                         'ASTMea': 'AST临床意义判定', 'LDHMea': 'LDH临床意义判定', 'GGTMea': 'GGT临床意义判定', 'TBILMea': 'TBIL临床意义判定', 'DBILMea': 'DBIL临床意义判定', 'IBILMea': 'IBIL临床意义判定',
+                         'GLUMea': 'GLU临床意义判定', 'TCMea': 'TC临床意义判定', 'LDLMea': 'LDL临床意义判定', 'hDLMea': 'HDL临床意义判定', 'TGMea': 'TG临床意义判定', 'UREAMea': 'UREA临床意义判定',
+                         'ALPMea': 'ALP临床意义判定', 'CREAMea': 'CREA临床意义判定', 'UAMea': 'UA临床意义判定', 'CO2Mea': 'CO2临床意义判定', 'KMea': 'K临床意义判定', 'NaMea': 'Na临床意义判定',
+                         'ClMea': 'Cl临床意义判定', 'CaMea': 'Ca临床意义判定', 'MgMea': 'Mg临床意义判定', 'PMea': 'P临床意义判定',
+                         'TPNote': 'TP备注', 'ALBNote': 'ALB备注', 'GLONote': 'GLO备注', 'ALTNote': 'ALT备注',
+                         'ASTNote': 'AST备注', 'LDHNote': 'LDH备注', 'GGTNote': 'GGT备注', 'TBILNote': 'TBIL备注', 'DBILNote': 'DBIL备注', 'IBILNote': 'IBIL备注',
+                         'GLUNote': 'GLU备注', 'TCNote': 'TC备注', 'LDLNote': 'LDL备注', 'hDLNote': 'HDL备注', 'TGNote': 'TG备注', 'UREANote': 'UREA备注',
+                         'ALPNote': 'ALP备注', 'CREANote': 'CREA备注', 'UANote': 'UA备注', 'CO2Note': 'CO2备注', 'KNote': 'K备注', 'NaNote': 'Na备注',
+                         'ClNote': 'Cl备注', 'CaNote': 'Ca备注', 'MgNote': 'Mg备注', 'PNote': 'P备注'
+                         }
     unit_map = {'TP': 'g/L', 'ALB': 'g/L', 'GLO': 'g/L', 'ALT': 'U/L',
                 'AST': 'U/L', 'LDH': 'U/L', 'GGT': 'U/L', 'TBIL': 'μmol/L', 'DBIL': 'μmol/L', 'IBIL': 'μmol/L',
                 'GLU': 'mmol/L', 'TC': 'mmol/L', 'LDL': 'mmol/L', 'hDL': 'mmol/L', 'TG': 'mmol/L', 'UREA': 'mmol/L',
@@ -314,7 +335,9 @@ class Thyroid(Base):
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
     # 和导出功能有关
-    export_header_map = {'samplingTime': '甲状腺功能检查时间', 'FT3': 'FT3', 'FT4': 'FT4', 'TSH': 'TSH'}
+    export_header_map = {'samplingTime': '甲状腺功能检查时间', 'FT3': 'FT3', 'FT4': 'FT4', 'TSH': 'TSH',
+                         'FT3Mea': 'FT3临床意义判定', 'FT4Mea': 'FT4临床意义判定', 'TSHMea': 'TSH临床意义判定',
+                         'FT3Note': 'FT3备注', 'FT4Note': 'FT4备注', 'TSHNote': 'TSH备注'}
 
     unit_map = {'FT3': 'pmol/L', 'FT4': 'pmol/L', 'TSH': 'UIU/ML'}
 
@@ -394,7 +417,12 @@ class Coagulation(Base):
 
     # 和导出功能有关
     export_header_map = {'samplingTime': '凝血功能检查时间', 'PT': 'PT', 'APTT': 'APTT', 'TT': 'TT',
-                         'FIB': 'FIB', 'INR': 'INR', 'D_dimer': 'D-dimer'}
+                         'FIB': 'FIB', 'INR': 'INR', 'D_dimer': 'D-dimer',
+                         'PTMea': 'PT临床意义判定', 'APTTMea': 'APTT临床意义判定', 'TTMea': 'TT临床意义判定',
+                         'FIBMea': 'FIB临床意义判定', 'INRMea': 'INR临床意义判定', 'D_dimerMea': 'D-dimer临床意义判定',
+                         'PTNote': 'PT备注', 'APTTNote': 'APTT备注', 'TTNote': 'TT备注',
+                         'FIBNote': 'FIB备注', 'INRNote': 'INR备注', 'D_dimerNote': 'D-dimer备注'
+                         }
     unit_map = {'PT': 's', 'APTT': 's', 'TT': 's', 'FIB': 'mg/dL',
                 'INR': '/', 'D_dimer': 'mg/L'}
 
@@ -481,7 +509,13 @@ class MyocardialEnzyme(Base):
 
     # 和导出功能有关
     export_header_map = {'samplingTime': '心肌酶谱检查时间', 'LDH': 'LDH', 'CK': 'CK', 'CK_MB': 'CK-MB',
-                         'cTnI': 'cTnI', 'cTnT': 'cTnT', 'MYO': 'MYO', 'BNP': 'BNP', 'NT_proBNP': 'NT-proBNP'}
+                         'cTnI': 'cTnI', 'cTnT': 'cTnT', 'MYO': 'MYO', 'BNP': 'BNP', 'NT_proBNP': 'NT-proBNP',
+                         'LDHMea': 'LDH临床意义判定', 'CKMea': 'CK临床意义判定', 'CK_MBMea': 'CK-MB临床意义判定',
+                         'cTnIMea': 'cTnI临床意义判定', 'cTnTMea': 'cTnT临床意义判定', 'MYOMea': 'MYO临床意义判定',
+                         'BNPMea': 'BNP临床意义判定', 'NT_proBNPMea': 'NT-proBNP临床意义判定',
+                         'LDHNote': 'LDH备注', 'CKNote': 'CK备注', 'CK_MBNote': 'CK-MB备注',
+                         'cTnINote': 'cTnI备注', 'cTnTNote': 'cTnT备注', 'MYONote': 'MYO备注', 'BNPNote': 'BNP备注', 'NT_proBNPNote': 'NT-proBNP备注'
+                         }
     unit_map = {'LDH': 'U/L', 'CK': 'U/L', 'CK_MB': 'U/L', 'cTnI': 'U/L',
                 'cTnT': 'U/L', 'MYO': 'U/L', 'BNP': 'U/L', 'NT_proBNP': 'U/L'}
 
@@ -564,7 +598,12 @@ class Cytokines(Base):
 
     # 和导出功能有关
     export_header_map = {'samplingTime': '细胞因子检查时间', 'TNF_a': 'TNF-alpha', 'IL_1b': 'IL-1beta',
-                         'IL_2R': 'IL-2R', 'IL_6': 'IL-6', 'IL_8': 'IL-8', 'IL_10': 'IL-10'}
+                         'IL_2R': 'IL-2R', 'IL_6': 'IL-6', 'IL_8': 'IL-8', 'IL_10': 'IL-10',
+                         'TNF_aMea': 'TNF-alpha临床意义判定', 'IL_1bMea': 'IL-1beta临床意义判定',
+                         'IL_2RMea': 'IL-2R临床意义判定', 'IL_6Mea': 'IL-6临床意义判定', 'IL_8Mea': 'IL-8临床意义判定', 'IL_10Mea': 'IL-10临床意义判定',
+                         'TNF_aNote': 'TNF-alpha备注', 'IL_1bNote': 'IL-1beta备注',
+                         'IL_2RNote': 'IL-2R备注', 'IL_6Note': 'IL-6备注', 'IL_8Note': 'IL-8备注', 'IL_10Note': 'IL-10备注'
+                         }
 
     unit_map = {'TNF_a': 'pg/ml', 'IL_1b': 'pg/ml', 'IL_2R': 'U/L',
                 'IL_6': 'pg/ml', 'IL_8': 'pg/ml', 'IL_10': 'pg/ml'}
@@ -716,8 +755,28 @@ class LymSubsets(Base):
                          'CD3_CD4_': 'CD3CD4', 'CD3_CD16_56_': 'CD3-CD(1656)#', 'CD3_CD16_56': 'CD3-CD(1656)',
                          'CD3_CD19__': 'CD3-CD19#', 'CD3_CD19_': 'CD3-CD19', 'CD8_CD28_': 'CD8CD28',
                          'CD20_': 'CD20', 'HLA_DR_': 'HLA-DR', 'CD3_HLA_DR1': 'CD3/HLA-DR',
-                         'CD3_HLA_DR2': 'CD3/HLA-DR-',
-                         'CD3_HLA_DR3': 'CD3-/HLA-DR', 'CD4_CD25_CD127low': 'CD4CD25CD127low'}
+                         'CD3_HLA_DR2': 'CD3/HLA-DR-', 'CD3_HLA_DR3': 'CD3-/HLA-DR',
+                         'CD4_CD25_CD127low': 'CD4CD25CD127low',
+                         'CD19_Mea': 'CD19#临床意义判定', 'CD3_Mea': 'CD3#临床意义判定', 'CD4_Mea': 'CD4#临床意义判定',
+                         'CD8_Mea': 'CD8#临床意义判定', 'CD16_56Mea': 'CD1656临床意义判定', 'LYMPH_Mea': 'LYMPH###临床意义判定',
+                         'CD19Mea': 'CD19临床意义判定', 'CD3Mea': 'CD3临床意义判定', 'CD4Mea': 'CD4临床意义判定', 'CD8Mea': 'CD8临床意义判定',
+                         'CD4CD8Mea': 'CD4/CD8临床意义判定', 'CD56Mea': 'CD56临床意义判定',
+                         'CD3_CD8__Mea': 'CD3CD8#临床意义判定', 'CD3_CD8_Mea': 'CD3CD8临床意义判定', 'CD3_CD4__Mea': 'CD3CD4#临床意义判定',
+                         'CD3_CD4_Mea': 'CD3CD4临床意义判定', 'CD3_CD16_56_Mea': 'CD3-CD(1656)#临床意义判定', 'CD3_CD16_56Mea': 'CD3-CD(1656)临床意义判定',
+                         'CD3_CD19__Mea': 'CD3-CD19#临床意义判定', 'CD3_CD19_Mea': 'CD3-CD19临床意义判定', 'CD8_CD28_Mea': 'CD8CD28临床意义判定',
+                         'CD20_Mea': 'CD20临床意义判定', 'HLA_DR_Mea': 'HLA-DR临床意义判定', 'CD3_HLA_DR1Mea': 'CD3/HLA-DR临床意义判定',
+                         'CD3_HLA_DR2Mea': 'CD3/HLA-DR-临床意义判定', 'CD3_HLA_DR3Mea': 'CD3-/HLA-DR临床意义判定',
+                         'CD4_CD25_CD127lowMea': 'CD4CD25CD127low临床意义判定',
+                         'CD19_Note': 'CD19#备注', 'CD3_Note': 'CD3#备注', 'CD4_Note': 'CD4#备注',
+                         'CD8_Note': 'CD8#备注', 'CD16_56Note': 'CD1656备注', 'LYMPH_Note': 'LYMPH###备注', 'CD19Note': 'CD19备注',
+                         'CD3Note': 'CD3备注', 'CD4Note': 'CD4备注', 'CD8Note': 'CD8备注', 'CD4CD8Note': 'CD4/CD8备注', 'CD56Note': 'CD56备注',
+                         'CD3_CD8__Note': 'CD3CD8#备注', 'CD3_CD8_Note': 'CD3CD8备注', 'CD3_CD4__Note': 'CD3CD4#备注',
+                         'CD3_CD4_Note': 'CD3CD4备注', 'CD3_CD16_56_Note': 'CD3-CD(1656)#备注', 'CD3_CD16_56Note': 'CD3-CD(1656)备注',
+                         'CD3_CD19__Note': 'CD3-CD19#备注', 'CD3_CD19_Note': 'CD3-CD19备注', 'CD8_CD28_Note': 'CD8CD28备注',
+                         'CD20_Note': 'CD20备注', 'HLA_DR_Note': 'HLA-DR备注', 'CD3_HLA_DR1Note': 'CD3/HLA-DR备注',
+                         'CD3_HLA_DR2Note': 'CD3/HLA-DR-备注', 'CD3_HLA_DR3Note': 'CD3-/HLA-DR备注',
+                         'CD4_CD25_CD127lowNote': 'CD4CD25CD127low备注'
+                         }
     unit_map = {'CD19_': 'cells/uL', 'CD3_': 'cells/uL', 'CD4_': 'cells/uL', 'CD8_': 'cells/uL', 'CD16_56': 'cells/uL',
                 'LYMPH_': 'cells/uL', 'CD19': '%',
                 'CD3': '%', 'CD4': '%', 'CD8': '%', 'CD4CD8': '/', 'CD56': '%',
@@ -839,7 +898,15 @@ class UrineRoutine(Base):
     # 和导出功能有关
     export_header_map = {'samplingTime': '尿常规检查时间', 'UPH': 'UPH', 'UGLU': 'UGLU', 'LEU': 'LEU',
                          'ERY': 'ERY', 'NIT': 'NIT', 'BIL': 'BIL', 'USG': 'USG', 'KET': 'KET',
-                         'BLD': 'BLD', 'PRO': 'PRO', 'UBG': 'UBG', 'COL': 'COL', 'CLA': 'CLA'}
+                         'BLD': 'BLD', 'PRO': 'PRO', 'UBG': 'UBG', 'COL': 'COL', 'CLA': 'CLA',
+                         'UPHMea': 'UPH临床意义判定', 'UGLUMea': 'UGLU临床意义判定', 'LEUMea': 'LEU临床意义判定',
+                         'ERYMea': 'ERY临床意义判定', 'NITMea': 'NIT临床意义判定', 'BILMea': 'BIL临床意义判定',
+                         'USGMea': 'USG临床意义判定', 'KETMea': 'KET临床意义判定', 'BLDMea': 'BLD临床意义判定', 'PROMea': 'PRO临床意义判定',
+                         'UBGMea': 'UBG临床意义判定', 'COLMea': 'COL临床意义判定', 'CLAMea': 'CLA临床意义判定',
+                         'UGLUNote': 'UGLU备注', 'LEUNote': 'LEU备注', 'ERYNote': 'ERY备注', 'NITNote': 'NIT备注',
+                         'BILNote': 'BIL备注', 'USGNote': 'USG备注', 'KETNote': 'KET备注', 'BLDNote': 'BLD备注',
+                         'PRONote': 'PRO备注', 'UBGNote': 'UBG备注', 'COLNote': 'COL备注', 'CLANote': 'CLA备注'
+                         }
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
@@ -924,7 +991,13 @@ class TumorMarker(Base):
 
     # 和导出功能有关
     export_header_map = {'samplingTime': '肿瘤标志物', 'CEA': 'CEA', 'NSE': 'NSE', 'pro_GPR': 'pro-GPR',
-                         'CYFRA': 'CYFRA', 'FERR': 'FERR', 'AFP': 'AFP', 'SCCA': 'SCCA'}
+                         'CYFRA': 'CYFRA', 'FERR': 'FERR', 'AFP': 'AFP', 'SCCA': 'SCCA',
+                         'CEAMea': 'CEA临床意义判定', 'NSEMea': 'NSE临床意义判定', 'pro_GPRMea': 'pro-GPR临床意义判定',
+                         'CYFRAMea': 'CYFRA临床意义判定', 'FERRMea': 'FERR临床意义判定', 'AFPMea': 'AFP临床意义判定',
+                         'SCCAMea': 'SCCA临床意义判定',
+                         'CEANote': 'CEA备注', 'NSENote': 'NSE备注', 'pro_GPRNote': 'pro-GPR备注',
+                         'CYFRANote': 'CYFRA备注', 'FERRNote': 'FERR备注', 'AFPNote': 'AFP备注', 'SCCANote': 'SCCA备注'
+                         }
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):

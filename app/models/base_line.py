@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime, SmallInteger, and_
-from app.models.base import Base, db
+from app.models.base import Base
 # 病人基本信息表
 from app.models.crf_info import FollInfo
 from app.models.cycle import MoleDetec
@@ -715,8 +715,8 @@ class IniDiaPro(Base, PatDia):
     cliStage = Column(String(30), comment='临床分期')
     pStage = Column(JSON, comment='p分期TNM,以逗号分隔,格式为(1,2,3或1,,2)')
     patStage = Column(String(30), comment='病理分期')
-    cRemark = Column(Text(10000))
-    pRemark = Column(Text(10000))
+    cRemark = Column(Text(10000), comment='c备注')
+    pRemark = Column(Text(10000), comment='p备注')
 
     # 和导出功能有关
     export_header_map = {'PSScore': 'PS评分', 'cliniManifest': '临床表现', 'videography': '影像学', 'part': '部位',

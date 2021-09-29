@@ -1,13 +1,13 @@
-
-
-
+import copy
 from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy as _SQLAlchemy, BaseQuery
-from sqlalchemy import Column, Integer, SmallInteger, Date, event, DateTime, func
+from sqlalchemy import Column, Integer, SmallInteger, Date, event, DateTime, func, JSON
 from contextlib import contextmanager
 
-from app.libs.error_code import NotFound
+from app.libs.enums import ModuleStatus
+from app.libs.error import Success
+from app.libs.error_code import NotFound, SampleStatusError
 
 
 class SQLAlchemy(_SQLAlchemy):
@@ -41,23 +41,30 @@ class Query(BaseQuery):
             raise NotFound()
         return rv
 
+
 db = SQLAlchemy(query_class=Query)
+
 
 class Base(db.Model):
     __abstract__ = True
-    create_time = Column(DateTime,server_default=func.now())
-    update_time = Column(DateTime,server_default=func.now(),onupdate=func.now())
+    create_time = Column(DateTime, server_default=func.now())
+    update_time = Column(DateTime, server_default=func.now(), onupdate=func.now())
     is_delete = Column(SmallInteger, server_default='0')
 
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
+
+    export_header_map = {}
     # 和导出功能有关
     header_num = 0
 
     # record_date = Column(Date)
     # def __init__(self):
     #     self.create_time = int(datetime.now().timestamp())
-    #对象转换为字典，要重写的2个方法，可以提取一个到基类
+    # 对象转换为字典，要重写的2个方法，可以提取一个到基类
     def __getitem__(self, item):
-        return  getattr(self,item)
+        return getattr(self, item)
 
     # @property
     # def create_datetime(self):
@@ -68,11 +75,13 @@ class Base(db.Model):
     def to_dict(self):
         return {c.name: getattr(self, c.name, None)
                 for c in self.__table__.columns}
+
     def set_attrs(self, attrs_dict):
         for key, value in attrs_dict.items():
             if hasattr(self, key) and key != 'id':
                 setattr(self, key, value)
-    #假删除
+
+    # 假删除
     def delete(self):
         self.is_delete = 1
 
@@ -85,7 +94,7 @@ class Base(db.Model):
             val = getattr(data, item)
         else:
             val = data
-        if val is not None and val != '' and val != [] and val != {} and val!= ():
+        if val is not None and val != '' and val != [] and val != {}:
             return val
         else:
             return '/'
@@ -110,16 +119,36 @@ class Base(db.Model):
             value = value + "," + "其他: " + other
         return value
 
+    def submit(self):
+        if self.module_status != ModuleStatus.UnSubmitted.value:
+            return False
+        with db.auto_commit():
+            self.module_status = ModuleStatus.Submitted.value
+        return True
 
+    def finish(self):
+        if self.module_status != ModuleStatus.Submitted.value:
+            return False
+        with db.auto_commit():
+            self.module_status = ModuleStatus.Finished.value
+        return True
 
-    @staticmethod
-    def on_created():
-        pass
+    def record_modification(self, data):
+        record = {'column': [], 'content': [], 'time': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+        for key, value in data.items():
+            record['column'].append(self.export_header_map.get(key))
+            record['content'].append(value)
+        with db.auto_commit():
+            if self.modification is None:
+                self.modification = []
+            temp = copy.copy(self.modification)
+            temp.append(record)
+            self.modification = copy.copy(temp)
 
-    # def update_sample_time(self):
-    #     if hasattr(self,'sample_id'):
-    #         sample = Sample.query.get_or_404(self.sample_id)
-    #     elif hasattr(self,'cycle_id'):
-    #         cycle = Cycle.query.get_or_404(self.cycle_id)
-    #         sample = Sample.query.get_or_404(self.sample_id)
-    #     sample.update_time = func.now()
+    # 将已提交的状态修改为未提交。在记录修改时调用，因为提交后每次修改都要把状态改为未提交。
+    def cancel_submit(self):
+        if self.module_status != ModuleStatus.Submitted.value:
+            return False
+        with db.auto_commit():
+            self.module_status = ModuleStatus.UnSubmitted.value
+        return True

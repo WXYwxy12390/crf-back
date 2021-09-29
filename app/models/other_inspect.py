@@ -80,9 +80,29 @@ class Lung(Base):
     # 和导出功能有关
     export_header_map = {'samplingTime': '肺功能检查时间', 'FVC': 'FVC(L)', 'FEV1_FVC': 'FEV1/FVC(%)', 'MEF': 'MEF(L/S)',
                          'MEF25': 'MEF25(L/S)', 'MEF50': 'MEF50(L/S)', 'MEF75': 'MEF75(L/S)', 'TLC_sb': 'TLC’sb(L)',
-                         'RV': 'RV(L)',
-                         'RV_TLC': 'RV’/TLC’(%)', 'VC': 'VC(L)', 'DLCO_ex': 'DLCO-ex(mL/mmHg/Mi)',
-                         'DLCO_sb': 'DLCO-sb(mL/mmHg/Mi)', 'KCO': 'KCO'}
+                         'RV': 'RV(L)', 'RV_TLC': 'RV’/TLC’(%)', 'VC': 'VC(L)', 'DLCO_ex': 'DLCO-ex(mL/mmHg/Mi)',
+                         'DLCO_sb': 'DLCO-sb(mL/mmHg/Mi)', 'KCO': 'KCO',
+                         'FVC_exp': 'FVC(L)预期值', 'FEV1_FVC_exp': 'FEV1/FVC(%)预期值', 'MEF_exp': 'MEF(L/S)预期值',
+                         'MEF25_exp': 'MEF25(L/S)预期值', 'MEF50_exp': 'MEF50(L/S)预期值', 'MEF75_exp': 'MEF75(L/S)预期值', 'TLC_sb_exp': 'TLC’sb(L)预期值',
+                         'RV_exp': 'RV(L)预期值', 'RV_TLC_exp': 'RV’/TLC’(%)预期值', 'VC_exp': 'VC(L)预期值', 'DLCO_ex_exp': 'DLCO-ex(mL/mmHg/Mi)预期值',
+                         'DLCO_sb_exp': 'DLCO-sb(mL/mmHg/Mi)预期值', 'KCO_exp': 'KCO预期值',
+                         'FVC_best': 'FVC(L)最佳值', 'FEV1_FVC_best': 'FEV1/FVC(%)最佳值', 'MEF_best': 'MEF(L/S)最佳值',
+                         'MEF25_best': 'MEF25(L/S)最佳值', 'MEF50_best': 'MEF50(L/S)最佳值', 'MEF75_best': 'MEF75(L/S)最佳值', 'TLC_sb_best': 'TLC’sb(L)最佳值',
+                         'RV_best': 'RV(L)最佳值', 'RV_TLC_best': 'RV’/TLC’(%)最佳值', 'VC_best': 'VC(L)最佳值', 'DLCO_ex_best': 'DLCO-ex(mL/mmHg/Mi)最佳值',
+                         'DLCO_sb_best': 'DLCO-sb(mL/mmHg/Mi)最佳值', 'KCO_best': 'KCO最佳值',
+                         'FVC_ratio': 'FVC(L)最佳值/预期值(%)', 'FEV1_FVC_ratio': 'FEV1/FVC(%)最佳值/预期值(%)', 'MEF_ratio': 'MEF(L/S)最佳值/预期值(%)',
+                         'MEF25_ratio': 'MEF25(L/S)最佳值/预期值(%)', 'MEF50_ratio': 'MEF50(L/S)最佳值/预期值(%)', 'MEF75_ratio': 'MEF75(L/S)最佳值/预期值(%)', 'TLC_sb_ratio': 'TLC’sb(L)最佳值/预期值(%)',
+                         'RV_ratio': 'RV(L)最佳值/预期值(%)', 'RV_TLC_ratio': 'RV’/TLC’(%)最佳值/预期值(%)', 'VC_ratio': 'VC(L)最佳值/预期值(%)', 'DLCO_ex_ratio': 'DLCO-ex(mL/mmHg/Mi)最佳值/预期值(%)',
+                         'DLCO_sb_ratio': 'DLCO-sb(mL/mmHg/Mi)最佳值/预期值(%)', 'KCO_ratio': 'KCO最佳值/预期值(%)',
+                         'FVCMea': 'FVC(L)临床意义判定', 'FEV1_FVCMea': 'FEV1/FVC(%)临床意义判定', 'MEFMea': 'MEF(L/S)临床意义判定',
+                         'MEF25Mea': 'MEF25(L/S)临床意义判定', 'MEF50Mea': 'MEF50(L/S)临床意义判定', 'MEF75Mea': 'MEF75(L/S)临床意义判定', 'TLC_sbMea': 'TLC’sb(L)临床意义判定',
+                         'RVMea': 'RV(L)临床意义判定', 'RV_TLCMea': 'RV’/TLC’(%)临床意义判定', 'VCMea': 'VC(L)临床意义判定', 'DLCO_exMea': 'DLCO-ex(mL/mmHg/Mi)临床意义判定',
+                         'DLCO_sbMea': 'DLCO-sb(mL/mmHg/Mi)临床意义判定', 'KCOMea': 'KCO临床意义判定',
+                         'FVCNote': 'FVC(L)备注', 'FEV1_FVCNote': 'FEV1/FVC(%)备注', 'MEFNote': 'MEF(L/S)备注',
+                         'MEF25Note': 'MEF25(L/S)备注', 'MEF50Note': 'MEF50(L/S)备注', 'MEF75Note': 'MEF75(L/S)备注', 'TLC_sbNote': 'TLC’sb(L)备注',
+                         'RVNote': 'RV(L)备注', 'RV_TLCNote': 'RV’/TLC’(%)备注', 'VCNote': 'VC(L)备注', 'DLCO_exNote': 'DLCO-ex(mL/mmHg/Mi)备注',
+                         'DLCO_sbNote': 'DLCO-sb(mL/mmHg/Mi)备注', 'KCONote': 'KCO备注'
+                         }
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
@@ -220,10 +240,8 @@ class ImageExams(Base):
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
-        # row = []
         row = np.zeros(0, dtype=str)
         if buffer.get('ImageExams').get(pid) is None or buffer.get('ImageExams').get(pid).get(treIndex) is None:
-            # row.extend(['/'] * ImageExams.header_num)
             row = np.append(row, ['/'] * ImageExams.header_num)
             return row
         obj_array = buffer.get('ImageExams').get(pid).get(treIndex)
@@ -231,15 +249,12 @@ class ImageExams(Base):
         for obj in obj_array:
             for column in columns:
                 value = self.filter_none(obj, column)
-                # row.append(value)
                 row = np.append(row, value)
-        # row.extend(['/'] * (ImageExams.header_num - len(row)))
         row = np.append(row, ['/'] * (ImageExams.header_num - len(row)))
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        # header = []
         header = np.zeros(0, dtype=str)
         # 求最多有多少条
         max_num = 0
@@ -252,7 +267,6 @@ class ImageExams(Base):
 
         for i in range(1, header_num + 1):
             for column in columns:
-                # header.append(self.export_header_map.get(column) + str(i))
                 header = np.append(header, self.export_header_map.get(column) + str(i))
         ImageExams.header_num = len(header)
         return header

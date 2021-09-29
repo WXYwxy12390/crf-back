@@ -5,8 +5,9 @@
 """
 from flask import request
 
-from app.libs.decorator import edit_need_auth, update_time
+from app.libs.decorator import edit_need_auth, update_time, record_modification
 from app.libs.error import Success
+from app.libs.error_code import SampleStatusError
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
 from app.models import json2db
@@ -25,9 +26,29 @@ def get_first_diagnose(pid):
 @auth.login_required
 @edit_need_auth
 @update_time
+@record_modification(IniDiaPro)
 def add_first_diagnose(pid):
     data = request.get_json()
-    patient = Patient.query.get_or_404(pid)
-    data["pid"] = patient.id
+    data["pid"] = pid
     json2db(data, IniDiaPro)
     return Success()
+
+
+@api.route('/submit/<int:pid>', methods=['GET'])
+@auth.login_required
+def submit_first_diagnose(pid):
+    iniDiaPro = IniDiaPro.query.filter_by(pid=pid).first_or_404()
+    if iniDiaPro.submit():
+        return Success(msg='提交成功')
+    else:
+        return SampleStatusError('当前状态无法提交')
+
+
+@api.route('/finish/<int:pid>', methods=['GET'])
+@auth.login_required
+def finish_first_diagnose(pid):
+    iniDiaPro = IniDiaPro.query.filter_by(pid=pid).first_or_404()
+    if iniDiaPro.finish():
+        return Success(msg='监察结束')
+    else:
+        return SampleStatusError('当前状态无法结束监察')

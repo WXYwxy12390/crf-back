@@ -1,4 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime, SmallInteger
+
+from app.libs.enums import ModuleStatus
 from app.models.base import Base, db
 import numpy as np
 from time import time
@@ -141,6 +143,7 @@ class TreRec(Base, PatDia):
     PFS_DFS = Column(String(2048), comment='PFS/DFS')
     is_auto_compute = Column(SmallInteger,server_default="1")
 
+
     # 和导出功能有关
     export_header_map = {'trement': '几线治疗', 'beEffEvaDate': '最佳疗效评估日期', 'beEffEva': '最佳疗效评估',
                          'proDate': '进展日期', 'proDes': '进展描述', 'PFS_DFS': 'PFS/DFS',
@@ -148,14 +151,13 @@ class TreRec(Base, PatDia):
                          'patDia': '病理诊断'}
 
     def keys(self):
-        return ['id', 'treNum', 'trement', 'date', 'beEffEvaDate', 'beEffEva', 'proDate', 'proDes', 'PFS_DFS','is_auto_compute']
+        return ['id', 'treNum', 'trement', 'date', 'beEffEvaDate', 'beEffEva', 'proDate', 'proDes', 'PFS_DFS',
+                'is_auto_compute']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
-        # row = []
         row = np.zeros(0, dtype=str)
         if buffer.get('TreRec').get(pid) is None or buffer.get('TreRec').get(pid).get(treIndex) is None:
-            # row.extend(['/']*TreRec.header_num)
             row = np.append(row, ['/']*TreRec.header_num)
             return row
         obj = buffer.get('TreRec').get(pid).get(treIndex)
@@ -184,47 +186,37 @@ class TreRec(Base, PatDia):
                                'five': '5线', 'surgery': '手术', 'radiotherapy': '放疗', 'other': '其他', '/': '/'}
                 value = self.filter_none(obj, column)
                 value = trement_map.get(value)
-                # row.append(value)
                 row = np.append(row, value)
             elif column == 'beEffEva':
                 beEffEva_map = {'1':'PD-进展','2':'SD-稳定','3':'PR-部分缓解','4':'CR-完全缓解','5':'术后未发现新病灶','/':'/',
                                 'PD-进展':'PD-进展','SD-稳定':'SD-稳定','PR-部分缓解':'PR-部分缓解','CR-完全缓解':'CR-完全缓解','术后未发现新病灶':'术后未发现新病灶'}
                 value = self.filter_none(obj, column)
                 value = beEffEva_map.get(value)
-                # row.append(value)
                 row = np.append(row, value)
             elif column == 'isRepBio':
                 value = self.filter_none(self.change_bool_to_yes_or_no(getattr(obj2, column))) if obj2 else '/'
-                # row.append(value)
                 row = np.append(row, value)
             elif column == 'matPart' or column == 'specNum':
                 value_isRepBio = getattr(obj2, 'isRepBio') if obj2 else None
                 value = self.filter_none(obj2, column) if value_isRepBio else '/'
-                # row.append(value)
                 row = np.append(row, value)
             elif column == 'bioMet':
                 value_isRepBio = getattr(obj2, 'isRepBio') if obj2 else None
                 value = self.format_radio_data(obj2, column) if value_isRepBio else '/'
-                # row.append(value)
                 row = np.append(row, value)
             elif column == 'patDia':
                 value_isRepBio = getattr(obj2, 'isRepBio') if obj2 else None
                 value = self.format_patDia(obj2) if value_isRepBio else '/'
-                # row.append(value)
                 row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
-                # row.append(value)
                 row = np.append(row, value)
-        # row = list(row)
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        # header = []
         header = np.zeros(0, dtype=str)
         for column in columns:
-            # header.append(self.export_header_map.get(column))
             header = np.append(header, self.export_header_map.get(column))
         TreRec.header_num = len(header)
         return header
@@ -312,7 +304,6 @@ class TreRec(Base, PatDia):
             self.delete_in_cycle(SideEffect)
 
     def delete_in_cycle(self, table):
-
         records = table.query.filter_by(pid=self.pid, treNum=self.treNum).all()
         with db.auto_commit():
             for record in records:

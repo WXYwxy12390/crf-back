@@ -3,10 +3,6 @@ from app.models.base import db
 
 
 def json2db(jsondata, table):
-    # if jsondata['sample_id'] is not None:
-    #     sample = Sample.query.get_or_404(jsondata['sample_id'])
-    #     if sample.is_submit == 1:
-    #         return
     with db.auto_commit():
         new_record = table()
         for k in jsondata:

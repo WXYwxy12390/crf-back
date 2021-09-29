@@ -1,6 +1,9 @@
 from flask import request, jsonify
 
+from app.libs.decorator import record_modification
+from app.libs.enums import ModuleStatus
 from app.libs.error import Success
+from app.libs.error_code import SampleStatusError
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
 from app.models import json2db, db, delete_array
@@ -40,10 +43,6 @@ def get_specimen_info_all():
     return Success(data=res)
 
 
-
-
-
-
 @api.route('/<int:pid>', methods=['GET'])
 @auth.login_required
 def get_specimen_info(pid):
@@ -53,10 +52,12 @@ def get_specimen_info(pid):
 
 @api.route('/<int:pid>', methods=['POST'])
 @auth.login_required
+@record_modification(SpecimenInfo)
 def add_specimen_info(pid):
     data = request.get_json()
-    patient = Patient.query.get_or_404(pid)
     data["pid"] = pid
+    specimenInfo = SpecimenInfo.query.filter_by(pid=pid).first_or_404()
+    data['module_status'] = specimenInfo.module_status
     json2db(data, SpecimenInfo)
     return Success()
 
@@ -68,3 +69,27 @@ def del_specimen_info(pid):
     items = SpecimenInfo.query.filter(SpecimenInfo.is_delete == 0, SpecimenInfo.id.in_(data['ids'])).all()
     delete_array(items)
     return Success()
+
+
+@api.route('/submit/<int:pid>', methods=['GET'])
+@auth.login_required
+def submit_image_exam(pid):
+    specimen_ls = SpecimenInfo.query.filter_by(pid=pid).all()
+    for specimen in specimen_ls:
+        if specimen.module_status != ModuleStatus.UnSubmitted.value:
+            return SampleStatusError('当前状态无法提交')
+    for specimen in specimen_ls:
+        specimen.submit()
+    return Success(msg='提交成功')
+
+
+@api.route('/finish/<int:pid>', methods=['GET'])
+@auth.login_required
+def finish_image_exam(pid):
+    specimen_ls = SpecimenInfo.query.filter_by(pid=pid).all()
+    for specimen in specimen_ls:
+        if specimen.module_status != ModuleStatus.Submitted.value:
+            return SampleStatusError('当前状态无法结束监察')
+    for specimen in specimen_ls:
+        specimen.finish()
+    return Success(msg='监察结束')

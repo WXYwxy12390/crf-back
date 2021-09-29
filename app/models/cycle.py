@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime
+from sqlalchemy import Column, Integer, String, Float, Date, Text, DateTime
 from app.models.base import Base
 import numpy as np
 
@@ -75,10 +75,8 @@ class Immunohis(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
         immunohis_map = {0: '无', 1: '-', 2: '±', 3: '+', 4: '++', 5: '+++', "/": "/"}
-        # row = []
         row = np.zeros(0, dtype=str)
         if buffer.get('Immunohis').get(pid) is None or buffer.get('Immunohis').get(pid).get(treIndex) is None:
-            # row.extend(['/'] * Immunohis.header_num)
             row = np.append(row, ['/']*Immunohis.header_num)
             return row
         obj = buffer.get('Immunohis').get(pid).get(treIndex)
@@ -86,25 +84,20 @@ class Immunohis(Base):
             if column == 'Ki67' or column == 'other':
                 value = self.filter_none(obj, column)
                 value = str(value) + "%" if value != '/' else value
-                # row.append(value)
                 row = np.append(row, value)
             elif column in ['detectTime','patNum']:
                 value = self.filter_none(obj, column)
-                # row.append(value)
                 row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
                 value = immunohis_map.get(value)
-                # row.append(value)
                 row = np.append(row, value)
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        # header = []
         header = np.zeros(0, dtype=str)
         for column in columns:
-            # header.append(self.export_header_map.get(column))
             header = np.append(header, self.export_header_map.get(column))
         Immunohis.header_num = len(header)
         return header
@@ -181,11 +174,22 @@ class MoleDetec(Base):
     sampleType = Column(String(255), comment='样本类型')
 
     # 和导出功能有关
-    export_header_map = {'EGFR': 'EGFR', 'ALK': 'ALK', 'ROS1': 'ROS1', 'HER_2': 'HER_2', 'BRAF': 'BRAF',
-                         'cMET': 'cMET', 'RET': 'RET', 'NTRK': 'NTRK', 'KRAS': 'KRAS', 'BIM': 'BIM',
-                         'PIK3CA': 'PIK3CA', 'UGT1A1': 'UGT1A1', 'MSI': 'MSI', 'PD1': 'PD-1表达',
-                         'PD1KT': 'PD1KT', 'PDL1': 'PD-L1表达', 'PDL1KT': 'PDL1KT', 'TMB': 'TMB',
-                         'other': '其他', 'detectTime': '分子检测检测时间', 'sampleType': '样本类型'}
+    export_header_map = {
+        'MSI': 'MSI', 'PD1': 'PD-1表达','PD1KT': 'PD1KT', 'PDL1': 'PD-L1表达', 'PDL1KT': 'PDL1KT', 'TMB': 'TMB',
+        'other': '其他', 'detectTime': '分子检测检测时间', 'sampleType': '样本类型',
+        'EGFR': 'EGFR', 'ALK': 'ALK', 'ROS1': 'ROS1', 'HER_2': 'HER_2', 'BRAF': 'BRAF',
+        'cMET': 'cMET', 'RET': 'RET', 'NTRK': 'NTRK', 'KRAS': 'KRAS', 'BIM': 'BIM',
+        'PIK3CA': 'PIK3CA', 'UGT1A1': 'UGT1A1',
+        'EGFRSam': 'EGFR检测样本', 'ALKSam': 'ALK检测样本', 'ROS1Sam': 'ROS1检测样本', 'HER_2Sam': 'HER_2检测样本', 'BRAFSam': 'BRAF检测样本',
+        'cMETSam': 'cMET检测样本', 'RETSam': 'RET检测样本', 'NTRKSam': 'NTRK检测样本', 'KRASSam': 'KRAS检测样本', 'BIMSam': 'BIM检测样本',
+        'PIK3CASam': 'PIK3CA检测样本', 'UGT1A1Sam': 'UGT1A1检测样本',
+        'EGFRMed': 'EGFR检测方法', 'ALKMed': 'ALK检测方法', 'ROS1Med': 'ROS1检测方法', 'HER_2Med': 'HER_2检测方法', 'BRAFMed': 'BRAF检测方法',
+        'cMETMed': 'cMET检测方法', 'RETMed': 'RET检测方法', 'NTRKMed': 'NTRK检测方法', 'KRASMed': 'KRAS检测方法', 'BIMMed': 'BIM检测方法',
+        'PIK3CAMed': 'PIK3CA检测方法', 'UGT1A1Med': 'UGT1A1检测方法',
+        'EGFRDesc': 'EGFR结果描述', 'ALKDesc': 'ALK结果描述', 'ROS1Desc': 'ROS1结果描述', 'HER_2Desc': 'HER_2结果描述', 'BRAFDesc': 'BRAF结果描述',
+        'cMETDesc': 'cMET结果描述', 'RETDesc': 'RET结果描述', 'NTRKDesc': 'NTRK结果描述', 'KRASDesc': 'KRAS结果描述', 'BIMDesc': 'BIM结果描述',
+        'PIK3CADesc': 'PIK3CA结果描述', 'UGT1A1Desc': 'UGT1A1结果描述'
+    }
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'ALK', 'BIM', 'BRAF', 'cMET', 'EGFR', 'HER_2', 'KRAS', 'NTRK',

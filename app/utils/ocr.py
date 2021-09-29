@@ -45,8 +45,8 @@ tumorMarker_item_to_code = {'癌胚抗原': 'CEA', '神经元特异性烯醇化�
 
 lung_item_to_code = {'FVC':'FVC',
                      'FEV1/FVC':'FEV1_FVC','FEV 1%FVC':'FEV1_FVC',
-                     'MEF'
-                     'TLC-sb':'TLC_sb'}
+                     'MEF':'MEF', 'MEF25':'MEF25', 'MEF50':'MEF50', 'MEF75':'MEF75',
+                     'TLC-sb':'TLC_sb', "RV'":'RV'}
 
 
 def posturl(url, data={}):
@@ -196,7 +196,7 @@ def lab_inspectation_ocr(path, table_name):
 
 
 if __name__ == "__main__":
-    ocr('C:/Users/dell/Desktop/fsdownload/lung/微信图片_20210106145126.jpg')
+    ocr('C:/Users/dell/Desktop/fsdownload/UCG/7BBB70DF-4F9A-4C03-A974-0FDBB300E946.jpeg')
 
     # print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/blood_routine/微信图片_20201118152459.jpg','blood_routine'))
     # print(lab_inspectation_ocr('C:/Users/dell/Desktop/fsdownload/blood_bio/微信图片_20201208153935.jpg', 'blood_bio'))

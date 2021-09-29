@@ -2,6 +2,7 @@ from flask import request
 
 from app.libs.decorator import edit_need_auth, update_time
 from app.libs.error import Success
+from app.libs.error_code import SampleStatusError
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
 from app.models import json2db
@@ -26,5 +27,25 @@ def add_mole_detec(pid, treNum):
     data['treNum'] = treNum
     json2db(data, MoleDetec)
     return Success()
+
+
+@api.route('/submit/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def submit_moleDetec(pid, treNum):
+    moleDetec = MoleDetec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+    if moleDetec.submit():
+        return Success(msg='提交成功')
+    else:
+        return SampleStatusError('当前状态无法提交')
+
+
+@api.route('/finish/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def finish_moleDetec(pid, treNum):
+    moleDetec = MoleDetec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+    if moleDetec.finish():
+        return Success(msg='监察结束')
+    else:
+        return SampleStatusError('当前状态无法结束监察')
 
 

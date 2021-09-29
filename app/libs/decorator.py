@@ -1,41 +1,24 @@
+import copy
 from datetime import datetime
 from functools import wraps
 
 from flask import request, g
 
-from app.libs.enums import SampleStatus, interface_dict
-from app.libs.error_code import SubmitError, ParameterException
+from app.libs.enums import ModuleStatus
+from app.libs.error_code import ParameterException
 from app.models import db
-from app.models.base_line import Patient
+from app.models.base_line import Patient, PastHis, IniDiaPro, SpecimenInfo
+from app.models.cycle import Immunohis, MoleDetec
+from app.models.lab_inspectation import BloodRoutine, BloodBio, Thyroid, Coagulation, MyocardialEnzyme, Cytokines, \
+    LymSubsets, UrineRoutine, TumorMarker
+from app.models.other_inspect import Lung, OtherExams, ImageExams
 from app.spider.user_info import UserInfo
 
-
-def sample_no_submit(func):
-    @wraps(func)
-    def wrapper(**kwargs):
-        # 样本已提交,则不能修改
-        sample = Sample.query.get_or_404(kwargs['sample_id'])
-        if sample.submit_status == SampleStatus.AllSubmit.value:
-            return SubmitError()
-
-        return func(**kwargs)
-
-    return wrapper
-
-
-def cycle_no_submit(func):
-    @wraps(func)
-    def wrapper(**kwargs):
-        cycle_number = kwargs['cycle_number'] if kwargs.get('cycle_number') else 1
-        # 治疗期随访已提交,则不能修改
-        cycle = Cycle.query.filter_by(sample_id=kwargs["sample_id"],
-                                      cycle_number=cycle_number).first_or_404()
-        if cycle.is_submit == 1:
-            return SubmitError(msg="当前访视已提交,无法进行修改")
-
-        return func(**kwargs)
-
-    return wrapper
+pid_for_one_obj = [PastHis, IniDiaPro]
+pid_for_many_obj = [SpecimenInfo]
+treNum_for_one_obj = [BloodRoutine, BloodBio, Thyroid, Coagulation, MyocardialEnzyme, Cytokines, LymSubsets,
+                      UrineRoutine, TumorMarker, Lung, OtherExams, Immunohis, MoleDetec]
+treNum_for_many_obj = [ImageExams]
 
 
 def post_not_null(func):
@@ -46,6 +29,7 @@ def post_not_null(func):
         return func(**kwargs)
 
     return wrapper
+
 
 def edit_need_auth(func):
     @wraps(func)
@@ -62,35 +46,105 @@ def edit_need_auth(func):
 
     return wrapper
 
+
 def update_time(func):
     @wraps(func)
     def call(*args, **kwargs):
         out = func(*args, **kwargs)
         pid = kwargs.get('pid')
-        if pid is None :
+        if pid is None:
             raise ParameterException(msg='未传pid')
         else:
             patient = Patient.query.get_or_404(pid)
             with db.auto_commit():
                 patient.update_time = datetime.now()
         return out
+
     return call
 
-def generate_modify_content(endpoint,cycle_number):
-    pre_fix = '访视'
-    if cycle_number:
-        pre_fix = pre_fix + str(cycle_number)
-    elif endpoint == 'v1.summary+add_summary':
-        pre_fix = '项目总结'
-    else:
-        pre_fix = '访视1'
-    return pre_fix + '-' + interface_dict.get(endpoint)
+
+def record_modification(T):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            out = func(*args, **kwargs)
+
+            data = copy.copy(request.get_json())
+            data_keys = data.keys()
+
+            if 'id' in data_keys:
+                kwargs['id'] = data['id']
+                del data['id']
+            if 'pid' in data_keys:
+                del data['pid']
+            if 'treNum' in data_keys:
+                del data['treNum']
+
+            obj = get_obj(T, **kwargs)
+            if obj is None:
+                return out
+            elif type(obj) != list:
+                # 当状态不是已提交时，不记录修改
+                if obj.module_status != ModuleStatus.Submitted.value:
+                    return out
+                obj.record_modification(data)
+                cancel_submit(T, **kwargs)
+            else:
+                data_ls = data.get('data')
+                cancel_submit(T, **kwargs)
+                for _obj in obj:
+                    for data in data_ls:
+                        if _obj.id == data.get['id']:
+                            del data['id']
+                            _obj.record_modification(data)
+                            break
+
+            return out
+
+        return wrapper
+
+    return decorator
 
 
+# 将某用户某访视的某模块的所有数据的状态均从已提交修改为未提交
+def cancel_submit(T, **kwargs):
+    pid = kwargs.get('pid')
+    treNum = kwargs.get('treNum')
+    if T == Patient:
+        obj = T.query.get_or_404(pid)
+        obj.cancel_submit()
+    elif T in pid_for_one_obj:
+        obj = T.query.filter_by(pid=pid).first_or_404()
+        obj.cancel_submit()
+    elif T in treNum_for_one_obj:
+        obj = T.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+        obj.cancel_submit()
+    elif T in pid_for_many_obj:
+        obj_ls = T.query.filter_by(pid=pid).all()
+        for obj in obj_ls:
+            obj.cancel_submit()
+    elif T in treNum_for_many_obj:
+        obj_ls = T.query.filter_by(pid=pid, treNum=treNum).all()
+        for obj in obj_ls:
+            obj.cancel_submit()
 
 
-
-
-
-
-
+# 返回修改的对象，可能是一个也可能是列表
+def get_obj(T, **kwargs):
+    pid = kwargs.get('pid')
+    treNum = kwargs.get('treNum')
+    id = kwargs.get('id')
+    if T == Patient:
+        obj = T.query.get_or_404(pid)
+    elif T in pid_for_one_obj:
+        obj = T.query.filter_by(pid=pid).first_or_404()
+    elif T in treNum_for_one_obj:
+        obj = T.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+    elif T == SpecimenInfo:
+        # 当不传id时，表示是新增一个标本信息，而不是在修改。因此不记录。
+        if id is None:
+            return None
+        obj = T.query.filter_by(pid=pid, id=id).first_or_404()
+    elif T in treNum_for_many_obj:
+        obj = T.query.filter_by(pid=pid, treNum=treNum).all()
+    return obj
