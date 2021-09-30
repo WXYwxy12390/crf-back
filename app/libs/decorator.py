@@ -91,13 +91,18 @@ def record_modification(T):
                 cancel_submit(T, **kwargs)
             else:
                 data_ls = data.get('data')
-                cancel_submit(T, **kwargs)
+                # 当状态不是已提交时，不记录修改。正常情况下，同病人同访视同模块多条记录应该是状态相同。
+                for _obj in obj:
+                    if _obj.module_status != ModuleStatus.Submitted.value:
+                        return out
+
                 for _obj in obj:
                     for data in data_ls:
-                        if _obj.id == data.get['id']:
+                        if _obj.id == data.get('id'):
                             del data['id']
                             _obj.record_modification(data)
                             break
+                cancel_submit(T, **kwargs)
 
             return out
 

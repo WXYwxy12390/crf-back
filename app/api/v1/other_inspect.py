@@ -107,6 +107,7 @@ def get_image_exam(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
+@record_modification(ImageExams)
 def add_image_exam(pid, treNum):
     data = request.get_json()
     for _data in data['data']:
