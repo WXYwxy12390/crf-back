@@ -65,7 +65,7 @@ def finish_patient(pid):
 def doubt_patient(pid):
     data = request.get_json()
     item = Patient.query.get_or_404(pid)
-    if item.doubt(data):
+    if item.question(data):
         return Success()
     else:
         return SampleStatusError()
@@ -76,7 +76,7 @@ def doubt_patient(pid):
 def reply_patient(pid, doubt_id):
     data = request.get_json()
     item = Patient.query.get_or_404(pid)
-    if item.reply(doubt_id, data):
+    if item.reply_doubt(doubt_id, data):
         return Success()
     else:
         return SampleStatusError()

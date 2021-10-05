@@ -1,10 +1,10 @@
 from sqlalchemy import Column, Integer, String, Float, Date, Text, DateTime, JSON
-from app.models.base import Base
+from app.models.base import Base, ModificationAndDoubt
 import numpy as np
 
 
 # 病人免疫组化信息表
-class Immunohis(Base):
+class Immunohis(Base, ModificationAndDoubt):
     __tablename__ = 'immunohis'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -56,7 +56,7 @@ class Immunohis(Base):
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -73,8 +73,8 @@ class Immunohis(Base):
         return ['id', 'pid', 'treNum', 'ALKD5F3', 'ALKD5F3N', 'CAIX', 'CAM52', 'CD10', 'CD34', 'CD56',
                 'CD117', 'CDX2', 'CEA', 'CgA', 'CK', 'CK56', 'CK7', 'CK818', 'CK19', 'CK20', 'Cyn', 'DLL3', 'EMA',
                 'ERCC1', 'LCA', 'MCM2', 'NapsinA', 'P16', 'P40', 'p53', 'P63', 'PAX2', 'PAX8', 'PCK',
-                'PDL1', 'RRM1', 'SATB2', 'Syn', 'TTF1', 'VEGFC', 'Villin', 'Villinco', 'other', 'filePath', 'Ki67',
-                'CD516', 'detectTime', 'patNum']
+                'PDL1', 'RRM1', 'SATB2', 'Syn', 'TTF1', 'VEGFC', 'Villin', 'Villinco', 'other', 'Ki67',
+                'CD516', 'detectTime', 'patNum', 'modification', 'doubt', 'module_status']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
@@ -108,7 +108,7 @@ class Immunohis(Base):
 
 
 # 病人分子检测信息表
-class MoleDetec(Base):
+class MoleDetec(Base, ModificationAndDoubt):
     __tablename__ = 'moleDetec'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -178,7 +178,7 @@ class MoleDetec(Base):
     sampleType = Column(String(255), comment='样本类型')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -208,7 +208,8 @@ class MoleDetec(Base):
                 'RETDetMed', 'UGT1A1DetMed', 'ALKDesc', 'BIMDesc', 'BRAFDesc', 'cMETDesc', 'EGFRDesc', 'HER_2Desc',
                 'KRASDesc', 'PIK3CADesc',
                 'ROS1Desc', 'RETDesc', 'UGT1A1Desc', 'NTRKDesc', 'path', 'MSI', 'other', 'PDL1', 'PDL1KT', 'TMB', 'PD1',
-                'PD1KT', 'sampleType', 'detectTime']
+                'PD1KT', 'sampleType', 'detectTime',
+                'modification', 'doubt', 'module_status']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
@@ -280,7 +281,7 @@ class MoleDetec(Base):
 
 
 # 症状体征表
-class Signs(Base):
+class Signs(Base,ModificationAndDoubt):
     __tablename__ = 'signs'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -291,7 +292,7 @@ class Signs(Base):
     endDate = Column(DateTime, comment='结束日期')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -357,11 +358,12 @@ class Signs(Base):
         return header
 
     def keys(self):
-        return ['id', 'pid', 'treNum', 'symName', 'begDate', 'isExe', 'endDate']
+        return ['id', 'pid', 'treNum', 'symName', 'begDate', 'isExe', 'endDate',
+                'modification', 'doubt', 'module_status']
 
 
 # 副反应表
-class SideEffect(Base):
+class SideEffect(Base, ModificationAndDoubt):
     __tablename__ = 'sideEffect'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -375,7 +377,7 @@ class SideEffect(Base):
     endDate = Column(Date, comment='结束日期')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -448,4 +450,4 @@ class SideEffect(Base):
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'sidReaName', 'sidRecCla', 'begDate', 'isExe', 'treatment', 'endDate',
-                'sidReaNameOther']
+                'sidReaNameOther', 'modification', 'doubt', 'module_status']

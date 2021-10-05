@@ -1,10 +1,10 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime
 import numpy as np
-from app.models.base import Base
+from app.models.base import Base, ModificationAndDoubt
 
 
 # 血常规表
-class BloodRoutine(Base):
+class BloodRoutine(Base,ModificationAndDoubt):
     __tablename__ = 'bloodRoutine'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -76,7 +76,7 @@ class BloodRoutine(Base):
     filePath = Column(Text(10000), comment='文件路径，多个以逗号分隔')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -110,7 +110,8 @@ class BloodRoutine(Base):
                 'HCTNote', 'MCVNote', 'MCHNote', 'MCHCNote', 'RDWCVNote', 'RDWSDNote', 'WBCNote', 'GRAN_Note',
                 'LYM_Note',
                 'EOS_Note', 'MID_Note', 'BASO_Note', 'PLTNote', 'LYMNote', 'MIDNote', 'GRANNote', 'EOSNote', 'BASONote',
-                'NEUTNote', 'filePath']
+                'NEUTNote',
+                'modification', 'doubt', 'module_status']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
@@ -155,7 +156,7 @@ class BloodRoutine(Base):
 
 
 # 血生化表
-class BloodBio(Base):
+class BloodBio(Base,ModificationAndDoubt):
     __tablename__ = 'bloodBio'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -242,7 +243,7 @@ class BloodBio(Base):
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -318,14 +319,12 @@ class BloodBio(Base):
                 'GLUMea', 'TCMea', 'LDLMea', 'hDLMea', 'TGMea', 'UREAMea', 'ALPMea', 'CREAMea', 'UAMea',
                 'CO2Mea', 'KMea', 'NaMea', 'ClMea', 'CaMea', 'MgMea', 'PMea', 'TPNote', 'ALBNote',
                 'GLONote', 'ALTNote', 'ASTNote', 'LDHNote', 'GGTNote', 'TBILNote', 'DBILNote', 'IBILNote', 'GLUNote',
-                'TCNote',
-                'LDLNote', 'hDLNote', 'TGNote', 'UREANote', 'ALPNote', 'CREANote', 'UANote', 'CO2Note', 'KNote',
-                'NaNote',
-                'ClNote', 'CaNote', 'MgNote', 'PNote', 'filePath']
+                'TCNote', 'LDLNote', 'hDLNote', 'TGNote', 'UREANote', 'ALPNote', 'CREANote', 'UANote', 'CO2Note', 'KNote',
+                'NaNote', 'ClNote', 'CaNote', 'MgNote', 'PNote', 'modification', 'doubt', 'module_status']
 
 
 # 甲状腺功能表
-class Thyroid(Base):
+class Thyroid(Base,ModificationAndDoubt):
     __tablename__ = 'thyroid'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -343,7 +342,7 @@ class Thyroid(Base):
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -382,12 +381,8 @@ class Thyroid(Base):
         header = np.zeros(0, dtype=str)
         for column in columns:
             if column == 'samplingTime':
-                # header.append(self.export_header_map.get(column))
                 header = np.append(header, self.export_header_map.get(column))
             else:
-                # header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                #                self.export_header_map.get(column) + '临床意义判断',
-                #                self.export_header_map.get(column) + '备注'])
                 header = np.append(header,
                                    [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
                                     self.export_header_map.get(column) + '临床意义判断',
@@ -397,11 +392,11 @@ class Thyroid(Base):
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'FT3', 'FT4', 'TSH', 'FT3Mea', 'FT4Mea', 'TSHMea', 'FT3Note',
-                'FT4Note', 'TSHNote', 'filePath']
+                'FT4Note', 'TSHNote', 'modification', 'doubt', 'module_status']
 
 
 # 凝血功能表
-class Coagulation(Base):
+class Coagulation(Base,ModificationAndDoubt):
     __tablename__ = 'coagulation'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -428,7 +423,7 @@ class Coagulation(Base):
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -448,35 +443,27 @@ class Coagulation(Base):
         # row = []
         row = np.zeros(0, dtype=str)
         if buffer.get('Coagulation').get(pid) is None or buffer.get('Coagulation').get(pid).get(treIndex) is None:
-            # row.extend(['/'] * Coagulation.header_num)
             row = np.append(row, ['/']*Coagulation.header_num)
             return row
         obj = buffer.get('Coagulation').get(pid).get(treIndex)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
-                # row.append(value)
                 row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
-                # row.extend([value, value_Mea, value_Note])
                 row = np.append(row, [value, value_Mea, value_Note])
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        # header = []
         header = np.zeros(0, dtype=str)
         for column in columns:
             if column == 'samplingTime':
-                # header.append(self.export_header_map.get(column))
                 header = np.append(header, self.export_header_map.get(column))
             else:
-                # header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                #                self.export_header_map.get(column) + '临床意义判断',
-                #                self.export_header_map.get(column) + '备注'])
                 header = np.append(header,
                                    [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
                                     self.export_header_map.get(column) + '临床意义判断',
@@ -487,11 +474,11 @@ class Coagulation(Base):
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'PT', 'APTT', 'TT', 'FIB', 'INR', 'D_dimer', 'PTMea',
                 'APTTMea', 'TTMea', 'FIBMea', 'INRMea', 'D_dimerMea', 'PTNote', 'APTTNote', 'TTNote', 'FIBNote',
-                'INRNote', 'D_dimerNote', 'filePath']
+                'INRNote', 'D_dimerNote', 'modification', 'doubt', 'module_status']
 
 
 # 心肌酶谱表
-class MyocardialEnzyme(Base):
+class MyocardialEnzyme(Base,ModificationAndDoubt):
     __tablename__ = 'myocardialEnzyme'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -524,7 +511,7 @@ class MyocardialEnzyme(Base):
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -542,24 +529,20 @@ class MyocardialEnzyme(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
-        # row = []
         row = np.zeros(0, dtype=str)
         if buffer.get('MyocardialEnzyme').get(pid) is None or buffer.get('MyocardialEnzyme').get(pid).get(
                 treIndex) is None:
-            # row.extend(['/'] * MyocardialEnzyme.header_num)
             row = np.append(row, ['/'] * MyocardialEnzyme.header_num)
             return row
         obj = buffer.get('MyocardialEnzyme').get(pid).get(treIndex)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
-                # row.append(value)
                 row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
-                # row.extend([value, value_Mea, value_Note])
                 row = np.append(row, [value, value_Mea, value_Note])
         return row
 
@@ -569,12 +552,8 @@ class MyocardialEnzyme(Base):
         header = np.zeros(0, dtype=str)
         for column in columns:
             if column == 'samplingTime':
-                # header.append(self.export_header_map.get(column))
                 header = np.append(header, self.export_header_map.get(column))
             else:
-                # header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                #                self.export_header_map.get(column) + '临床意义判断',
-                #                self.export_header_map.get(column) + '备注'])
                 header = np.append(header,
                                    [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
                                     self.export_header_map.get(column) + '临床意义判断',
@@ -586,11 +565,11 @@ class MyocardialEnzyme(Base):
         return ['id', 'pid', 'treNum', 'samplingTime', 'LDH', 'CK', 'CK_MB', 'cTnI', 'cTnT', 'MYO', 'BNP',
                 'NT_proBNP', 'LDHMea', 'CKMea', 'CK_MBMea', 'cTnIMea', 'cTnTMea', 'MYOMea', 'BNPMea', 'NT_proBNPMea',
                 'LDHNote', 'CKNote', 'CK_MBNote', 'cTnINote', 'cTnTNote', 'MYONote', 'BNPNote', 'NT_proBNPNote',
-                'filePath']
+                'modification', 'doubt', 'module_status']
 
 
 # 细胞因子表
-class Cytokines(Base):
+class Cytokines(Base,ModificationAndDoubt):
     __tablename__ = 'Cytokines'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -617,7 +596,7 @@ class Cytokines(Base):
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -635,38 +614,29 @@ class Cytokines(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
-        # row = []
         row = np.zeros(0, dtype=str)
         if buffer.get('Cytokines').get(pid) is None or buffer.get('Cytokines').get(pid).get(treIndex) is None:
-            # row.extend(['/'] * Cytokines.header_num)
             row = np.append(row, ['/'] * Cytokines.header_num)
             return row
         obj = buffer.get('Cytokines').get(pid).get(treIndex)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
-                # row.append(value)
                 row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
-                # row.extend([value, value_Mea, value_Note])
                 row = np.append(row, [value, value_Mea, value_Note])
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        # header = []
         header = np.zeros(0, dtype=str)
         for column in columns:
             if column == 'samplingTime':
-                # header.append(self.export_header_map.get(column))
                 header = np.append(header, self.export_header_map.get(column))
             else:
-                # header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                #                self.export_header_map.get(column) + '临床意义判断',
-                #                self.export_header_map.get(column) + '备注'])
                 header = np.append(header,
                                    [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
                                     self.export_header_map.get(column) + '临床意义判断',
@@ -677,12 +647,11 @@ class Cytokines(Base):
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'TNF_a', 'IL_1b', 'IL_2R', 'IL_6', 'IL_8', 'IL_10', 'TNF_aMea',
                 'IL_1bMea', 'IL_2RMea', 'IL_6Mea', 'IL_8Mea', 'IL_10Mea', 'TNF_aNote', 'IL_1bNote', 'IL_2RNote',
-                'IL_6Note',
-                'IL_8Note', 'IL_10Note', 'filePath']
+                'IL_6Note', 'IL_8Note', 'IL_10Note', 'modification', 'doubt', 'module_status']
 
 
 # 淋巴细胞亚群表
-class LymSubsets(Base):
+class LymSubsets(Base,ModificationAndDoubt):
     __tablename__ = 'lymSubsets'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -772,7 +741,7 @@ class LymSubsets(Base):
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -817,38 +786,29 @@ class LymSubsets(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
-        # row = []
         row = np.zeros(0, dtype=str)
         if buffer.get('LymSubsets').get(pid) is None or buffer.get('LymSubsets').get(pid).get(treIndex) is None:
-            # row.extend(['/'] * LymSubsets.header_num)
             row = np.append(row, ['/'] * LymSubsets.header_num)
             return row
         obj = buffer.get('LymSubsets').get(pid).get(treIndex)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
-                # row.append(value)
                 row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
-                # row.extend([value, value_Mea, value_Note])
                 row = np.append(row, [value, value_Mea, value_Note])
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        # header = []
         header = np.zeros(0, dtype=str)
         for column in columns:
             if column == 'samplingTime':
-                # header.append(self.export_header_map.get(column))
                 header = np.append(header, self.export_header_map.get(column))
             else:
-                # header.extend([self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
-                #                self.export_header_map.get(column) + '临床意义判断',
-                #                self.export_header_map.get(column) + '备注'])
                 header = np.append(header,
                                    [self.export_header_map.get(column) + '测定值(' + self.unit_map.get(column) + ')',
                                     self.export_header_map.get(column) + '临床意义判断',
@@ -872,11 +832,11 @@ class LymSubsets(Base):
                 'CD4CD8Note', 'CD56Note', 'CD3_CD8__Note', 'CD3_CD8_Note', 'CD3_CD4__Note', 'CD3_CD4_Note',
                 'CD3_CD16_56_Note', 'CD3_CD16_56Note', 'CD3_CD19__Note', 'CD3_CD19_Note',
                 'CD8_CD28_Note', 'CD20_Note', 'HLA_DR_Note', 'CD3_HLA_DR1Note', 'CD3_HLA_DR2Note', 'CD3_HLA_DR3Note',
-                'CD4_CD25_CD127lowNote', 'filePath']
+                'CD4_CD25_CD127lowNote', 'modification', 'doubt', 'module_status']
 
 
 # 尿常规表
-class UrineRoutine(Base):
+class UrineRoutine(Base,ModificationAndDoubt):
     __tablename__ = 'urineRoutine'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -924,7 +884,7 @@ class UrineRoutine(Base):
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -943,38 +903,29 @@ class UrineRoutine(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
-        # row = []
         row = np.zeros(0, dtype=str)
         if buffer.get('UrineRoutine').get(pid) is None or buffer.get('UrineRoutine').get(pid).get(treIndex) is None:
-            # row.extend(['/'] * UrineRoutine.header_num)
             row = np.append(row, ['/'] * UrineRoutine.header_num)
             return row
         obj = buffer.get('UrineRoutine').get(pid).get(treIndex)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
-                # row.append(value)
                 row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
-                # row.extend([value, value_Mea, value_Note])
                 row = np.append(row, [value, value_Mea, value_Note])
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        # header = []
         header = np.zeros(0, dtype=str)
         for column in columns:
             if column == 'samplingTime':
-                # header.append(self.export_header_map.get(column))
                 header = np.append(header, self.export_header_map.get(column))
             else:
-                # header.extend([self.export_header_map.get(column) + '测定值',
-                #                self.export_header_map.get(column) + '临床意义判断',
-                #                self.export_header_map.get(column) + '备注'])
                 header = np.append(header,
                                    [self.export_header_map.get(column) + '测定值',
                                     self.export_header_map.get(column) + '临床意义判断',
@@ -985,14 +936,13 @@ class UrineRoutine(Base):
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'UPH', 'UGLU', 'LEU', 'ERY', 'NIT', 'BIL', 'USG',
                 'KET', 'BLD', 'PRO', 'UBG', 'COL', 'CLA', 'UPHMea', 'UGLUMea', 'LEUMea', 'ERYMea', 'NITMea', 'BILMea',
-                'USGMea',
-                'KETMea', 'BLDMea', 'PROMea', 'UBGMea', 'COLMea', 'CLAMea', 'UPHNote', 'UGLUNote', 'LEUNote', 'ERYNote',
-                'NITNote',
-                'BILNote', 'USGNote', 'KETNote', 'BLDNote', 'PRONote', 'UBGNote', 'COLNote', 'CLANote', 'filePath']
+                'USGMea','KETMea', 'BLDMea', 'PROMea', 'UBGMea', 'COLMea', 'CLAMea', 'UPHNote', 'UGLUNote', 'LEUNote',
+                'ERYNote','NITNote','BILNote', 'USGNote', 'KETNote', 'BLDNote', 'PRONote', 'UBGNote', 'COLNote', 'CLANote',
+                'modification', 'doubt', 'module_status']
 
 
 # 肿瘤标志物表
-class TumorMarker(Base):
+class TumorMarker(Base,ModificationAndDoubt):
     __tablename__ = 'tumorMarker'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -1022,7 +972,7 @@ class TumorMarker(Base):
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -1038,38 +988,29 @@ class TumorMarker(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
-        # row = []
         row = np.zeros(0, dtype=str)
         if buffer.get('TumorMarker').get(pid) is None or buffer.get('TumorMarker').get(pid).get(treIndex) is None:
-            # row.extend(['/'] * TumorMarker.header_num)
             row = np.append(row, ['/'] * TumorMarker.header_num)
             return row
         obj = buffer.get('TumorMarker').get(pid).get(treIndex)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
-                # row.append(value)
                 row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
-                # row.extend([value, value_Mea, value_Note])
                 row = np.append(row, [value, value_Mea, value_Note])
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        # header = []
         header = np.zeros(0, dtype=str)
         for column in columns:
             if column == 'samplingTime':
-                # header.append(self.export_header_map.get(column))
                 header = np.append(header, self.export_header_map.get(column))
             else:
-                # header.extend([self.export_header_map.get(column) + '测定值(NG/ML)',
-                #                self.export_header_map.get(column) + '临床意义判断',
-                #                self.export_header_map.get(column) + '备注'])
                 header = np.append(header, [self.export_header_map.get(column) + '测定值(NG/ML)',
                                             self.export_header_map.get(column) + '临床意义判断',
                                             self.export_header_map.get(column) + '备注'])
@@ -1079,5 +1020,5 @@ class TumorMarker(Base):
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'CEA', 'NSE', 'pro_GPR', 'CYFRA', 'FERR', 'AFP', 'SCCA',
                 'CEAMea', 'NSEMea', 'pro_GPRMea', 'CYFRAMea', 'FERRMea', 'AFPMea', 'SCCAMea', 'CEANote', 'NSENote',
-                'pro_GPRNote', 'CYFRANote', 'FERRNote',
-                'AFPNote', 'SCCANote', 'filePath']
+                'pro_GPRNote', 'CYFRANote', 'FERRNote','AFPNote', 'SCCANote',
+                'modification', 'doubt', 'module_status']

@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime, SmallInteger, and_
-from app.models.base import Base
+from app.models.base import Base, ModificationAndDoubt
 # 病人基本信息表
 from app.models.crf_info import FollInfo
 from app.models.cycle import MoleDetec
@@ -9,7 +9,7 @@ from app.utils.date import get_birth_date_by_id_card, get_age_by_birth
 import numpy as np
 
 
-class Patient(Base):
+class Patient(Base, ModificationAndDoubt):
     __tablename__ = 'patient'
     id = Column(Integer, primary_key=True, autoincrement=True, comment='病人id')
     patNumber = Column(String(255), comment='编号')  # 长度
@@ -32,7 +32,7 @@ class Patient(Base):
     finishFollowup = Column(Integer, comment='是否完成随访(True:1、False:0)')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -87,8 +87,8 @@ class Patient(Base):
     def keys(self):
         return ['id', 'patNumber', 'account', 'researchCenter', 'idNumber', 'hospitalNumber',
                 'patientName', 'gender', 'birthday', 'phoneNumber1', 'phoneNumber2', 'updateTime', 'nextFollowupTime',
-                'finishFollowup', 'update_time',
-                '_researchCenter', '_account', '_gender']
+                'finishFollowup', 'update_time', '_researchCenter', '_account', '_gender',
+                'modification', 'doubt', 'module_status']
 
     def get_fotmat_info(self):
         pat_dia = Patient.get_pat_dia([self.id])
@@ -481,7 +481,7 @@ class Patient(Base):
 
 
 # 病人既往史表
-class PastHis(Base):
+class PastHis(Base,ModificationAndDoubt):
     __tablename__ = 'pastHis'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -516,7 +516,7 @@ class PastHis(Base):
                         comment='药物使用史,[{key: , drugDose: 2g, drugName: 药物1, duration: 1}, {key: 1, drugDose: 1g, drugName: 药物2, duration: 2}]')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -619,9 +619,8 @@ class PastHis(Base):
 
     def keys(self):
         return ['id', 'pid', 'basDisHis', 'infDisHis', 'tumor', 'tumHis', 'tumorFam', 'tumFamHis', 'smoke',
-                'smokingHis',
-                'drink', 'drinkingHis', 'hormone', 'drug', '_basDisHis', '_tumHis',
-                '_tumFamHis']
+                'smokingHis', 'drink', 'drinkingHis', 'hormone', 'drug', '_basDisHis', '_tumHis',
+                '_tumFamHis', 'modification', 'doubt', 'module_status']
 
     # 和导出功能有关
     def format_drink_history(self, object):
@@ -665,25 +664,27 @@ class PastHis(Base):
 
 
 # 激素史与药物史
-class DrugHistory(Base):
+class DrugHistory(Base,ModificationAndDoubt):
     __tablename__ = 'drug_history'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
     type = Column(SmallInteger, comment='type=1,激素史，type = 0，其他药物史')
-    drug_name = Column(String(255))
-    drug_dose = Column(String(255))
-    use_time = Column(Float)
+    drug_name = Column(String(255), comment='药物名称')
+    drug_dose = Column(String(255), comment='日使用剂量')
+    use_time = Column(Float, comment='累积使用时间（月）')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
+    export_header_map = {'drug_name': '药物名称', 'drug_dose':'日使用剂量', 'use_time':'累积使用时间（月）'}
+
     def keys(self):
-        return ['id', 'drug_name', 'drug_dose', 'use_time']
+        return ['id', 'drug_name', 'drug_dose', 'use_time', 'modification', 'doubt', 'module_status']
 
 
 # 病人初诊过程信息表
-class IniDiaPro(Base, PatDia):
+class IniDiaPro(Base, PatDia, ModificationAndDoubt):
     __tablename__ = 'iniDiaPro'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id', index=True)
@@ -731,7 +732,7 @@ class IniDiaPro(Base, PatDia):
     pRemark = Column(Text(10000), comment='p备注')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -748,7 +749,8 @@ class IniDiaPro(Base, PatDia):
         return ["id", "PSScore", "cliniManifest", "videography", "part", "bioMet", "pleInv", "speSite", "firVisDate",
                 "patReDate", "patNum", "patDia", "mitIma", "comCar", "necArea", "massSize", "Ki67",
                 "traSite", "TSize", "stage", "cStage", "cliStage", "pStage", "patStage", 'cRemark', 'pRemark',
-                '_cliniManifest', '_part', '_bioMet', '_traSite', '_patDia', '_patDiaOthers', 'cliniDia']
+                '_cliniManifest', '_part', '_bioMet', '_traSite', '_patDia', '_patDiaOthers', 'cliniDia',
+                'modification', 'doubt', 'module_status']
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
@@ -854,7 +856,7 @@ class IniDiaPro(Base, PatDia):
         return array_value
 
 
-class SpecimenInfo(Base):
+class SpecimenInfo(Base,ModificationAndDoubt):
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id', index=True)
     number = Column(Text, comment="样本编号")
@@ -865,7 +867,7 @@ class SpecimenInfo(Base):
     note = Column(Text)
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -934,4 +936,5 @@ class SpecimenInfo(Base):
         return value
 
     def keys(self):
-        return ['id', 'number', 'type', 'amount', 'samplingTime', 'note', 'storeSite']
+        return ['id', 'number', 'type', 'amount', 'samplingTime', 'note', 'storeSite',
+                'modification', 'doubt', 'module_status']

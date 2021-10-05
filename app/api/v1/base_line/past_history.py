@@ -75,7 +75,8 @@ def finish_past_history(pid):
 def doubt_past_history(pid):
     data = request.get_json()
     item = PastHis.query.filter_by(pid=pid).first_or_404()
-    if item.doubt(data):
+
+    if item.question(data):
         return Success()
     else:
         return SampleStatusError()
@@ -86,7 +87,7 @@ def doubt_past_history(pid):
 def reply_past_history(pid, doubt_id):
     data = request.get_json()
     item = PastHis.query.filter_by(pid=pid).first_or_404()
-    if item.reply(doubt_id, data):
+    if item.reply_doubt(doubt_id, data):
         return Success()
     else:
         return SampleStatusError()
@@ -127,23 +128,23 @@ def del_hormone_history(pid):
     return Success()
 
 
-@api.route('/drug_history/doubt/<int:pid>', methods=['POST'])
+@api.route('/drug_history/doubt/<int:drug_history_id>', methods=['POST'])
 @auth.login_required
-def doubt_patient(pid):
+def doubt_drug_history(drug_history_id):
     data = request.get_json()
-    item = Patient.query.get_or_404(pid)
-    if item.doubt(data):
+    item = DrugHistory.query.get_or_404(drug_history_id)
+    if item.question(data):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/drug_history/reply/<int:pid>/<int:doubt_id>', methods=['POST'])
+@api.route('/drug_history/reply/<int:drug_history_id>/<int:doubt_id>', methods=['POST'])
 @auth.login_required
-def reply_patient(pid, doubt_id):
+def reply_drug_history(drug_history_id, doubt_id):
     data = request.get_json()
-    item = Patient.query.get_or_404(pid)
-    if item.reply(doubt_id, data):
+    item = DrugHistory.query.get_or_404(drug_history_id)
+    if item.reply_doubt(doubt_id, data):
         return Success()
     else:
         return SampleStatusError()

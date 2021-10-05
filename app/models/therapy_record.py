@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime, SmallInteger
 
 from app.libs.enums import ModuleStatus
-from app.models.base import Base, db
+from app.models.base import Base, db, ModificationAndDoubt
 import numpy as np
 from time import time
 # 治疗记录及疗效评估表
@@ -128,7 +128,7 @@ class PatDia:
     }  # 病理诊断map
 
 
-class TreRec(Base, PatDia):
+class TreRec(Base, PatDia, ModificationAndDoubt):
     __tablename__ = 'treRec'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -144,7 +144,7 @@ class TreRec(Base, PatDia):
     is_auto_compute = Column(SmallInteger,server_default="1")
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
 
@@ -156,7 +156,7 @@ class TreRec(Base, PatDia):
 
     def keys(self):
         return ['id', 'treNum', 'trement', 'date', 'beEffEvaDate', 'beEffEva', 'proDate', 'proDes', 'PFS_DFS',
-                'is_auto_compute']
+                'is_auto_compute', 'modification', 'doubt', 'module_status']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
@@ -315,7 +315,7 @@ class TreRec(Base, PatDia):
 
 
 # 1-5线及其他表
-class OneToFive(Base, PatDia):
+class OneToFive(Base, PatDia, ModificationAndDoubt):
     __tablename__ = 'oneToFive'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -335,11 +335,10 @@ class OneToFive(Base, PatDia):
     patDia = Column(JSON, comment='病理诊断结果')
     patDiaRes = Column(Text(10000), comment='病理诊断结果')
     patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
-    # patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
     note = Column(String(2048), comment='备注')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -353,9 +352,9 @@ class OneToFive(Base, PatDia):
                          'drugs': '药物', 'detailBegDate': '给药/治疗开始日期', 'detailEndDate': '给药/治疗结束日期', 'detailNote': '备注'}
 
     def keys(self):
-        return ['id', 'pid', 'treNum', 'isTre', 'clinTri', 'treSolu', 'spePlan', 'begDate',
-                'endDate', 'isRepBio', 'bioMet', 'matPart', 'specNum', 'patDiaRes', 'patDiaOthers', 'note', 'patDia',
-                '_bioMet']
+        return ['id', 'pid', 'treNum', 'isTre', 'clinTri', 'treSolu', 'spePlan', 'begDate', 'endDate', 'isRepBio',
+                'bioMet', 'matPart', 'specNum', 'patDiaRes', 'patDiaOthers', 'note', 'patDia', '_bioMet',
+                'modification', 'doubt', 'module_status']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
@@ -486,7 +485,6 @@ class OneToFive(Base, PatDia):
     def get_export_header(self, columns, buffer):
         detail_header = ['treatName', 'currPeriod', 'treSche', 'drugs', 'detailBegDate', 'detailEndDate',
                          'detailNote']
-        # header = []
         header = np.zeros(0, dtype=str)
         # 求最多有多少条
         max_chemo_detail_num = 0
@@ -527,18 +525,14 @@ class OneToFive(Base, PatDia):
                         header = np.append(header, '化疗:' + self.export_header_map.get(detail_column) + str(k))
                 for k in range(1, max_targeted_detail_num + 1):
                     for detail_column in my_detail_headers:
-                        # header.append('靶向治疗:' + self.export_header_map.get(detail_column) + str(k))
                         header = np.append(header, '靶向治疗:' + self.export_header_map.get(detail_column) + str(k))
                 for k in range(1, max_immunity_detail_num + 1):
                     for detail_column in my_detail_headers:
-                        # header.append('免疫治疗:' + self.export_header_map.get(detail_column) + str(k))
                         header = np.append(header, '免疫治疗:' + self.export_header_map.get(detail_column) + str(k))
                 for k in range(1, max_antivascular_detail_num + 1):
                     for detail_column in my_detail_headers:
-                        # header.append('抗血管治疗:' + self.export_header_map.get(detail_column) + str(k))
                         header = np.append(header, '抗血管治疗:' + self.export_header_map.get(detail_column) + str(k))
             elif not (column in my_detail_headers):
-                # header.append(self.export_header_map.get(column))
                 header = np.append(header, self.export_header_map.get(column))
 
         OneToFive.chemo_detail_num = max_chemo_detail_num
@@ -571,7 +565,7 @@ class OneToFive(Base, PatDia):
 
 
 # 详细治疗方案
-class DetailTrePlan(Base):
+class DetailTrePlan(Base, ModificationAndDoubt):
     __tablename__ = 'DetailTrePlan'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -582,19 +576,23 @@ class DetailTrePlan(Base):
     treatName = Column(String(255), comment='治疗名称')  # 长度
     begDate = Column(Date, comment='开始时间')
     endDate = Column(Date, comment='结束时间')
-    drugs = Column(JSON, comment='药物使用情况, {drugName:{drugDosa: ,duration: },...}')
+    drugs = Column(JSON, comment='药物使用情况, [{"dose": "", "name": ""},...]')
     note = Column(String(2048), comment='药物使用备注')  # 长度
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
+    export_header_map = {'treSche':'药物方案', 'treatName':'治疗名称', 'currPeriod':'当前周期', 'begDate':'给药/治疗开始日期',
+                         'endDate':'给药/治疗结束日期', 'drugs':'药物使用情况', 'note':'备注'}
+
     def keys(self):
-        return ['id', 'treSolu', 'treSche', 'currPeriod', 'treatName', 'begDate', 'endDate', 'drugs', 'note']
+        return ['id', 'treSolu', 'treSche', 'currPeriod', 'treatName', 'begDate', 'endDate', 'drugs', 'note',
+                'modification', 'doubt', 'module_status']
 
 
 # 手术表
-class Surgery(Base, PatDia):
+class Surgery(Base, PatDia, ModificationAndDoubt):
     __tablename__ = 'surgery'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -617,7 +615,7 @@ class Surgery(Base, PatDia):
     patDia = Column(JSON, comment='病理诊断结果')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -630,12 +628,10 @@ class Surgery(Base, PatDia):
     def get_export_row(self, columns, buffer, pid, treIndex):
         detail_header = ['treatName', 'currPeriod', 'treSche', 'drugs', 'detailBegDate', 'detailEndDate',
                          'detailNote']
-        # row = []
         row = np.zeros(0, dtype=str)
         if (buffer.get('Surgery').get(pid) is None or buffer.get('Surgery').get(pid).get(treIndex) is None
                 or buffer.get('TreRec').get(pid) is None or buffer.get('TreRec').get(pid).get(treIndex) is None
                 or buffer.get('TreRec').get(pid).get(treIndex).trement != 'surgery'):
-            # row.extend(['/']*Surgery.header_num)
             row = np.append(row, ['/']*Surgery.header_num)
             return row
         obj = buffer.get('Surgery').get(pid).get(treIndex)
@@ -680,16 +676,12 @@ class Surgery(Base, PatDia):
                         for detail_column in my_detail_headers:
                             if detail_column == 'drugs':
                                 value_drugs = self.filter_none(detail_trePlan, detail_column)
-                                # row.append(self.format_drugs_of_detailTrePlan(value_drugs))
                                 row = np.append(row, self.format_drugs_of_detailTrePlan(value_drugs))
                             else:
-                                # row.append(self.filter_none(detail_trePlan, detail_column))
                                 row = np.append(row, self.filter_none(detail_trePlan, detail_column))
-                    # row.extend(['/']*size*(Surgery.detail_header_num - detail_num))
                     row = np.append(row, ['/']*size*(Surgery.detail_header_num - detail_num))
             elif not (column in detail_header):
                 value = self.filter_none(obj, column)
-                # row.append(value)
                 row = np.append(row, value)
         return row
 
@@ -697,7 +689,6 @@ class Surgery(Base, PatDia):
     def get_export_header(self, columns, buffer):
         detail_header = ['treatName', 'currPeriod', 'treSche', 'drugs', 'detailBegDate', 'detailEndDate',
                          'detailNote']
-        # header = []
         header = np.zeros(0, dtype=str)
         my_detail_headers = []
         for column in columns:
@@ -720,10 +711,8 @@ class Surgery(Base, PatDia):
                 detail_flag = True
                 for k in range(1, header_num + 1):
                     for detail_column in my_detail_headers:
-                        # header.append('术后辅助化疗:' + self.export_header_map.get(detail_column) + str(k))
                         header = np.append(header, '术后辅助化疗:' + self.export_header_map.get(detail_column) + str(k))
             elif not (column in my_detail_headers):
-                # header.append(self.export_header_map.get(column))
                 header = np.append(header, self.export_header_map.get(column))
         Surgery.detail_header_num = header_num
         Surgery.header_num = len(header)
@@ -752,13 +741,12 @@ class Surgery(Base, PatDia):
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'surSco', 'lymDis', 'cleGro', 'surDate', 'posAdjChem', 'isPro', 'proDate',
-                'proDes',
-                'isRepBio', 'bioMet', 'matPart', 'specNum', 'patDia',
-                '_surSco', '_lymDis']
+                'proDes', 'isRepBio', 'bioMet', 'matPart', 'specNum', 'patDia', '_surSco', '_lymDis',
+                'modification', 'doubt', 'module_status']
 
 
 # 放疗表
-class Radiotherapy(Base):
+class Radiotherapy(Base, ModificationAndDoubt):
     __tablename__ = 'radiotherapy'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -774,14 +762,13 @@ class Radiotherapy(Base):
     splTim = Column(Integer, comment='分割次数')
     method = Column(String(255), comment='分割次数单位')
     isRepBio = Column(Boolean, comment='是否重复活检')
-    # bioMet = Column(JSON, comment='活检方式')  # 长度
     bioMet = Column(JSON, comment='活检方式')  # 长度
     matPart = Column(String(255), comment='取材部位')
     specNum = Column(String(255), comment='标本库流水号')
     patDia = Column(JSON, comment='病理诊断结果')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -791,49 +778,41 @@ class Radiotherapy(Base):
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
         radosUnit_map = {0: 'Gy', 1: 'cGy', "/": "/"}
-        # row = []
         row = np.zeros(0, dtype=str)
         if (buffer.get('Radiotherapy').get(pid) is None or buffer.get('Radiotherapy').get(pid).get(treIndex) is None
                 or buffer.get('TreRec').get(pid) is None or buffer.get('TreRec').get(pid).get(treIndex) is None
                 or buffer.get('TreRec').get(pid).get(treIndex).trement != 'radiotherapy'):
-            # row.extend(['/']*Radiotherapy.header_num)
             row = np.append(row, ['/']*Radiotherapy.header_num)
             return row
         obj = buffer.get('Radiotherapy').get(pid).get(treIndex)
         for column in columns:
             if column == 'radSite':
                 value = self.format_radio_data(obj, column)
-                # row.append(value)
                 row = np.append(row, value)
             elif column == 'radDose':
                 value_radDose = self.filter_none(obj, column)
                 value_dosUnit = radosUnit_map.get(self.filter_none(obj, 'dosUnit'))
                 value = str(value_radDose) + value_dosUnit if value_radDose != '/' else '/'
-                # row.append(value)
                 row = np.append(row, value)
             elif column == 'splTim':
                 value_splTim = self.filter_none(obj, column)
                 value_method = self.filter_none(obj, 'method')
                 value = str(value_splTim) + value_method if value_splTim != '/' else '/'
-                # row.append(value)
                 row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
-                # row.append(value)
                 row = np.append(row, value)
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        # header = []
         header = np.zeros(0, dtype=str)
         for column in columns:
-            # header.append(self.export_header_map.get(column))
             header = np.append(header, self.export_header_map.get(column))
         Radiotherapy.header_num = len(header)
         return header
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'begDate', 'endDate', 'radSite', 'radDose', 'dosUnit', 'splTim', 'method',
-                '_radSite',
-                'isRepBio', 'bioMet', 'matPart', 'specNum', 'patDia']
+                '_radSite', 'isRepBio', 'bioMet', 'matPart', 'specNum', 'patDia',
+                'modification', 'doubt', 'module_status']

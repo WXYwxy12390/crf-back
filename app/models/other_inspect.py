@@ -1,10 +1,10 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime
 import numpy as np
-from app.models.base import Base
+from app.models.base import Base, ModificationAndDoubt
 
 
 # 肺功能表
-class Lung(Base):
+class Lung(Base, ModificationAndDoubt):
     __tablename__ = 'lung'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -78,7 +78,7 @@ class Lung(Base):
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -87,24 +87,35 @@ class Lung(Base):
                          'RV': 'RV(L)', 'RV_TLC': 'RV’/TLC’(%)', 'VC': 'VC(L)', 'DLCO_ex': 'DLCO-ex(mL/mmHg/Mi)',
                          'DLCO_sb': 'DLCO-sb(mL/mmHg/Mi)', 'KCO': 'KCO',
                          'FVC_exp': 'FVC(L)预期值', 'FEV1_FVC_exp': 'FEV1/FVC(%)预期值', 'MEF_exp': 'MEF(L/S)预期值',
-                         'MEF25_exp': 'MEF25(L/S)预期值', 'MEF50_exp': 'MEF50(L/S)预期值', 'MEF75_exp': 'MEF75(L/S)预期值', 'TLC_sb_exp': 'TLC’sb(L)预期值',
-                         'RV_exp': 'RV(L)预期值', 'RV_TLC_exp': 'RV’/TLC’(%)预期值', 'VC_exp': 'VC(L)预期值', 'DLCO_ex_exp': 'DLCO-ex(mL/mmHg/Mi)预期值',
+                         'MEF25_exp': 'MEF25(L/S)预期值', 'MEF50_exp': 'MEF50(L/S)预期值', 'MEF75_exp': 'MEF75(L/S)预期值',
+                         'TLC_sb_exp': 'TLC’sb(L)预期值',
+                         'RV_exp': 'RV(L)预期值', 'RV_TLC_exp': 'RV’/TLC’(%)预期值', 'VC_exp': 'VC(L)预期值',
+                         'DLCO_ex_exp': 'DLCO-ex(mL/mmHg/Mi)预期值',
                          'DLCO_sb_exp': 'DLCO-sb(mL/mmHg/Mi)预期值', 'KCO_exp': 'KCO预期值',
                          'FVC_best': 'FVC(L)最佳值', 'FEV1_FVC_best': 'FEV1/FVC(%)最佳值', 'MEF_best': 'MEF(L/S)最佳值',
-                         'MEF25_best': 'MEF25(L/S)最佳值', 'MEF50_best': 'MEF50(L/S)最佳值', 'MEF75_best': 'MEF75(L/S)最佳值', 'TLC_sb_best': 'TLC’sb(L)最佳值',
-                         'RV_best': 'RV(L)最佳值', 'RV_TLC_best': 'RV’/TLC’(%)最佳值', 'VC_best': 'VC(L)最佳值', 'DLCO_ex_best': 'DLCO-ex(mL/mmHg/Mi)最佳值',
+                         'MEF25_best': 'MEF25(L/S)最佳值', 'MEF50_best': 'MEF50(L/S)最佳值', 'MEF75_best': 'MEF75(L/S)最佳值',
+                         'TLC_sb_best': 'TLC’sb(L)最佳值',
+                         'RV_best': 'RV(L)最佳值', 'RV_TLC_best': 'RV’/TLC’(%)最佳值', 'VC_best': 'VC(L)最佳值',
+                         'DLCO_ex_best': 'DLCO-ex(mL/mmHg/Mi)最佳值',
                          'DLCO_sb_best': 'DLCO-sb(mL/mmHg/Mi)最佳值', 'KCO_best': 'KCO最佳值',
-                         'FVC_ratio': 'FVC(L)最佳值/预期值(%)', 'FEV1_FVC_ratio': 'FEV1/FVC(%)最佳值/预期值(%)', 'MEF_ratio': 'MEF(L/S)最佳值/预期值(%)',
-                         'MEF25_ratio': 'MEF25(L/S)最佳值/预期值(%)', 'MEF50_ratio': 'MEF50(L/S)最佳值/预期值(%)', 'MEF75_ratio': 'MEF75(L/S)最佳值/预期值(%)', 'TLC_sb_ratio': 'TLC’sb(L)最佳值/预期值(%)',
-                         'RV_ratio': 'RV(L)最佳值/预期值(%)', 'RV_TLC_ratio': 'RV’/TLC’(%)最佳值/预期值(%)', 'VC_ratio': 'VC(L)最佳值/预期值(%)', 'DLCO_ex_ratio': 'DLCO-ex(mL/mmHg/Mi)最佳值/预期值(%)',
+                         'FVC_ratio': 'FVC(L)最佳值/预期值(%)', 'FEV1_FVC_ratio': 'FEV1/FVC(%)最佳值/预期值(%)',
+                         'MEF_ratio': 'MEF(L/S)最佳值/预期值(%)',
+                         'MEF25_ratio': 'MEF25(L/S)最佳值/预期值(%)', 'MEF50_ratio': 'MEF50(L/S)最佳值/预期值(%)',
+                         'MEF75_ratio': 'MEF75(L/S)最佳值/预期值(%)', 'TLC_sb_ratio': 'TLC’sb(L)最佳值/预期值(%)',
+                         'RV_ratio': 'RV(L)最佳值/预期值(%)', 'RV_TLC_ratio': 'RV’/TLC’(%)最佳值/预期值(%)',
+                         'VC_ratio': 'VC(L)最佳值/预期值(%)', 'DLCO_ex_ratio': 'DLCO-ex(mL/mmHg/Mi)最佳值/预期值(%)',
                          'DLCO_sb_ratio': 'DLCO-sb(mL/mmHg/Mi)最佳值/预期值(%)', 'KCO_ratio': 'KCO最佳值/预期值(%)',
                          'FVCMea': 'FVC(L)临床意义判定', 'FEV1_FVCMea': 'FEV1/FVC(%)临床意义判定', 'MEFMea': 'MEF(L/S)临床意义判定',
-                         'MEF25Mea': 'MEF25(L/S)临床意义判定', 'MEF50Mea': 'MEF50(L/S)临床意义判定', 'MEF75Mea': 'MEF75(L/S)临床意义判定', 'TLC_sbMea': 'TLC’sb(L)临床意义判定',
-                         'RVMea': 'RV(L)临床意义判定', 'RV_TLCMea': 'RV’/TLC’(%)临床意义判定', 'VCMea': 'VC(L)临床意义判定', 'DLCO_exMea': 'DLCO-ex(mL/mmHg/Mi)临床意义判定',
+                         'MEF25Mea': 'MEF25(L/S)临床意义判定', 'MEF50Mea': 'MEF50(L/S)临床意义判定', 'MEF75Mea': 'MEF75(L/S)临床意义判定',
+                         'TLC_sbMea': 'TLC’sb(L)临床意义判定',
+                         'RVMea': 'RV(L)临床意义判定', 'RV_TLCMea': 'RV’/TLC’(%)临床意义判定', 'VCMea': 'VC(L)临床意义判定',
+                         'DLCO_exMea': 'DLCO-ex(mL/mmHg/Mi)临床意义判定',
                          'DLCO_sbMea': 'DLCO-sb(mL/mmHg/Mi)临床意义判定', 'KCOMea': 'KCO临床意义判定',
                          'FVCNote': 'FVC(L)备注', 'FEV1_FVCNote': 'FEV1/FVC(%)备注', 'MEFNote': 'MEF(L/S)备注',
-                         'MEF25Note': 'MEF25(L/S)备注', 'MEF50Note': 'MEF50(L/S)备注', 'MEF75Note': 'MEF75(L/S)备注', 'TLC_sbNote': 'TLC’sb(L)备注',
-                         'RVNote': 'RV(L)备注', 'RV_TLCNote': 'RV’/TLC’(%)备注', 'VCNote': 'VC(L)备注', 'DLCO_exNote': 'DLCO-ex(mL/mmHg/Mi)备注',
+                         'MEF25Note': 'MEF25(L/S)备注', 'MEF50Note': 'MEF50(L/S)备注', 'MEF75Note': 'MEF75(L/S)备注',
+                         'TLC_sbNote': 'TLC’sb(L)备注',
+                         'RVNote': 'RV(L)备注', 'RV_TLCNote': 'RV’/TLC’(%)备注', 'VCNote': 'VC(L)备注',
+                         'DLCO_exNote': 'DLCO-ex(mL/mmHg/Mi)备注',
                          'DLCO_sbNote': 'DLCO-sb(mL/mmHg/Mi)备注', 'KCONote': 'KCO备注'
                          }
 
@@ -112,17 +123,14 @@ class Lung(Base):
     def get_export_row(self, columns, buffer, pid, treIndex):
         Mea_map = {-1: '异常', 0: '正常', 1: '异常 1', 2: '异常 2', 3: '异常 3', 4: '异常 4', 5: '异常 5', "/": "/"}
         row = []
-        # row = np.zeros(0, dtype=str)
         if buffer.get('Lung').get(pid) is None or buffer.get('Lung').get(pid).get(treIndex) is None:
-            # row.extend(['/'] * Lung.header_num)
-            row = np.append(row, ['/']*Lung.header_num)
+            row = np.append(row, ['/'] * Lung.header_num)
             return row
 
         obj = buffer.get('Lung').get(pid).get(treIndex)
         for column in columns:
             if column == 'samplingTime':
                 value = self.filter_none(obj, column)
-                # row.append(value)
                 row = np.append(row, value)
             else:
                 value_exp = self.filter_none(obj, column + '_exp')
@@ -131,24 +139,16 @@ class Lung(Base):
                 value_ratio = str(value_ratio) + "%" if value_ratio != "/" else value_ratio
                 value_Mea = Mea_map.get(self.filter_none(obj, column + 'Mea'))
                 value_Note = self.filter_none(obj, column + 'Note')
-                # row.extend([value_exp, value_best, value_ratio, value_Mea, value_Note])
                 row = np.append(row, [value_exp, value_best, value_ratio, value_Mea, value_Note])
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        # header = []
         header = np.zeros(0, dtype=str)
         for column in columns:
             if column == 'samplingTime':
-                # header.append(self.export_header_map.get(column))
                 header = np.append(header, self.export_header_map.get(column))
             else:
-                # header.extend([self.export_header_map.get(column) + '预计值',
-                #                self.export_header_map.get(column) + '最佳值',
-                #                self.export_header_map.get(column) + '最佳值/预计值(%)',
-                #                self.export_header_map.get(column) + '临床意义判断',
-                #                self.export_header_map.get(column) + '备注'])
                 header = np.append(header, [self.export_header_map.get(column) + '预计值',
                                             self.export_header_map.get(column) + '最佳值',
                                             self.export_header_map.get(column) + '最佳值/预计值(%)',
@@ -160,22 +160,18 @@ class Lung(Base):
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'FVC_exp', 'FEV1_FVC_exp', 'MEF_exp', 'MEF25_exp', 'MEF50_exp',
                 'MEF75_exp', 'TLC_sb_exp', 'RV_exp', 'RV_TLC_exp', 'VC_exp', 'DLCO_ex_exp', 'DLCO_sb_exp', 'KCO_exp',
-                'FVC_best',
-                'FEV1_FVC_best', 'MEF_best', 'MEF25_best', 'MEF50_best', 'MEF75_best', 'TLC_sb_best', 'RV_best',
-                'RV_TLC_best',
-                'VC_best', 'DLCO_ex_best', 'DLCO_sb_best', 'KCO_best', 'FVC_ratio', 'FEV1_FVC_ratio', 'MEF_ratio',
-                'MEF25_ratio', 'MEF50_ratio',
-                'MEF75_ratio', 'TLC_sb_ratio', 'RV_ratio', 'RV_TLC_ratio', 'VC_ratio', 'DLCO_ex_ratio', 'DLCO_sb_ratio',
-                'KCO_ratio',
-                'FVCMea', 'FEV1_FVCMea', 'MEFMea', 'MEF25Mea', 'MEF50Mea', 'MEF75Mea', 'TLC_sbMea', 'RVMea',
-                'RV_TLCMea', 'VCMea', 'DLCO_exMea',
+                'FVC_best', 'FEV1_FVC_best', 'MEF_best', 'MEF25_best', 'MEF50_best', 'MEF75_best', 'TLC_sb_best',
+                'RV_best', 'RV_TLC_best', 'VC_best', 'DLCO_ex_best', 'DLCO_sb_best', 'KCO_best', 'FVC_ratio',
+                'FEV1_FVC_ratio', 'MEF_ratio', 'MEF25_ratio', 'MEF50_ratio', 'MEF75_ratio', 'TLC_sb_ratio', 'RV_ratio',
+                'RV_TLC_ratio', 'VC_ratio', 'DLCO_ex_ratio', 'DLCO_sb_ratio', 'KCO_ratio', 'FVCMea', 'FEV1_FVCMea',
+                'MEFMea', 'MEF25Mea', 'MEF50Mea', 'MEF75Mea', 'TLC_sbMea', 'RVMea', 'RV_TLCMea', 'VCMea', 'DLCO_exMea',
                 'DLCO_sbMea', 'KCOMea', 'FVCNote', 'FEV1_FVCNote', 'MEFNote', 'MEF25Note', 'MEF50Note', 'MEF75Note',
-                'TLC_sbNote',
-                'RVNote', 'RV_TLCNote', 'VCNote', 'DLCO_exNote', 'DLCO_sbNote', 'KCONote', 'filePath']
+                'TLC_sbNote', 'RVNote', 'RV_TLCNote', 'VCNote', 'DLCO_exNote', 'DLCO_sbNote', 'KCONote',
+                'modification', 'doubt', 'module_status']
 
 
 # 其他检查表
-class OtherExams(Base):
+class OtherExams(Base, ModificationAndDoubt):
     __tablename__ = 'otherExams'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -188,7 +184,7 @@ class OtherExams(Base):
     UCGPath = Column(String(200), comment='超声心动图报告路径,多个以逗号分隔')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
@@ -197,10 +193,8 @@ class OtherExams(Base):
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
-        # row = []
         row = np.zeros(0, dtype=str)
         if buffer.get('OtherExams').get(pid) is None or buffer.get('OtherExams').get(pid).get(treIndex) is None:
-            # row.extend(['/'] * OtherExams.header_num)
             row = np.append(row, ['/'] * OtherExams.header_num)
             return row
         obj = buffer.get('OtherExams').get(pid).get(treIndex)
@@ -212,20 +206,19 @@ class OtherExams(Base):
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        # header = []
         header = np.zeros(0, dtype=str)
         for column in columns:
-            # header.append(self.export_header_map.get(column))
             header = np.append(header, self.export_header_map.get(column))
         OtherExams.header_num = len(header)
         return header
 
     def keys(self):
-        return ['id', 'pid', 'treNum', 'ECGDetTime', 'ECGDesc', 'ECGPath', 'UCGDetTime', 'UCGDesc', 'UCGPath']
+        return ['id', 'pid', 'treNum', 'ECGDetTime', 'ECGDesc', 'UCGDetTime', 'UCGDesc',
+                'modification', 'doubt', 'module_status']
 
 
 # 影像学检查表
-class ImageExams(Base):
+class ImageExams(Base, ModificationAndDoubt):
     __tablename__ = 'ImageExams'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -240,15 +233,16 @@ class ImageExams(Base):
     path = Column(String(200), comment='文件路径,多个以逗号分隔')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
-    query_reply = Column(JSON, comment='质疑和回复')
+    doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'detectTime': '影像学检查检测时间', 'examArea': '检查部位', 'exmaMethod': '检查方法',
-                         'tumorLD': '肿瘤长径', 'tumorSD': '肿瘤短径', 'tumorDesc': '肿瘤描述', 'photoNumber':'影像号'}
+                         'tumorLD': '肿瘤长径', 'tumorSD': '肿瘤短径', 'tumorDesc': '肿瘤描述', 'photoNumber': '影像号'}
 
     def keys(self):
-        return ['id','pid','treNum','detectTime','examArea','exmaMethod','tumorLD','tumorSD','tumorDesc','path','photoNumber']
+        return ['id', 'pid', 'treNum', 'detectTime', 'examArea', 'exmaMethod', 'tumorLD', 'tumorSD', 'tumorDesc',
+                'photoNumber', 'modification', 'doubt', 'module_status']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
