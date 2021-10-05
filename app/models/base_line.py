@@ -31,6 +31,10 @@ class Patient(Base):
     nextFollowupTime = Column(DateTime, comment='随访时间')
     finishFollowup = Column(Integer, comment='是否完成随访(True:1、False:0)')
 
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
+
     # 和导出功能有关
     export_header_map = {'patNumber': '编号', 'researchCenter': '研究中心', 'idNumber': '身份证号', 'patientName': '姓名',
                          'hospitalNumber': '住院号', 'gender': '性别', 'birthday': '出生日期', 'age': '年龄',
@@ -511,6 +515,10 @@ class PastHis(Base):
     drugUseHis = Column(JSON,
                         comment='药物使用史,[{key: , drugDose: 2g, drugName: 药物1, duration: 1}, {key: 1, drugDose: 1g, drugName: 药物2, duration: 2}]')
 
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
+
     # 和导出功能有关
     export_header_map = {'basDisHis': '基础疾病史', 'infDisHis': '传染病史', 'tumor': '是否有肿瘤史', 'tumHis': '肿瘤史',
                          'tumorFam': '是否有肿瘤家族史', 'tumFamHis': '肿瘤家族史', 'smoke': '是否吸烟', 'smokingHis': '吸烟史',
@@ -612,7 +620,7 @@ class PastHis(Base):
     def keys(self):
         return ['id', 'pid', 'basDisHis', 'infDisHis', 'tumor', 'tumHis', 'tumorFam', 'tumFamHis', 'smoke',
                 'smokingHis',
-                'drink', 'drinkingHis', 'hormone', 'hormoneUseHis', 'drug', 'drugUseHis', '_basDisHis', '_tumHis',
+                'drink', 'drinkingHis', 'hormone', 'drug', '_basDisHis', '_tumHis',
                 '_tumFamHis']
 
     # 和导出功能有关
@@ -666,6 +674,10 @@ class DrugHistory(Base):
     drug_dose = Column(String(255))
     use_time = Column(Float)
 
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
+
     def keys(self):
         return ['id', 'drug_name', 'drug_dose', 'use_time']
 
@@ -717,6 +729,10 @@ class IniDiaPro(Base, PatDia):
     patStage = Column(String(30), comment='病理分期')
     cRemark = Column(Text(10000), comment='c备注')
     pRemark = Column(Text(10000), comment='p备注')
+
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'PSScore': 'PS评分', 'cliniManifest': '临床表现', 'videography': '影像学', 'part': '部位',
@@ -847,6 +863,10 @@ class SpecimenInfo(Base):
     samplingTime = Column(Date, comment='取样时间')
     storeSite = Column(Text, comment="存储位置")
     note = Column(Text)
+
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'number': '样本编号', 'type': '样本类型', 'amount': '样本数量',

@@ -7,6 +7,7 @@
 from flask import request
 
 from app.libs.decorator import edit_need_auth, update_time, record_modification
+from app.libs.enums import ModuleStatus
 from app.libs.error import Success
 from app.libs.error_code import SampleStatusError
 from app.libs.redprint import Redprint
@@ -35,6 +36,62 @@ def add_past_history(pid):
     return Success()
 
 
+@api.route('/submit/<int:pid>', methods=['GET'])
+@auth.login_required
+def submit_past_history(pid):
+    past_history = PastHis.query.filter_by(pid=pid).first_or_404()
+    if not past_history.submit():
+        return SampleStatusError('当前状态无法提交')
+
+    drug_history_ls = DrugHistory.query.filter_by(pid=pid).all()
+    for drug_history in drug_history_ls:
+        if drug_history.module_status != ModuleStatus.UnSubmitted.value:
+            return SampleStatusError('当前状态无法提交')
+    for drug_history in drug_history_ls:
+        drug_history.submit()
+
+    return Success(msg='提交成功')
+
+
+@api.route('/finish/<int:pid>', methods=['GET'])
+@auth.login_required
+def finish_past_history(pid):
+    past_history = PastHis.query.filter_by(pid=pid).first_or_404()
+    if not past_history.finish():
+        return SampleStatusError('当前状态无法结束监察')
+
+    drug_history_ls = DrugHistory.query.filter_by(pid=pid).all()
+    for drug_history in drug_history_ls:
+        if drug_history.module_status != ModuleStatus.Submitted.value:
+            return SampleStatusError('当前状态无法结束监察')
+    for drug_history in drug_history_ls:
+        drug_history.finish()
+
+    return Success(msg='监察结束')
+
+
+@api.route('/doubt/<int:pid>', methods=['POST'])
+@auth.login_required
+def doubt_past_history(pid):
+    data = request.get_json()
+    item = PastHis.query.filter_by(pid=pid).first_or_404()
+    if item.doubt(data):
+        return Success()
+    else:
+        return SampleStatusError()
+
+
+@api.route('/reply/<int:pid>/<int:doubt_id>', methods=['POST'])
+@auth.login_required
+def reply_past_history(pid, doubt_id):
+    data = request.get_json()
+    item = PastHis.query.filter_by(pid=pid).first_or_404()
+    if item.reply(doubt_id, data):
+        return Success()
+    else:
+        return SampleStatusError()
+
+
 @api.route('/drug_history/<int:pid>', methods=['GET'])
 def get_drug_history(pid):
     args = request.args.to_dict()
@@ -47,10 +104,12 @@ def get_drug_history(pid):
 @auth.login_required
 @edit_need_auth
 @update_time
+@record_modification(DrugHistory)
 def add_drug_history(pid):
     data = request.get_json()
-    patient = Patient.query.get_or_404(pid)
-    data["pid"] = patient.id
+    drugHistory = DrugHistory.query.filter_by(pid=pid).first()
+    data['module_status'] = drugHistory.module_status if drugHistory else 0
+    data["pid"] = pid
     json2db(data, DrugHistory)
     return Success()
 
@@ -68,21 +127,25 @@ def del_hormone_history(pid):
     return Success()
 
 
-@api.route('/submit/<int:pid>', methods=['GET'])
+@api.route('/drug_history/doubt/<int:pid>', methods=['POST'])
 @auth.login_required
-def submit_past_history(pid):
-    past_history = PastHis.query.filter_by(pid=pid).first_or_404()
-    if past_history.submit():
-        return Success(msg='提交成功')
+def doubt_patient(pid):
+    data = request.get_json()
+    item = Patient.query.get_or_404(pid)
+    if item.doubt(data):
+        return Success()
     else:
-        return SampleStatusError('当前状态无法提交')
+        return SampleStatusError()
 
 
-@api.route('/finish/<int:pid>', methods=['GET'])
+@api.route('/drug_history/reply/<int:pid>/<int:doubt_id>', methods=['POST'])
 @auth.login_required
-def finish_past_history(pid):
-    past_history = PastHis.query.filter_by(pid=pid).first_or_404()
-    if past_history.finish():
-        return Success(msg='监察结束')
+def reply_patient(pid, doubt_id):
+    data = request.get_json()
+    item = Patient.query.get_or_404(pid)
+    if item.reply(doubt_id, data):
+        return Success()
     else:
-        return SampleStatusError('当前状态无法结束监察')
+        return SampleStatusError()
+
+

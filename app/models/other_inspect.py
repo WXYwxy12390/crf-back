@@ -77,6 +77,10 @@ class Lung(Base):
     KCONote = Column(Text(10000), comment='比弥散量备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
+
     # 和导出功能有关
     export_header_map = {'samplingTime': '肺功能检查时间', 'FVC': 'FVC(L)', 'FEV1_FVC': 'FEV1/FVC(%)', 'MEF': 'MEF(L/S)',
                          'MEF25': 'MEF25(L/S)', 'MEF50': 'MEF50(L/S)', 'MEF75': 'MEF75(L/S)', 'TLC_sb': 'TLC’sb(L)',
@@ -183,6 +187,10 @@ class OtherExams(Base):
     UCGDesc = Column(Text, comment='超声心动图结果描述')  # 长度
     UCGPath = Column(String(200), comment='超声心动图报告路径,多个以逗号分隔')
 
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
+
     # 和导出功能有关
     export_header_map = {'ECGDetTime': '12导联心电图检测时间', 'ECGDesc': '12导联心电图结果描述',
                          'UCGDetTime': '超声心动图检测时间', 'UCGDesc': '超声心动图结果描述'}
@@ -230,6 +238,10 @@ class ImageExams(Base):
     tumorSD = Column(Float, comment='肿瘤短径')
     tumorDesc = Column(Text, comment='肿瘤描述')
     path = Column(String(200), comment='文件路径,多个以逗号分隔')
+
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'detectTime': '影像学检查检测时间', 'examArea': '检查部位', 'exmaMethod': '检查方法',

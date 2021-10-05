@@ -2,8 +2,10 @@ from datetime import timedelta as td, datetime
 
 from flask import request, g,current_app
 
-from app.libs.decorator import edit_need_auth, update_time
+from app.libs.decorator import edit_need_auth, update_time, record_modification
+from app.libs.enums import ModuleStatus
 from app.libs.error import Success
+from app.libs.error_code import SampleStatusError
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
 from app.models import json2db, delete_array, db
@@ -30,6 +32,7 @@ def get_treatment_evaluation(pid, treNum, trement):
 @auth.login_required
 @edit_need_auth
 @update_time
+@record_modification(TreRec)
 def add_treatment_evaluation(pid, treNum, trement):
     data = request.get_json()
     data['pid'] = pid
@@ -49,6 +52,26 @@ def add_treatment_evaluation(pid, treNum, trement):
     return Success()
 
 
+@api.route('/evaluation/submit/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def submit_treatment_evaluation(pid, treNum):
+    treRec = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+    if treRec.submit():
+        return Success(msg='提交成功')
+    else:
+        return SampleStatusError('当前状态无法提交')
+
+
+@api.route('/evaluation/finish/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def finish_treatment_evaluation(pid, treNum):
+    treRec = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+    if treRec.finish():
+        return Success(msg='监察结束')
+    else:
+        return SampleStatusError('当前状态无法结束监察')
+
+
 # 症状体征的获取、提交、删除
 @api.route('/signs/<int:pid>/<int:treNum>', methods=['GET'])
 def get_signs(pid, treNum):
@@ -60,11 +83,14 @@ def get_signs(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
+@record_modification(Signs)
 def add_signs(pid, treNum):
     data = request.get_json()
+    sign = Signs.query.filter_by(pid=pid, treNum=treNum).first()
     for _data in data['data']:
         _data['pid'] = pid
         _data['treNum'] = treNum
+        _data['module_status'] = sign.module_status if sign else 0
         json2db(_data, Signs)
     return Success()
 
@@ -79,6 +105,30 @@ def del_signs(pid,sign_id):
     return Success()
 
 
+@api.route('/signs/submit/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def submit_signs(pid, treNum):
+    signs = Signs.query.filter_by(pid=pid, treNum=treNum).all()
+    for sign in signs:
+        if sign.module_status != ModuleStatus.UnSubmitted.value:
+            return SampleStatusError('当前状态无法提交')
+    for sign in signs:
+        sign.submit()
+    return Success(msg='提交成功')
+
+
+@api.route('/signs/finish/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def finish_signs(pid, treNum):
+    signs = Signs.query.filter_by(pid=pid, treNum=treNum).all()
+    for sign in signs:
+        if sign.module_status != ModuleStatus.Submitted.value:
+            return SampleStatusError('当前状态无法结束监察')
+    for sign in signs:
+        sign.finish()
+    return Success(msg='监察结束')
+
+
 # 副反应的获取、提交、删除
 @api.route('/side_effect/<int:pid>/<int:treNum>', methods=['GET'])
 def get_side_effect(pid, treNum):
@@ -90,11 +140,14 @@ def get_side_effect(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
+@record_modification(SideEffect)
 def add_side_effect(pid, treNum):
     data = request.get_json()
+    sideEffect = SideEffect.query.filter_by(pid=pid, treNum=treNum).first()
     for _data in data['data']:
         _data['pid'] = pid
         _data['treNum'] = treNum
+        _data['module_status'] = sideEffect.module_status if sideEffect else 0
         json2db(_data, SideEffect)
     return Success()
 
@@ -109,6 +162,30 @@ def del_side_effect(pid,se_id):
     return Success()
 
 
+@api.route('/side_effect/submit/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def submit_side_effect(pid, treNum):
+    side_effects = SideEffect.query.filter_by(pid=pid, treNum=treNum).all()
+    for side_effect in side_effects:
+        if side_effect.module_status != ModuleStatus.UnSubmitted.value:
+            return SampleStatusError('当前状态无法提交')
+    for side_effect in side_effects:
+        side_effect.submit()
+    return Success(msg='提交成功')
+
+
+@api.route('/side_effect/finish/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def finish_side_effect(pid, treNum):
+    side_effects = SideEffect.query.filter_by(pid=pid, treNum=treNum).all()
+    for side_effect in side_effects:
+        if side_effect.module_status != ModuleStatus.Submitted.value:
+            return SampleStatusError('当前状态无法结束监察')
+    for side_effect in side_effects:
+        side_effect.finish()
+    return Success(msg='监察结束')
+
+
 # 随访信息表的获取、提交、删除
 @api.route('/follInfo/<int:pid>', methods=['GET'])
 def get_follInfo(pid):
@@ -121,10 +198,15 @@ def get_follInfo(pid):
 @auth.login_required
 @edit_need_auth
 @update_time
+@record_modification(FollInfo)
 def add_follInfo(pid):
     data = request.get_json()
+    # 状态和同病人同的其他标本信息一致
+    follInfo = FollInfo.query.filter_by(pid=pid).first()
+
     for _data in data['data']:
         _data['pid'] = pid
+        _data['module_status'] = follInfo.module_status if follInfo else 0
         json2db(_data, FollInfo)
     return Success()
 
@@ -136,6 +218,30 @@ def del_follInfo(pid,fid):
     follInfo = FollInfo.query.filter_by(id=fid).all()
     delete_array(follInfo)
     return Success()
+
+
+@api.route('/follInfo/submit/<int:pid>', methods=['GET'])
+@auth.login_required
+def submit_follInfo(pid):
+    follInfos = FollInfo.query.filter_by(pid=pid).all()
+    for follInfo in follInfos:
+        if follInfo.module_status != ModuleStatus.UnSubmitted.value:
+            return SampleStatusError('当前状态无法提交')
+    for follInfo in follInfos:
+        follInfo.submit()
+    return Success(msg='提交成功')
+
+
+@api.route('/follInfo/finish/<int:pid>', methods=['GET'])
+@auth.login_required
+def finish_follInfo(pid):
+    follInfos = FollInfo.query.filter_by(pid=pid).all()
+    for follInfo in follInfos:
+        if follInfo.module_status != ModuleStatus.Submitted.value:
+            return SampleStatusError('当前状态无法结束监察')
+    for follInfo in follInfos:
+        follInfo.finish()
+    return Success(msg='监察结束')
 
 
 # 设置病人随访提醒

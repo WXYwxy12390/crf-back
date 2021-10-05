@@ -75,6 +75,10 @@ class BloodRoutine(Base):
     NEUTNote = Column(Text(10000), comment='中性淋巴比值备注')
     filePath = Column(Text(10000), comment='文件路径，多个以逗号分隔')
 
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
+
     # 和导出功能有关
     export_header_map = {'samplingTime': '血常规检查时间', 'RBC': 'RBC', 'HGb': 'HGb', 'HCT': 'HCT', 'MCV': 'MCV',
                          'MCH': 'MCH', 'MCHC': 'MCHC', 'RDWCV': 'RDWCV', 'RDWSD': 'RDWSD', 'WBC': 'WBC',
@@ -237,6 +241,10 @@ class BloodBio(Base):
     PNote = Column(Text(10000), comment='磷备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
+
     # 和导出功能有关
     export_header_map = {'samplingTime': '血生化检查时间', 'TP': 'TP', 'ALB': 'ALB', 'GLO': 'GLO', 'ALT': 'ALT',
                          'AST': 'AST', 'LDH': 'LDH', 'GGT': 'GGT', 'TBIL': 'TBIL', 'DBIL': 'DBIL', 'IBIL': 'IBIL',
@@ -334,6 +342,10 @@ class Thyroid(Base):
     TSHNote = Column(Text(10000), comment='促甲状腺激素备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
+
     # 和导出功能有关
     export_header_map = {'samplingTime': '甲状腺功能检查时间', 'FT3': 'FT3', 'FT4': 'FT4', 'TSH': 'TSH',
                          'FT3Mea': 'FT3临床意义判定', 'FT4Mea': 'FT4临床意义判定', 'TSHMea': 'TSH临床意义判定',
@@ -414,6 +426,10 @@ class Coagulation(Base):
     INRNote = Column(Text(10000), comment='国际标准化比值备注')
     D_dimerNote = Column(Text(10000), comment='D-二聚体备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
+
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'samplingTime': '凝血功能检查时间', 'PT': 'PT', 'APTT': 'APTT', 'TT': 'TT',
@@ -507,6 +523,10 @@ class MyocardialEnzyme(Base):
     NT_proBNPNote = Column(Text(10000), comment='氨基末端脑钠肽前体备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
+
     # 和导出功能有关
     export_header_map = {'samplingTime': '心肌酶谱检查时间', 'LDH': 'LDH', 'CK': 'CK', 'CK_MB': 'CK-MB',
                          'cTnI': 'cTnI', 'cTnT': 'cTnT', 'MYO': 'MYO', 'BNP': 'BNP', 'NT_proBNP': 'NT-proBNP',
@@ -595,6 +615,10 @@ class Cytokines(Base):
     IL_8Note = Column(Text(10000), comment='白介素8备注')
     IL_10Note = Column(Text(10000), comment='白介素10备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
+
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'samplingTime': '细胞因子检查时间', 'TNF_a': 'TNF-alpha', 'IL_1b': 'IL-1beta',
@@ -747,6 +771,10 @@ class LymSubsets(Base):
     CD4_CD25_CD127lowNote = Column(Text(10000), comment='CD4+CD25+CD127low备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
+
     # 和导出功能有关
     export_header_map = {'samplingTime': '淋巴细胞亚群检查时间', 'CD19_': 'CD19#', 'CD3_': 'CD3#', 'CD4_': 'CD4#',
                          'CD8_': 'CD8#', 'CD16_56': 'CD1656', 'LYMPH_': 'LYMPH###', 'CD19': 'CD19',
@@ -895,6 +923,10 @@ class UrineRoutine(Base):
     CLANote = Column(Text(10000), comment='尿透明度备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
 
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
+
     # 和导出功能有关
     export_header_map = {'samplingTime': '尿常规检查时间', 'UPH': 'UPH', 'UGLU': 'UGLU', 'LEU': 'LEU',
                          'ERY': 'ERY', 'NIT': 'NIT', 'BIL': 'BIL', 'USG': 'USG', 'KET': 'KET',
@@ -988,6 +1020,10 @@ class TumorMarker(Base):
     AFPNote = Column(Text(10000), comment='甲胎蛋白备注')
     SCCANote = Column(Text(10000), comment='鳞癌相关抗原备注')
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
+
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'samplingTime': '肿瘤标志物', 'CEA': 'CEA', 'NSE': 'NSE', 'pro_GPR': 'pro-GPR',

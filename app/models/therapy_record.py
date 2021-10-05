@@ -143,6 +143,10 @@ class TreRec(Base, PatDia):
     PFS_DFS = Column(String(2048), comment='PFS/DFS')
     is_auto_compute = Column(SmallInteger,server_default="1")
 
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
+
 
     # 和导出功能有关
     export_header_map = {'trement': '几线治疗', 'beEffEvaDate': '最佳疗效评估日期', 'beEffEva': '最佳疗效评估',
@@ -333,6 +337,10 @@ class OneToFive(Base, PatDia):
     patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
     # patDiaOthers = Column(String(255), comment='病理诊断,其他的内容')
     note = Column(String(2048), comment='备注')
+
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     chemo_detail_num = 0
@@ -577,6 +585,10 @@ class DetailTrePlan(Base):
     drugs = Column(JSON, comment='药物使用情况, {drugName:{drugDosa: ,duration: },...}')
     note = Column(String(2048), comment='药物使用备注')  # 长度
 
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
+
     def keys(self):
         return ['id', 'treSolu', 'treSche', 'currPeriod', 'treatName', 'begDate', 'endDate', 'drugs', 'note']
 
@@ -603,6 +615,10 @@ class Surgery(Base, PatDia):
     matPart = Column(String(255), comment='取材部位')
     specNum = Column(String(255), comment='标本库流水号')
     patDia = Column(JSON, comment='病理诊断结果')
+
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     detail_header_num = 0
@@ -763,6 +779,10 @@ class Radiotherapy(Base):
     matPart = Column(String(255), comment='取材部位')
     specNum = Column(String(255), comment='标本库流水号')
     patDia = Column(JSON, comment='病理诊断结果')
+
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'begDate': '开始日期', 'endDate': '结束日期', 'radSite': '放疗部位',

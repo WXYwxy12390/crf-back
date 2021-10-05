@@ -1,14 +1,14 @@
-from flask import request, g
+from datetime import datetime
 
+from flask import request
 from app.libs.decorator import edit_need_auth, record_modification
 from app.libs.enums import ModuleStatus
 from app.libs.error import Success
-from app.libs.error_code import ParameterException, SubmitError, SampleStatusError
+from app.libs.error_code import ParameterException, SampleStatusError
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
 from app.models import json2db, db
 from app.models.base_line import Patient
-from app.spider.user_info import UserInfo
 
 api = Redprint('patient')
 
@@ -58,3 +58,25 @@ def finish_patient(pid):
         return Success(msg='监察结束')
     else:
         return SampleStatusError('当前状态无法结束监察')
+
+
+@api.route('/doubt/<int:pid>', methods=['POST'])
+@auth.login_required
+def doubt_patient(pid):
+    data = request.get_json()
+    item = Patient.query.get_or_404(pid)
+    if item.doubt(data):
+        return Success()
+    else:
+        return SampleStatusError()
+
+
+@api.route('/reply/<int:pid>/<int:doubt_id>', methods=['POST'])
+@auth.login_required
+def reply_patient(pid, doubt_id):
+    data = request.get_json()
+    item = Patient.query.get_or_404(pid)
+    if item.reply(doubt_id, data):
+        return Success()
+    else:
+        return SampleStatusError()

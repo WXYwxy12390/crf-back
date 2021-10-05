@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Date, Text, DateTime
+from sqlalchemy import Column, Integer, String, Float, Date, Text, DateTime, JSON
 from app.models.base import Base
 import numpy as np
 
@@ -54,6 +54,10 @@ class Immunohis(Base):
     Ki67 = Column(Float, comment='Ki67')
     other = Column(String(2048), comment='其他')  # 长度
     filePath = Column(String(200), comment='文件路径，多个以逗号分隔')
+
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'ALKD5F3': 'ALKD5F3', 'ALKD5F3N': 'ALKD5F3N', 'CAIX': 'CAIX', 'CAM52': 'CAM52', 'CD10': 'CD10',
@@ -173,6 +177,10 @@ class MoleDetec(Base):
     detectTime = Column(Date, comment='检测时间')
     sampleType = Column(String(255), comment='样本类型')
 
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
+
     # 和导出功能有关
     export_header_map = {
         'MSI': 'MSI', 'PD1': 'PD-1表达','PD1KT': 'PD1KT', 'PDL1': 'PD-L1表达', 'PDL1KT': 'PDL1KT', 'TMB': 'TMB',
@@ -282,6 +290,10 @@ class Signs(Base):
     isExe = Column(Integer, comment='目前是否存在')
     endDate = Column(DateTime, comment='结束日期')
 
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
+
     # 和导出功能有关
     export_header_map = {'symName': '症状名称', 'begDate': '开始日期',
                          'isExe': '目前是否存在', 'endDate': '结束日期'}
@@ -361,6 +373,10 @@ class SideEffect(Base):
     isExe = Column(Integer, comment='目前是否存在')
     treatment = Column(String(2048), comment='治疗情况')
     endDate = Column(Date, comment='结束日期')
+
+    modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
+    query_reply = Column(JSON, comment='质疑和回复')
+    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'sidReaName': '症状描述', 'sidRecCla': '副反应分级', 'begDate': '开始日期',
