@@ -129,6 +129,7 @@ class ModificationAndDoubt:
         from app.models.doubt import Doubt
         json2db(data, Doubt)
 
+        # 求同模块内存在的所有质疑的id列表
         all_doubt_id = []
         from app.models.base_line import SpecimenInfo, DrugHistory
         from app.models.crf_info import FollInfo
@@ -147,8 +148,33 @@ class ModificationAndDoubt:
                     all_doubt_id.extend(item.doubt)
         else:
             all_doubt_id.extend(self.doubt)
-        doubt_ls = Doubt.query.filter(Doubt.is_delete == 0, Doubt.id.in_(all_doubt_id)).all()
+
+        from app.models.therapy_record import OneToFive, Radiotherapy, Surgery
+        if self.__class__ in [OneToFive, Radiotherapy, Surgery]:
+            detail_tre_plans = DetailTrePlan.query.filter_by(pid=self.pid, treNum=self.treNum).all()
+            for detail_tre_plan in detail_tre_plans:
+                if detail_tre_plan.doubt:
+                    all_doubt_id.extend(detail_tre_plan.doubt)
+        from app.models.base_line import PastHis
+        if self.__class__ == PastHis:
+            drugHistory_ls = DrugHistory.query.filter_by(pid=self.pid).all()
+            for drugHistory in drugHistory_ls:
+                if drugHistory.doubt:
+                    all_doubt_id.extend(drugHistory.doubt)
+        if self.__class__ == DetailTrePlan:
+            one_to_five = OneToFive.query.filter_by(pid=self.pid, treNum=self.treNum).first()
+            surgery = Surgery.query.filter_by(pid=self.pid, treNum=self.treNum).first()
+            if one_to_five and one_to_five.doubt:
+                all_doubt_id.extend(one_to_five.doubt)
+            if surgery and surgery.doubt:
+                all_doubt_id.extend(surgery.doubt)
+        if self.__class__ == DrugHistory:
+            pastHis = PastHis.query.filter_by(pid=self.pid).first()
+            if pastHis and pastHis.doubt:
+                all_doubt_id.extend(pastHis.doubt)
+
         # 检查是否还存在没有回复的质疑，若存在则不修改状态
+        doubt_ls = Doubt.query.filter(Doubt.is_delete == 0, Doubt.id.in_(all_doubt_id)).all()
         for doubt in doubt_ls:
             if doubt.is_replied == 0:
                 return True
@@ -167,7 +193,6 @@ class ModificationAndDoubt:
                 self.module_status = ModuleStatus.AllReplied.value
 
         # 有的表和别的表属于同一模块。修改同一模块中其他表的状态。
-        from app.models.therapy_record import OneToFive, Radiotherapy, Surgery
         if self.__class__ in [OneToFive, Radiotherapy, Surgery]:
             detail_tre_plans = DetailTrePlan.query.filter_by(pid=self.pid, treNum=self.treNum).all()
             with db.auto_commit():

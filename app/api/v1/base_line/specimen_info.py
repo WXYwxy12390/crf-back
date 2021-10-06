@@ -76,7 +76,7 @@ def del_specimen_info(pid):
 
 @api.route('/submit/<int:pid>', methods=['GET'])
 @auth.login_required
-def submit_image_exam(pid):
+def submit_specimen_info(pid):
     specimen_ls = SpecimenInfo.query.filter_by(pid=pid).all()
     for specimen in specimen_ls:
         if specimen.module_status != ModuleStatus.UnSubmitted.value:
@@ -88,7 +88,7 @@ def submit_image_exam(pid):
 
 @api.route('/finish/<int:pid>', methods=['GET'])
 @auth.login_required
-def finish_image_exam(pid):
+def finish_specimen_info(pid):
     specimen_ls = SpecimenInfo.query.filter_by(pid=pid).all()
     for specimen in specimen_ls:
         if specimen.module_status != ModuleStatus.Submitted.value:
@@ -96,3 +96,26 @@ def finish_image_exam(pid):
     for specimen in specimen_ls:
         specimen.finish()
     return Success(msg='监察结束')
+
+
+@api.route('/doubt/<int:specimen_info_id>', methods=['POST'])
+@auth.login_required
+def doubt_specimen_info(specimen_info_id):
+    data = request.get_json()
+    item = SpecimenInfo.query.get_or_404(specimen_info_id)
+
+    if item.question(data):
+        return Success()
+    else:
+        return SampleStatusError()
+
+
+@api.route('/reply/<int:specimen_info_id>/<int:doubt_id>', methods=['POST'])
+@auth.login_required
+def reply_specimen_info(specimen_info_id, doubt_id):
+    data = request.get_json()
+    item = SpecimenInfo.query.get_or_404(specimen_info_id)
+    if item.reply_doubt(doubt_id, data):
+        return Success()
+    else:
+        return SampleStatusError()

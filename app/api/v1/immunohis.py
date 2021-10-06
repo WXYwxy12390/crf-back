@@ -49,3 +49,25 @@ def finish_immunohis(pid, treNum):
         return SampleStatusError('当前状态无法结束监察')
 
 
+@api.route('/doubt/<int:pid>/<int:treNum>', methods=['POST'])
+@auth.login_required
+def doubt_immunohis(pid, treNum):
+    data = request.get_json()
+    item = Immunohis.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+    if item.question(data):
+        return Success()
+    else:
+        return SampleStatusError()
+
+
+@api.route('/reply/<int:pid>/<int:treNum>/<int:doubt_id>', methods=['POST'])
+@auth.login_required
+def reply_immunohis(pid, treNum, doubt_id):
+    data = request.get_json()
+    item = Immunohis.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+    if item.reply_doubt(doubt_id, data):
+        return Success()
+    else:
+        return SampleStatusError()
+
+

@@ -72,6 +72,28 @@ def finish_treatment_evaluation(pid, treNum):
         return SampleStatusError('当前状态无法结束监察')
 
 
+@api.route('/evaluation/doubt/<int:pid>/<int:treNum>', methods=['POST'])
+@auth.login_required
+def doubt_evaluation(pid, treNum):
+    data = request.get_json()
+    item = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+    if item.question(data):
+        return Success()
+    else:
+        return SampleStatusError()
+
+
+@api.route('/evaluation/reply/<int:pid>/<int:treNum>/<int:doubt_id>', methods=['POST'])
+@auth.login_required
+def reply_evaluation(pid, treNum, doubt_id):
+    data = request.get_json()
+    item = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+    if item.reply_doubt(doubt_id, data):
+        return Success()
+    else:
+        return SampleStatusError()
+
+
 # 症状体征的获取、提交、删除
 @api.route('/signs/<int:pid>/<int:treNum>', methods=['GET'])
 def get_signs(pid, treNum):
@@ -127,6 +149,28 @@ def finish_signs(pid, treNum):
     for sign in signs:
         sign.finish()
     return Success(msg='监察结束')
+
+
+@api.route('/signs/doubt/<int:image_exam_id>', methods=['POST'])
+@auth.login_required
+def doubt_signs(image_exam_id):
+    data = request.get_json()
+    item = Signs.query.get_or_404(image_exam_id)
+    if item.question(data):
+        return Success()
+    else:
+        return SampleStatusError()
+
+
+@api.route('/signs/reply/<int:image_exam_id>/<int:doubt_id>', methods=['POST'])
+@auth.login_required
+def reply_signs(image_exam_id, doubt_id):
+    data = request.get_json()
+    item = Signs.query.get_or_404(image_exam_id)
+    if item.reply_doubt(doubt_id, data):
+        return Success()
+    else:
+        return SampleStatusError()
 
 
 # 副反应的获取、提交、删除
@@ -186,6 +230,28 @@ def finish_side_effect(pid, treNum):
     return Success(msg='监察结束')
 
 
+@api.route('/side_effect/doubt/<int:image_exam_id>', methods=['POST'])
+@auth.login_required
+def doubt_side_effect(image_exam_id):
+    data = request.get_json()
+    item = SideEffect.query.get_or_404(image_exam_id)
+    if item.question(data):
+        return Success()
+    else:
+        return SampleStatusError()
+
+
+@api.route('/side_effect/reply/<int:image_exam_id>/<int:doubt_id>', methods=['POST'])
+@auth.login_required
+def reply_side_effect(image_exam_id, doubt_id):
+    data = request.get_json()
+    item = SideEffect.query.get_or_404(image_exam_id)
+    if item.reply_doubt(doubt_id, data):
+        return Success()
+    else:
+        return SampleStatusError()
+
+
 # 随访信息表的获取、提交、删除
 @api.route('/follInfo/<int:pid>', methods=['GET'])
 def get_follInfo(pid):
@@ -242,6 +308,29 @@ def finish_follInfo(pid):
     for follInfo in follInfos:
         follInfo.finish()
     return Success(msg='监察结束')
+
+
+@api.route('/follInfo/doubt/<int:specimen_info_id>', methods=['POST'])
+@auth.login_required
+def doubt_follInfo(specimen_info_id):
+    data = request.get_json()
+    item = FollInfo.query.get_or_404(specimen_info_id)
+
+    if item.question(data):
+        return Success()
+    else:
+        return SampleStatusError()
+
+
+@api.route('/follInfo/reply/<int:specimen_info_id>/<int:doubt_id>', methods=['POST'])
+@auth.login_required
+def reply_follInfo(specimen_info_id, doubt_id):
+    data = request.get_json()
+    item = FollInfo.query.get_or_404(specimen_info_id)
+    if item.reply_doubt(doubt_id, data):
+        return Success()
+    else:
+        return SampleStatusError()
 
 
 # 设置病人随访提醒

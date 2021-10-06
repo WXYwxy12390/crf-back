@@ -103,6 +103,44 @@ def finish_therapy_record(pid, treNum):
     return Success(msg='监察结束')
 
 
+@api.route('/doubt/<int:pid>/<int:treNum>', methods=['POST'])
+@auth.login_required
+def doubt_therapy_record(pid, treNum):
+    tre_rec = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+    trement = tre_rec.trement
+    if trement in ['one', 'two', 'three', 'four', 'five', 'other']:
+        item = OneToFive.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+    elif trement == 'surgery':
+        item = Surgery.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+    elif trement == 'radiotherapy':
+        item = Radiotherapy.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+
+    data = request.get_json()
+    if item.question(data):
+        return Success()
+    else:
+        return SampleStatusError()
+
+
+@api.route('/reply/<int:pid>/<int:treNum>/<int:doubt_id>', methods=['POST'])
+@auth.login_required
+def reply_therapy_record(pid, treNum, doubt_id):
+    data = request.get_json()
+    tre_rec = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+    trement = tre_rec.trement
+    if trement in ['one', 'two', 'three', 'four', 'five', 'other']:
+        item = OneToFive.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+    elif trement == 'surgery':
+        item = Surgery.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+    elif trement == 'radiotherapy':
+        item = Radiotherapy.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+
+    if item.reply_doubt(doubt_id, data):
+        return Success()
+    else:
+        return SampleStatusError()
+
+
 @api.route('/therapy_plan/<int:pid>/<int:treNum>', methods=['GET'])
 def get_therapy_plan(pid, treNum):
     items = DetailTrePlan.query.filter_by(pid=pid, treNum=treNum).all()
@@ -138,5 +176,26 @@ def del_therapy_plan(pid, treNum):
     data = request.get_json()
     items = DetailTrePlan.query.filter(DetailTrePlan.is_delete == 0, DetailTrePlan.id.in_(data['ids'])).all()
     delete_array(items)
-
     return Success()
+
+
+@api.route('/therapy_plan/doubt/<int:therapy_plan_id>', methods=['POST'])
+@auth.login_required
+def doubt_therapy_plan(therapy_plan_id):
+    data = request.get_json()
+    item = DetailTrePlan.query.get_or_404(therapy_plan_id)
+    if item.question(data):
+        return Success()
+    else:
+        return SampleStatusError()
+
+
+@api.route('/therapy_plan/reply/<int:therapy_plan_id>/<int:doubt_id>', methods=['POST'])
+@auth.login_required
+def reply_therapy_plan(therapy_plan_id, doubt_id):
+    data = request.get_json()
+    item = DetailTrePlan.query.get_or_404(therapy_plan_id)
+    if item.reply_doubt(doubt_id, data):
+        return Success()
+    else:
+        return SampleStatusError()

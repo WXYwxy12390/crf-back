@@ -10,3 +10,6 @@ class Doubt(Base):
     is_replied = Column(SmallInteger, server_default='0', comment='是否被回复')
     reply = Column(String(1000), comment='回复内容')
     reply_time = Column(DateTime, comment='回复的时间')
+
+    def keys(self):
+        return ['id', 'doubt_column', 'doubt_description', 'is_replied', 'reply', 'reply_time', "create_time"]

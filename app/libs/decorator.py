@@ -98,7 +98,9 @@ def record_modification(T):
                 if obj.module_status != ModuleStatus.Submitted.value:
                     return out
                 obj.record_modification(processed_data)
-                cancel_submit(T_copy, **kwargs)
+
+                # 修改后是否需要重新提交
+                # cancel_submit(T_copy, **kwargs)
             else:
                 # 当状态不是已提交时，不记录修改。正常情况下，同病人同访视同模块多条记录应该是状态相同。
                 for _obj in obj:
@@ -110,7 +112,8 @@ def record_modification(T):
                             del _data['id']
                             _obj.record_modification(_data)
                             break
-                cancel_submit(T_copy, **kwargs)
+                # 修改后是否需要重新提交
+                # cancel_submit(T_copy, **kwargs)
 
             return out
 
@@ -146,48 +149,48 @@ def process_data(T, data):
 
 
 # 将某用户某访视的某模块的所有数据的状态均从已提交修改为未提交
-def cancel_submit(T, **kwargs):
-    pid = kwargs.get('pid')
-    treNum = kwargs.get('treNum')
-
-    if T == Patient:
-        obj = T.query.get_or_404(pid)
-        obj.cancel_submit()
-    elif T in pid_for_one_obj:
-        obj = T.query.filter_by(pid=pid).first_or_404()
-        obj.cancel_submit()
-    elif T in treNum_for_one_obj:
-        obj = T.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-        obj.cancel_submit()
-    elif T in pid_for_many_obj:
-        obj_ls = T.query.filter_by(pid=pid).all()
-        for obj in obj_ls:
-            obj.cancel_submit()
-    elif T in treNum_for_many_obj:
-        obj_ls = T.query.filter_by(pid=pid, treNum=treNum).all()
-        for obj in obj_ls:
-            obj.cancel_submit()
-
-    # 有的表和别的表共同属于一个模块。取消提交时要对同模块的其他表也取消提交。
-    if T in [OneToFive, Radiotherapy, Surgery]:
-        detail_tre_plans = DetailTrePlan.query.filter_by(pid=pid, treNum=treNum).all()
-        for detail_tre_plan in detail_tre_plans:
-            detail_tre_plan.cancel_submit()
-    if T == PastHis:
-        drugHistory_ls = DrugHistory.query.filter_by(pid=pid).all()
-        for drugHistory in drugHistory_ls:
-            drugHistory.cancel_submit()
-    if T == DetailTrePlan:
-        one_to_five = OneToFive.query.filter_by(pid=pid, treNum=treNum).first()
-        surgery = Surgery.query.filter_by(pid=pid, treNum=treNum).first()
-        if one_to_five:
-            one_to_five.cancel_submit()
-        if surgery:
-            surgery.cancel_submit()
-    if T == DrugHistory:
-        pastHis = PastHis.query.filter_by(pid=pid).first()
-        if pastHis:
-            pastHis.cancel_submit()
+# def cancel_submit(T, **kwargs):
+#     pid = kwargs.get('pid')
+#     treNum = kwargs.get('treNum')
+#
+#     if T == Patient:
+#         obj = T.query.get_or_404(pid)
+#         obj.cancel_submit()
+#     elif T in pid_for_one_obj:
+#         obj = T.query.filter_by(pid=pid).first_or_404()
+#         obj.cancel_submit()
+#     elif T in treNum_for_one_obj:
+#         obj = T.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+#         obj.cancel_submit()
+#     elif T in pid_for_many_obj:
+#         obj_ls = T.query.filter_by(pid=pid).all()
+#         for obj in obj_ls:
+#             obj.cancel_submit()
+#     elif T in treNum_for_many_obj:
+#         obj_ls = T.query.filter_by(pid=pid, treNum=treNum).all()
+#         for obj in obj_ls:
+#             obj.cancel_submit()
+#
+#     # 有的表和别的表共同属于一个模块。取消提交时要对同模块的其他表也取消提交。
+#     if T in [OneToFive, Radiotherapy, Surgery]:
+#         detail_tre_plans = DetailTrePlan.query.filter_by(pid=pid, treNum=treNum).all()
+#         for detail_tre_plan in detail_tre_plans:
+#             detail_tre_plan.cancel_submit()
+#     if T == PastHis:
+#         drugHistory_ls = DrugHistory.query.filter_by(pid=pid).all()
+#         for drugHistory in drugHistory_ls:
+#             drugHistory.cancel_submit()
+#     if T == DetailTrePlan:
+#         one_to_five = OneToFive.query.filter_by(pid=pid, treNum=treNum).first()
+#         surgery = Surgery.query.filter_by(pid=pid, treNum=treNum).first()
+#         if one_to_five:
+#             one_to_five.cancel_submit()
+#         if surgery:
+#             surgery.cancel_submit()
+#     if T == DrugHistory:
+#         pastHis = PastHis.query.filter_by(pid=pid).first()
+#         if pastHis:
+#             pastHis.cancel_submit()
 
 
 # 返回修改的对象，可能是一个也可能是列表

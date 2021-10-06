@@ -52,3 +52,26 @@ def finish_first_diagnose(pid):
         return Success(msg='监察结束')
     else:
         return SampleStatusError('当前状态无法结束监察')
+
+
+@api.route('/doubt/<int:pid>', methods=['POST'])
+@auth.login_required
+def doubt_first_diagnose(pid):
+    data = request.get_json()
+    item = IniDiaPro.query.filter_by(pid=pid).first_or_404()
+
+    if item.question(data):
+        return Success()
+    else:
+        return SampleStatusError()
+
+
+@api.route('/reply/<int:pid>/<int:doubt_id>', methods=['POST'])
+@auth.login_required
+def reply_first_diagnose(pid, doubt_id):
+    data = request.get_json()
+    item = IniDiaPro.query.filter_by(pid=pid).first_or_404()
+    if item.reply_doubt(doubt_id, data):
+        return Success()
+    else:
+        return SampleStatusError()
