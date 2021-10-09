@@ -79,7 +79,6 @@ class Lung(Base, ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'samplingTime': '肺功能检查时间', 'FVC': 'FVC(L)', 'FEV1_FVC': 'FEV1/FVC(%)', 'MEF': 'MEF(L/S)',
@@ -167,7 +166,7 @@ class Lung(Base, ModificationAndDoubt):
                 'MEFMea', 'MEF25Mea', 'MEF50Mea', 'MEF75Mea', 'TLC_sbMea', 'RVMea', 'RV_TLCMea', 'VCMea', 'DLCO_exMea',
                 'DLCO_sbMea', 'KCOMea', 'FVCNote', 'FEV1_FVCNote', 'MEFNote', 'MEF25Note', 'MEF50Note', 'MEF75Note',
                 'TLC_sbNote', 'RVNote', 'RV_TLCNote', 'VCNote', 'DLCO_exNote', 'DLCO_sbNote', 'KCONote',
-                'modification', 'doubt', 'module_status']
+                'modification', 'doubt']
 
 
 # 其他检查表
@@ -185,7 +184,6 @@ class OtherExams(Base, ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'ECGDetTime': '12导联心电图检测时间', 'ECGDesc': '12导联心电图结果描述',
@@ -214,7 +212,7 @@ class OtherExams(Base, ModificationAndDoubt):
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'ECGDetTime', 'ECGDesc', 'UCGDetTime', 'UCGDesc',
-                'modification', 'doubt', 'module_status']
+                'modification', 'doubt']
 
 
 # 影像学检查表
@@ -234,7 +232,6 @@ class ImageExams(Base, ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'detectTime': '影像学检查检测时间', 'examArea': '检查部位', 'exmaMethod': '检查方法',
@@ -242,7 +239,7 @@ class ImageExams(Base, ModificationAndDoubt):
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'detectTime', 'examArea', 'exmaMethod', 'tumorLD', 'tumorSD', 'tumorDesc',
-                'photoNumber', 'modification', 'doubt', 'module_status']
+                'photoNumber', 'modification', 'doubt']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):

@@ -33,7 +33,7 @@ class Patient(Base, ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
+    module_status = Column(JSON, comment='各访视的各模块的状态，0未提交，1未启动监察，2CRA监察中，3CRA有质疑，4有回复，5CRA已完成')
 
     # 和导出功能有关
     export_header_map = {'patNumber': '编号', 'researchCenter': '研究中心', 'idNumber': '身份证号', 'patientName': '姓名',
@@ -517,7 +517,6 @@ class PastHis(Base,ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'basDisHis': '基础疾病史', 'infDisHis': '传染病史', 'tumor': '是否有肿瘤史', 'tumHis': '肿瘤史',
@@ -620,7 +619,7 @@ class PastHis(Base,ModificationAndDoubt):
     def keys(self):
         return ['id', 'pid', 'basDisHis', 'infDisHis', 'tumor', 'tumHis', 'tumorFam', 'tumFamHis', 'smoke',
                 'smokingHis', 'drink', 'drinkingHis', 'hormone', 'drug', '_basDisHis', '_tumHis',
-                '_tumFamHis', 'modification', 'doubt', 'module_status']
+                '_tumFamHis', 'modification', 'doubt']
 
     # 和导出功能有关
     def format_drink_history(self, object):
@@ -675,12 +674,11 @@ class DrugHistory(Base,ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     export_header_map = {'drug_name': '药物名称', 'drug_dose':'日使用剂量', 'use_time':'累积使用时间（月）'}
 
     def keys(self):
-        return ['id', 'drug_name', 'drug_dose', 'use_time', 'modification', 'doubt', 'module_status']
+        return ['id', 'drug_name', 'drug_dose', 'use_time', 'modification', 'doubt']
 
 
 # 病人初诊过程信息表
@@ -733,7 +731,6 @@ class IniDiaPro(Base, PatDia, ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'PSScore': 'PS评分', 'cliniManifest': '临床表现', 'videography': '影像学', 'part': '部位',
@@ -750,7 +747,7 @@ class IniDiaPro(Base, PatDia, ModificationAndDoubt):
                 "patReDate", "patNum", "patDia", "mitIma", "comCar", "necArea", "massSize", "Ki67",
                 "traSite", "TSize", "stage", "cStage", "cliStage", "pStage", "patStage", 'cRemark', 'pRemark',
                 '_cliniManifest', '_part', '_bioMet', '_traSite', '_patDia', '_patDiaOthers', 'cliniDia',
-                'modification', 'doubt', 'module_status']
+                'modification', 'doubt']
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
@@ -868,7 +865,6 @@ class SpecimenInfo(Base,ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'number': '样本编号', 'type': '样本类型', 'amount': '样本数量',
@@ -937,4 +933,4 @@ class SpecimenInfo(Base,ModificationAndDoubt):
 
     def keys(self):
         return ['id', 'number', 'type', 'amount', 'samplingTime', 'note', 'storeSite',
-                'modification', 'doubt', 'module_status']
+                'modification', 'doubt']

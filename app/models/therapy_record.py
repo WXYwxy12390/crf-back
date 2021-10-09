@@ -141,12 +141,10 @@ class TreRec(Base, PatDia, ModificationAndDoubt):
     proDate = Column(Date, comment='进展日期')
     proDes = Column(String(2048), comment='进展描述')  # text
     PFS_DFS = Column(String(2048), comment='PFS/DFS')
-    is_auto_compute = Column(SmallInteger,server_default="1")
+    is_auto_compute = Column(SmallInteger, server_default="1")
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
-
 
     # 和导出功能有关
     export_header_map = {'trement': '几线治疗', 'beEffEvaDate': '最佳疗效评估日期', 'beEffEva': '最佳疗效评估',
@@ -156,13 +154,13 @@ class TreRec(Base, PatDia, ModificationAndDoubt):
 
     def keys(self):
         return ['id', 'treNum', 'trement', 'date', 'beEffEvaDate', 'beEffEva', 'proDate', 'proDes', 'PFS_DFS',
-                'is_auto_compute', 'modification', 'doubt', 'module_status']
+                'is_auto_compute', 'modification', 'doubt']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
         row = np.zeros(0, dtype=str)
         if buffer.get('TreRec').get(pid) is None or buffer.get('TreRec').get(pid).get(treIndex) is None:
-            row = np.append(row, ['/']*TreRec.header_num)
+            row = np.append(row, ['/'] * TreRec.header_num)
             return row
         obj = buffer.get('TreRec').get(pid).get(treIndex)
 
@@ -192,8 +190,9 @@ class TreRec(Base, PatDia, ModificationAndDoubt):
                 value = trement_map.get(value)
                 row = np.append(row, value)
             elif column == 'beEffEva':
-                beEffEva_map = {'1':'PD-进展','2':'SD-稳定','3':'PR-部分缓解','4':'CR-完全缓解','5':'术后未发现新病灶','/':'/',
-                                'PD-进展':'PD-进展','SD-稳定':'SD-稳定','PR-部分缓解':'PR-部分缓解','CR-完全缓解':'CR-完全缓解','术后未发现新病灶':'术后未发现新病灶'}
+                beEffEva_map = {'1': 'PD-进展', '2': 'SD-稳定', '3': 'PR-部分缓解', '4': 'CR-完全缓解', '5': '术后未发现新病灶', '/': '/',
+                                'PD-进展': 'PD-进展', 'SD-稳定': 'SD-稳定', 'PR-部分缓解': 'PR-部分缓解', 'CR-完全缓解': 'CR-完全缓解',
+                                '术后未发现新病灶': '术后未发现新病灶'}
                 value = self.filter_none(obj, column)
                 value = beEffEva_map.get(value)
                 row = np.append(row, value)
@@ -241,7 +240,9 @@ class TreRec(Base, PatDia, ModificationAndDoubt):
             if surgery:
                 date1 = surgery.surDate
         elif self.trement in ["one", "two", "three", "four", "five", 'other']:
-            trePlan = DetailTrePlan.query.filter(DetailTrePlan.is_delete==0,DetailTrePlan.pid==self.pid, DetailTrePlan.treNum==self.treNum,DetailTrePlan.begDate!=None).order_by(DetailTrePlan.begDate).first()
+            trePlan = DetailTrePlan.query.filter(DetailTrePlan.is_delete == 0, DetailTrePlan.pid == self.pid,
+                                                 DetailTrePlan.treNum == self.treNum,
+                                                 DetailTrePlan.begDate != None).order_by(DetailTrePlan.begDate).first()
             one_to_five = OneToFive.query.filter_by(pid=self.pid, treNum=self.treNum).first()
             if one_to_five is None:
                 with db.auto_commit():
@@ -253,10 +254,9 @@ class TreRec(Base, PatDia, ModificationAndDoubt):
                 return
             else:
                 if one_to_five.begDate is not None and trePlan.begDate is not None:
-                    date1 = min(one_to_five.begDate,trePlan.begDate)
+                    date1 = min(one_to_five.begDate, trePlan.begDate)
                 else:
                     date1 = one_to_five.begDate if one_to_five.begDate else trePlan.begDate
-
 
         date2 = self.proDate
         if date1 and date2:
@@ -339,7 +339,6 @@ class OneToFive(Base, PatDia, ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     chemo_detail_num = 0
@@ -354,7 +353,7 @@ class OneToFive(Base, PatDia, ModificationAndDoubt):
     def keys(self):
         return ['id', 'pid', 'treNum', 'isTre', 'clinTri', 'treSolu', 'spePlan', 'begDate', 'endDate', 'isRepBio',
                 'bioMet', 'matPart', 'specNum', 'patDiaRes', 'patDiaOthers', 'note', 'patDia', '_bioMet',
-                'modification', 'doubt', 'module_status']
+                'modification', 'doubt']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
@@ -365,8 +364,9 @@ class OneToFive(Base, PatDia, ModificationAndDoubt):
         row = np.zeros(0, dtype=str)
         if (buffer.get('OneToFive').get(pid) is None or buffer.get('OneToFive').get(pid).get(treIndex) is None
                 or buffer.get('TreRec').get(pid) is None or buffer.get('TreRec').get(pid).get(treIndex) is None
-                or not (buffer.get('TreRec').get(pid).get(treIndex).trement in ['one', 'two', 'three', 'four', 'five'])):
-            row = np.append(row, ['/']*OneToFive.header_num)
+                or not (buffer.get('TreRec').get(pid).get(treIndex).trement in ['one', 'two', 'three', 'four',
+                                                                                'five'])):
+            row = np.append(row, ['/'] * OneToFive.header_num)
             return row
         obj = buffer.get('OneToFive').get(pid).get(treIndex)
 
@@ -378,14 +378,14 @@ class OneToFive(Base, PatDia, ModificationAndDoubt):
                 my_detail_headers.append('endDate')
             elif column == 'detailNote':
                 my_detail_headers.append('note')
-            elif column in ['treatName','currPeriod','treSche','drugs']:
+            elif column in ['treatName', 'currPeriod', 'treSche', 'drugs']:
                 my_detail_headers.append(column)
 
         if buffer.get('DetailTrePlan').get(pid) is None or buffer.get('DetailTrePlan').get(pid).get(treIndex) is None:
             detail_trePlan_array = None
         else:
             detail_trePlan_array = buffer.get('DetailTrePlan').get(pid).get(treIndex)
-        detail_flag = False #标志是否已经处理了详细治疗方案的字段
+        detail_flag = False  # 标志是否已经处理了详细治疗方案的字段
         for column in columns:
             if column == 'isTre':
                 value = self.filter_none(obj, column)
@@ -415,7 +415,7 @@ class OneToFive(Base, PatDia, ModificationAndDoubt):
                 size = len(my_detail_headers)
                 if not detail_trePlan_array:
                     times = OneToFive.chemo_detail_num + OneToFive.targeted_detail_num + OneToFive.immunity_detail_num + OneToFive.antivascular_detail_num
-                    row = np.append(row, ['/']*size*times)
+                    row = np.append(row, ['/'] * size * times)
                 else:
                     chemo_detail_num = 0
                     targeted_detail_num = 0
@@ -432,7 +432,7 @@ class OneToFive(Base, PatDia, ModificationAndDoubt):
                                     row = np.append(row, self.format_drugs_of_detailTrePlan(value_drugs))
                                 else:
                                     row = np.append(row, self.filter_none(detail_trePlan, detail_column))
-                    row = np.append(row, ['/']*size*(OneToFive.chemo_detail_num - chemo_detail_num))
+                    row = np.append(row, ['/'] * size * (OneToFive.chemo_detail_num - chemo_detail_num))
 
                     if 'TargetedTherapy' in treSolu_value and detail_trePlan_array.get('TargetedTherapy'):
                         targeted_detail_trePlan_array = detail_trePlan_array['TargetedTherapy']
@@ -444,7 +444,7 @@ class OneToFive(Base, PatDia, ModificationAndDoubt):
                                     row = np.append(row, self.format_drugs_of_detailTrePlan(value_drugs))
                                 else:
                                     row = np.append(row, self.filter_none(detail_trePlan, detail_column))
-                    row = np.append(row, ['/']*size*(OneToFive.targeted_detail_num - targeted_detail_num))
+                    row = np.append(row, ['/'] * size * (OneToFive.targeted_detail_num - targeted_detail_num))
 
                     if 'ImmunityTherapy' in treSolu_value and detail_trePlan_array.get('ImmunityTherapy'):
                         immunity_detail_trePlan_array = detail_trePlan_array['ImmunityTherapy']
@@ -456,7 +456,7 @@ class OneToFive(Base, PatDia, ModificationAndDoubt):
                                     row = np.append(row, self.format_drugs_of_detailTrePlan(value_drugs))
                                 else:
                                     row = np.append(row, self.filter_none(detail_trePlan, detail_column))
-                    row = np.append(row, ['/']*size*(OneToFive.immunity_detail_num - immunity_detail_num))
+                    row = np.append(row, ['/'] * size * (OneToFive.immunity_detail_num - immunity_detail_num))
 
                     if 'AntivascularTherapy' in treSolu_value and detail_trePlan_array.get('AntivascularTherapy'):
                         antivascular_detail_trePlan_array = detail_trePlan_array['AntivascularTherapy']
@@ -468,7 +468,7 @@ class OneToFive(Base, PatDia, ModificationAndDoubt):
                                     row = np.append(row, self.format_drugs_of_detailTrePlan(value_drugs))
                                 else:
                                     row = np.append(row, self.filter_none(detail_trePlan, detail_column))
-                    row = np.append(row, ['/']*size*(OneToFive.antivascular_detail_num - antivascular_detail_num))
+                    row = np.append(row, ['/'] * size * (OneToFive.antivascular_detail_num - antivascular_detail_num))
             elif column == 'note':
                 value_treSolu = self.filter_none(obj, 'treSolu')
                 if 'Other' in value_treSolu:
@@ -515,7 +515,7 @@ class OneToFive(Base, PatDia, ModificationAndDoubt):
                     if antivascular_detail_num > max_antivascular_detail_num:
                         max_antivascular_detail_num = antivascular_detail_num
 
-        detail_flag = False #标志是否已经处理详细治疗方案字段
+        detail_flag = False  # 标志是否已经处理详细治疗方案字段
         for column in columns:
             if (not detail_flag) and (column in my_detail_headers):
                 detail_flag = True
@@ -581,14 +581,13 @@ class DetailTrePlan(Base, ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
-    export_header_map = {'treSche':'药物方案', 'treatName':'治疗名称', 'currPeriod':'当前周期', 'begDate':'给药/治疗开始日期',
-                         'endDate':'给药/治疗结束日期', 'drugs':'药物使用情况', 'note':'备注'}
+    export_header_map = {'treSche': '药物方案', 'treatName': '治疗名称', 'currPeriod': '当前周期', 'begDate': '给药/治疗开始日期',
+                         'endDate': '给药/治疗结束日期', 'drugs': '药物使用情况', 'note': '备注'}
 
     def keys(self):
         return ['id', 'treSolu', 'treSche', 'currPeriod', 'treatName', 'begDate', 'endDate', 'drugs', 'note',
-                'modification', 'doubt', 'module_status']
+                'modification', 'doubt']
 
 
 # 手术表
@@ -616,7 +615,6 @@ class Surgery(Base, PatDia, ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     detail_header_num = 0
@@ -632,7 +630,7 @@ class Surgery(Base, PatDia, ModificationAndDoubt):
         if (buffer.get('Surgery').get(pid) is None or buffer.get('Surgery').get(pid).get(treIndex) is None
                 or buffer.get('TreRec').get(pid) is None or buffer.get('TreRec').get(pid).get(treIndex) is None
                 or buffer.get('TreRec').get(pid).get(treIndex).trement != 'surgery'):
-            row = np.append(row, ['/']*Surgery.header_num)
+            row = np.append(row, ['/'] * Surgery.header_num)
             return row
         obj = buffer.get('Surgery').get(pid).get(treIndex)
 
@@ -652,7 +650,7 @@ class Surgery(Base, PatDia, ModificationAndDoubt):
         else:
             detail_trePlan_array = buffer.get('DetailTrePlan').get(pid).get(treIndex)
 
-        detail_flag = False # 标志是否已经处理详细治疗方案字段
+        detail_flag = False  # 标志是否已经处理详细治疗方案字段
         for column in columns:
             if column == 'surSco' or column == 'lymDis':
                 value = self.format_radio_data(obj, column)
@@ -668,7 +666,7 @@ class Surgery(Base, PatDia, ModificationAndDoubt):
                 posAdjChem_value = self.filter_none(self.change_bool_to_yes_or_no(getattr(obj, 'posAdjChem')))
                 if posAdjChem_value != '是' or not detail_trePlan_array or not detail_trePlan_array.get('Chemotherapy'):
                     # row.extend(['/']*size*Surgery.detail_header_num)
-                    row = np.append(row, ['/']*size*Surgery.detail_header_num)
+                    row = np.append(row, ['/'] * size * Surgery.detail_header_num)
                 else:
                     surgery_detail_trePlan_array = detail_trePlan_array.get('Chemotherapy')
                     detail_num = len(surgery_detail_trePlan_array)
@@ -679,7 +677,7 @@ class Surgery(Base, PatDia, ModificationAndDoubt):
                                 row = np.append(row, self.format_drugs_of_detailTrePlan(value_drugs))
                             else:
                                 row = np.append(row, self.filter_none(detail_trePlan, detail_column))
-                    row = np.append(row, ['/']*size*(Surgery.detail_header_num - detail_num))
+                    row = np.append(row, ['/'] * size * (Surgery.detail_header_num - detail_num))
             elif not (column in detail_header):
                 value = self.filter_none(obj, column)
                 row = np.append(row, value)
@@ -742,7 +740,7 @@ class Surgery(Base, PatDia, ModificationAndDoubt):
     def keys(self):
         return ['id', 'pid', 'treNum', 'surSco', 'lymDis', 'cleGro', 'surDate', 'posAdjChem', 'isPro', 'proDate',
                 'proDes', 'isRepBio', 'bioMet', 'matPart', 'specNum', 'patDia', '_surSco', '_lymDis',
-                'modification', 'doubt', 'module_status']
+                'modification', 'doubt']
 
 
 # 放疗表
@@ -769,7 +767,6 @@ class Radiotherapy(Base, ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'begDate': '开始日期', 'endDate': '结束日期', 'radSite': '放疗部位',
@@ -782,7 +779,7 @@ class Radiotherapy(Base, ModificationAndDoubt):
         if (buffer.get('Radiotherapy').get(pid) is None or buffer.get('Radiotherapy').get(pid).get(treIndex) is None
                 or buffer.get('TreRec').get(pid) is None or buffer.get('TreRec').get(pid).get(treIndex) is None
                 or buffer.get('TreRec').get(pid).get(treIndex).trement != 'radiotherapy'):
-            row = np.append(row, ['/']*Radiotherapy.header_num)
+            row = np.append(row, ['/'] * Radiotherapy.header_num)
             return row
         obj = buffer.get('Radiotherapy').get(pid).get(treIndex)
         for column in columns:
@@ -815,4 +812,4 @@ class Radiotherapy(Base, ModificationAndDoubt):
     def keys(self):
         return ['id', 'pid', 'treNum', 'begDate', 'endDate', 'radSite', 'radDose', 'dosUnit', 'splTim', 'method',
                 '_radSite', 'isRepBio', 'bioMet', 'matPart', 'specNum', 'patDia',
-                'modification', 'doubt', 'module_status']
+                'modification', 'doubt']

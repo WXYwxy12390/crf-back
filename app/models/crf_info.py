@@ -25,7 +25,6 @@ class FollInfo(Base, ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'nextFollowupTime': '计划下次随访时间', 'date': '随访日期', 'folMet': '随访方式', 'effEva': '疗效评估',
@@ -121,4 +120,4 @@ class FollInfo(Base, ModificationAndDoubt):
 
     def keys(self):
         return ['id', 'pid', 'number', 'date', 'effEva', 'folMet', 'livSta', 'dieDate', 'remarks', 'imaFilType', 'suv',
-                'examArea', 'examArea', 'tumorLD', 'tumorSD', 'tumorDesc', 'modification', 'doubt', 'module_status']
+                'examArea', 'examArea', 'tumorLD', 'tumorSD', 'tumorDesc', 'modification', 'doubt']

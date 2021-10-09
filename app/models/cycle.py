@@ -57,7 +57,6 @@ class Immunohis(Base, ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'ALKD5F3': 'ALKD5F3', 'ALKD5F3N': 'ALKD5F3N', 'CAIX': 'CAIX', 'CAM52': 'CAM52', 'CD10': 'CD10',
@@ -74,7 +73,7 @@ class Immunohis(Base, ModificationAndDoubt):
                 'CD117', 'CDX2', 'CEA', 'CgA', 'CK', 'CK56', 'CK7', 'CK818', 'CK19', 'CK20', 'Cyn', 'DLL3', 'EMA',
                 'ERCC1', 'LCA', 'MCM2', 'NapsinA', 'P16', 'P40', 'p53', 'P63', 'PAX2', 'PAX8', 'PCK',
                 'PDL1', 'RRM1', 'SATB2', 'Syn', 'TTF1', 'VEGFC', 'Villin', 'Villinco', 'other', 'Ki67',
-                'CD516', 'detectTime', 'patNum', 'modification', 'doubt', 'module_status']
+                'CD516', 'detectTime', 'patNum', 'modification', 'doubt']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
@@ -179,7 +178,6 @@ class MoleDetec(Base, ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {
@@ -209,7 +207,7 @@ class MoleDetec(Base, ModificationAndDoubt):
                 'KRASDesc', 'PIK3CADesc',
                 'ROS1Desc', 'RETDesc', 'UGT1A1Desc', 'NTRKDesc', 'path', 'MSI', 'other', 'PDL1', 'PDL1KT', 'TMB', 'PD1',
                 'PD1KT', 'sampleType', 'detectTime',
-                'modification', 'doubt', 'module_status']
+                'modification', 'doubt']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
@@ -293,7 +291,6 @@ class Signs(Base,ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'symName': '症状名称', 'begDate': '开始日期',
@@ -359,7 +356,7 @@ class Signs(Base,ModificationAndDoubt):
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'symName', 'begDate', 'isExe', 'endDate',
-                'modification', 'doubt', 'module_status']
+                'modification', 'doubt']
 
 
 # 副反应表
@@ -378,7 +375,6 @@ class SideEffect(Base, ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'sidReaName': '症状描述', 'sidRecCla': '副反应分级', 'begDate': '开始日期',
@@ -450,4 +446,4 @@ class SideEffect(Base, ModificationAndDoubt):
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'sidReaName', 'sidRecCla', 'begDate', 'isExe', 'treatment', 'endDate',
-                'sidReaNameOther', 'modification', 'doubt', 'module_status']
+                'sidReaNameOther', 'modification', 'doubt']

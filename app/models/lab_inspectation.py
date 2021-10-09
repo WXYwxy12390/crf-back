@@ -77,7 +77,6 @@ class BloodRoutine(Base,ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'samplingTime': '血常规检查时间', 'RBC': 'RBC', 'HGb': 'HGb', 'HCT': 'HCT', 'MCV': 'MCV',
@@ -111,7 +110,7 @@ class BloodRoutine(Base,ModificationAndDoubt):
                 'LYM_Note',
                 'EOS_Note', 'MID_Note', 'BASO_Note', 'PLTNote', 'LYMNote', 'MIDNote', 'GRANNote', 'EOSNote', 'BASONote',
                 'NEUTNote',
-                'modification', 'doubt', 'module_status']
+                'modification', 'doubt']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
@@ -244,7 +243,6 @@ class BloodBio(Base,ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'samplingTime': '血生化检查时间', 'TP': 'TP', 'ALB': 'ALB', 'GLO': 'GLO', 'ALT': 'ALT',
@@ -320,7 +318,7 @@ class BloodBio(Base,ModificationAndDoubt):
                 'CO2Mea', 'KMea', 'NaMea', 'ClMea', 'CaMea', 'MgMea', 'PMea', 'TPNote', 'ALBNote',
                 'GLONote', 'ALTNote', 'ASTNote', 'LDHNote', 'GGTNote', 'TBILNote', 'DBILNote', 'IBILNote', 'GLUNote',
                 'TCNote', 'LDLNote', 'hDLNote', 'TGNote', 'UREANote', 'ALPNote', 'CREANote', 'UANote', 'CO2Note', 'KNote',
-                'NaNote', 'ClNote', 'CaNote', 'MgNote', 'PNote', 'modification', 'doubt', 'module_status']
+                'NaNote', 'ClNote', 'CaNote', 'MgNote', 'PNote', 'modification', 'doubt']
 
 
 # 甲状腺功能表
@@ -343,7 +341,6 @@ class Thyroid(Base,ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'samplingTime': '甲状腺功能检查时间', 'FT3': 'FT3', 'FT4': 'FT4', 'TSH': 'TSH',
@@ -392,7 +389,7 @@ class Thyroid(Base,ModificationAndDoubt):
 
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'FT3', 'FT4', 'TSH', 'FT3Mea', 'FT4Mea', 'TSHMea', 'FT3Note',
-                'FT4Note', 'TSHNote', 'modification', 'doubt', 'module_status']
+                'FT4Note', 'TSHNote', 'modification', 'doubt']
 
 
 # 凝血功能表
@@ -424,7 +421,6 @@ class Coagulation(Base,ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'samplingTime': '凝血功能检查时间', 'PT': 'PT', 'APTT': 'APTT', 'TT': 'TT',
@@ -474,7 +470,7 @@ class Coagulation(Base,ModificationAndDoubt):
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'PT', 'APTT', 'TT', 'FIB', 'INR', 'D_dimer', 'PTMea',
                 'APTTMea', 'TTMea', 'FIBMea', 'INRMea', 'D_dimerMea', 'PTNote', 'APTTNote', 'TTNote', 'FIBNote',
-                'INRNote', 'D_dimerNote', 'modification', 'doubt', 'module_status']
+                'INRNote', 'D_dimerNote', 'modification', 'doubt']
 
 
 # 心肌酶谱表
@@ -512,7 +508,6 @@ class MyocardialEnzyme(Base,ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'samplingTime': '心肌酶谱检查时间', 'LDH': 'LDH', 'CK': 'CK', 'CK_MB': 'CK-MB',
@@ -565,7 +560,7 @@ class MyocardialEnzyme(Base,ModificationAndDoubt):
         return ['id', 'pid', 'treNum', 'samplingTime', 'LDH', 'CK', 'CK_MB', 'cTnI', 'cTnT', 'MYO', 'BNP',
                 'NT_proBNP', 'LDHMea', 'CKMea', 'CK_MBMea', 'cTnIMea', 'cTnTMea', 'MYOMea', 'BNPMea', 'NT_proBNPMea',
                 'LDHNote', 'CKNote', 'CK_MBNote', 'cTnINote', 'cTnTNote', 'MYONote', 'BNPNote', 'NT_proBNPNote',
-                'modification', 'doubt', 'module_status']
+                'modification', 'doubt']
 
 
 # 细胞因子表
@@ -597,7 +592,6 @@ class Cytokines(Base,ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'samplingTime': '细胞因子检查时间', 'TNF_a': 'TNF-alpha', 'IL_1b': 'IL-1beta',
@@ -647,7 +641,7 @@ class Cytokines(Base,ModificationAndDoubt):
     def keys(self):
         return ['id', 'pid', 'treNum', 'samplingTime', 'TNF_a', 'IL_1b', 'IL_2R', 'IL_6', 'IL_8', 'IL_10', 'TNF_aMea',
                 'IL_1bMea', 'IL_2RMea', 'IL_6Mea', 'IL_8Mea', 'IL_10Mea', 'TNF_aNote', 'IL_1bNote', 'IL_2RNote',
-                'IL_6Note', 'IL_8Note', 'IL_10Note', 'modification', 'doubt', 'module_status']
+                'IL_6Note', 'IL_8Note', 'IL_10Note', 'modification', 'doubt']
 
 
 # 淋巴细胞亚群表
@@ -742,7 +736,6 @@ class LymSubsets(Base,ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'samplingTime': '淋巴细胞亚群检查时间', 'CD19_': 'CD19#', 'CD3_': 'CD3#', 'CD4_': 'CD4#',
@@ -832,7 +825,7 @@ class LymSubsets(Base,ModificationAndDoubt):
                 'CD4CD8Note', 'CD56Note', 'CD3_CD8__Note', 'CD3_CD8_Note', 'CD3_CD4__Note', 'CD3_CD4_Note',
                 'CD3_CD16_56_Note', 'CD3_CD16_56Note', 'CD3_CD19__Note', 'CD3_CD19_Note',
                 'CD8_CD28_Note', 'CD20_Note', 'HLA_DR_Note', 'CD3_HLA_DR1Note', 'CD3_HLA_DR2Note', 'CD3_HLA_DR3Note',
-                'CD4_CD25_CD127lowNote', 'modification', 'doubt', 'module_status']
+                'CD4_CD25_CD127lowNote', 'modification', 'doubt']
 
 
 # 尿常规表
@@ -885,7 +878,6 @@ class UrineRoutine(Base,ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'samplingTime': '尿常规检查时间', 'UPH': 'UPH', 'UGLU': 'UGLU', 'LEU': 'LEU',
@@ -938,7 +930,7 @@ class UrineRoutine(Base,ModificationAndDoubt):
                 'KET', 'BLD', 'PRO', 'UBG', 'COL', 'CLA', 'UPHMea', 'UGLUMea', 'LEUMea', 'ERYMea', 'NITMea', 'BILMea',
                 'USGMea','KETMea', 'BLDMea', 'PROMea', 'UBGMea', 'COLMea', 'CLAMea', 'UPHNote', 'UGLUNote', 'LEUNote',
                 'ERYNote','NITNote','BILNote', 'USGNote', 'KETNote', 'BLDNote', 'PRONote', 'UBGNote', 'COLNote', 'CLANote',
-                'modification', 'doubt', 'module_status']
+                'modification', 'doubt']
 
 
 # 肿瘤标志物表
@@ -973,7 +965,6 @@ class TumorMarker(Base,ModificationAndDoubt):
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
-    module_status = Column(Integer, server_default='0', comment='该模块的状态，0未提交，1已提交，2已结束，3有质疑，4已回复')
 
     # 和导出功能有关
     export_header_map = {'samplingTime': '肿瘤标志物', 'CEA': 'CEA', 'NSE': 'NSE', 'pro_GPR': 'pro-GPR',
@@ -1021,4 +1012,4 @@ class TumorMarker(Base,ModificationAndDoubt):
         return ['id', 'pid', 'treNum', 'samplingTime', 'CEA', 'NSE', 'pro_GPR', 'CYFRA', 'FERR', 'AFP', 'SCCA',
                 'CEAMea', 'NSEMea', 'pro_GPRMea', 'CYFRAMea', 'FERRMea', 'AFPMea', 'SCCAMea', 'CEANote', 'NSENote',
                 'pro_GPRNote', 'CYFRANote', 'FERRNote','AFPNote', 'SCCANote',
-                'modification', 'doubt', 'module_status']
+                'modification', 'doubt']
