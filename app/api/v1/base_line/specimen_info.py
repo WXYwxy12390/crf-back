@@ -77,25 +77,31 @@ def del_specimen_info(pid):
 @api.route('/submit/<int:pid>', methods=['GET'])
 @auth.login_required
 def submit_specimen_info(pid):
-    specimen_ls = SpecimenInfo.query.filter_by(pid=pid).all()
-    for specimen in specimen_ls:
-        if specimen.module_status != ModuleStatus.UnSubmitted.value:
-            return SampleStatusError('当前状态无法提交')
-    for specimen in specimen_ls:
-        specimen.submit()
-    return Success(msg='提交成功')
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('SpecimenInfo', 0):
+        return Success(msg='提交成功')
+    else:
+        return SampleStatusError('当前状态无法提交')
+
+
+@api.route('/begin_monitor/<int:pid>', methods=['GET'])
+@auth.login_required
+def begin_monitor_specimen_info(pid):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('SpecimenInfo', 0):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
 
 
 @api.route('/finish/<int:pid>', methods=['GET'])
 @auth.login_required
 def finish_specimen_info(pid):
-    specimen_ls = SpecimenInfo.query.filter_by(pid=pid).all()
-    for specimen in specimen_ls:
-        if specimen.module_status != ModuleStatus.Submitted.value:
-            return SampleStatusError('当前状态无法结束监察')
-    for specimen in specimen_ls:
-        specimen.finish()
-    return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('SpecimenInfo', 0):
+        return Success(msg='监察已完成')
+    else:
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/doubt/<int:specimen_info_id>', methods=['POST'])

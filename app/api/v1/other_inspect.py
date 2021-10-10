@@ -13,6 +13,7 @@ from app.libs.error_code import SampleStatusError
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
 from app.models import json2db, db, delete_array
+from app.models.base_line import Patient
 from app.models.other_inspect import Lung, OtherExams, ImageExams
 from app.models.therapy_record import TreRec
 
@@ -41,21 +42,31 @@ def add_lung_function(pid, treNum):
 @api.route('/lung_function/submit/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def submit_lung(pid, treNum):
-    lung = Lung.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if lung.submit():
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('Lung', treNum):
         return Success(msg='提交成功')
     else:
         return SampleStatusError('当前状态无法提交')
 
 
+@api.route('/lung_function/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def begin_monitor_lung_function(pid, treNum):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('Lung', treNum):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
+
+
 @api.route('/lung_function/finish/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def finish_lung(pid, treNum):
-    lung = Lung.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if lung.finish():
-        return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('Lung', treNum):
+        return Success(msg='监察已完成')
     else:
-        return SampleStatusError('当前状态无法结束监察')
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/lung_function/doubt/<int:pid>/<int:treNum>', methods=['POST'])
@@ -102,21 +113,31 @@ def add_other_exam(pid, treNum):
 @api.route('/other_exam/submit/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def submit_other_exam(pid, treNum):
-    other_exam = OtherExams.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if other_exam.submit():
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('OtherExams', treNum):
         return Success(msg='提交成功')
     else:
         return SampleStatusError('当前状态无法提交')
 
 
+@api.route('/other_exam/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def begin_monitor_other_exam(pid, treNum):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('OtherExams', treNum):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
+
+
 @api.route('/other_exam/finish/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def finish_other_exam(pid, treNum):
-    other_exam = OtherExams.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if other_exam.finish():
-        return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('OtherExams', treNum):
+        return Success(msg='监察已完成')
     else:
-        return SampleStatusError('当前状态无法结束监察')
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/other_exam/doubt/<int:pid>/<int:treNum>', methods=['POST'])
@@ -178,25 +199,31 @@ def del_image_exam(pid, treNum):
 @api.route('/image_exam/submit/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def submit_image_exam(pid, treNum):
-    exams = ImageExams.query.filter_by(pid=pid, treNum=treNum).all()
-    for exam in exams:
-        if exam.module_status != ModuleStatus.UnSubmitted.value:
-            return SampleStatusError('当前状态无法提交')
-    for exam in exams:
-        exam.submit()
-    return Success(msg='提交成功')
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('ImageExams', treNum):
+        return Success(msg='提交成功')
+    else:
+        return SampleStatusError('当前状态无法提交')
+
+
+@api.route('/image_exam/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def begin_monitor_image_exam(pid, treNum):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('ImageExams', treNum):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
 
 
 @api.route('/image_exam/finish/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def finish_image_exam(pid, treNum):
-    exams = ImageExams.query.filter_by(pid=pid, treNum=treNum).all()
-    for exam in exams:
-        if exam.module_status != ModuleStatus.Submitted.value:
-            return SampleStatusError('当前状态无法结束监察')
-    for exam in exams:
-        exam.finish()
-    return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('ImageExams', treNum):
+        return Success(msg='监察已完成')
+    else:
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/image_exam/doubt/<int:image_exam_id>', methods=['POST'])

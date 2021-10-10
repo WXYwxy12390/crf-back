@@ -1,5 +1,10 @@
+import copy
+
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime, SmallInteger, and_
-from app.models.base import Base, ModificationAndDoubt
+from sqlalchemy.orm.attributes import flag_modified
+
+from app.libs.enums import ModuleStatus
+from app.models.base import Base, ModificationAndDoubt, db
 # 病人基本信息表
 from app.models.crf_info import FollInfo
 from app.models.cycle import MoleDetec
@@ -34,7 +39,7 @@ class Patient(Base, ModificationAndDoubt):
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
     module_status = Column(JSON, comment='各访视的各模块的状态，0未提交，1未启动监察，2CRA监察中，3CRA有质疑，4有回复，5CRA已完成')
-
+    cycle_is_submit = Column(JSON, comment='记录各访视是否已经提交，0已提交，1未提交')
     # 和导出功能有关
     export_header_map = {'patNumber': '编号', 'researchCenter': '研究中心', 'idNumber': '身份证号', 'patientName': '姓名',
                          'hospitalNumber': '住院号', 'gender': '性别', 'birthday': '出生日期', 'age': '年龄',
@@ -88,7 +93,7 @@ class Patient(Base, ModificationAndDoubt):
         return ['id', 'patNumber', 'account', 'researchCenter', 'idNumber', 'hospitalNumber',
                 'patientName', 'gender', 'birthday', 'phoneNumber1', 'phoneNumber2', 'updateTime', 'nextFollowupTime',
                 'finishFollowup', 'update_time', '_researchCenter', '_account', '_gender',
-                'modification', 'doubt', 'module_status']
+                'modification', 'doubt', 'module_status', 'cycle_is_submit']
 
     def get_fotmat_info(self):
         pat_dia = Patient.get_pat_dia([self.id])
@@ -479,9 +484,57 @@ class Patient(Base, ModificationAndDoubt):
             data[pid].append(item)
         return data
 
+    def submit_module(self, module, treNum):
+        flag = True  # 标记是否成功提交
+        treNum = str(treNum)
+        temp = copy.copy(self.module_status)
+        if temp is None:
+            temp = {}
+        if temp.get(module) is None:
+            temp[module] = {}
+        status = temp[module].get(treNum)
+        if status is None or status == ModuleStatus.UnSubmitted.value:
+            temp[module][treNum] = ModuleStatus.UnInitiateMonitoring.value
+            with db.auto_commit():
+                self.module_status = copy.copy(temp)
+                flag_modified(self, 'module_status')  # 加上这句JSON类型数据才可以更新到数据库。原因不明。
+        else:
+            flag = False
+        return flag
+
+    def start_monitor(self, module, treNum):
+        treNum_str = str(treNum)
+        flag = False  # 标志是否成功启动监察
+        if not self.cycle_is_submit:
+            return flag
+        if not self.cycle_is_submit.get(treNum_str):
+            return flag
+        if self.module_status[module][treNum_str] != ModuleStatus.UnInitiateMonitoring.value:
+            return flag
+        temp = copy.copy(self.module_status)
+        temp[module][treNum_str] = ModuleStatus.CRAMonitoring.value
+        flag = True
+        with db.auto_commit():
+            self.module_status = temp
+            flag_modified(self, 'module_status')  # 加上这句JSON类型数据才可以更新到数据库。原因不明。
+        return flag
+
+    def finish(self, module, treNum):
+        treNum_str = str(treNum)
+        flag = False  # 标志是否成功完成模块
+        if self.module_status[module][treNum_str] not in [ModuleStatus.CRAMonitoring.value, ModuleStatus.CRADoubt.value, ModuleStatus.WithReply.value]:
+            return flag
+        temp = copy.copy(self.module_status)
+        temp[module][treNum_str] = ModuleStatus.CRAFinish.value
+        flag = True
+        with db.auto_commit():
+            self.module_status = temp
+            flag_modified(self, 'module_status')  # 加上这句JSON类型数据才可以更新到数据库。原因不明。
+        return flag
+
 
 # 病人既往史表
-class PastHis(Base,ModificationAndDoubt):
+class PastHis(Base, ModificationAndDoubt):
     __tablename__ = 'pastHis'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -663,7 +716,7 @@ class PastHis(Base,ModificationAndDoubt):
 
 
 # 激素史与药物史
-class DrugHistory(Base,ModificationAndDoubt):
+class DrugHistory(Base, ModificationAndDoubt):
     __tablename__ = 'drug_history'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -675,7 +728,7 @@ class DrugHistory(Base,ModificationAndDoubt):
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
     doubt = Column(JSON, comment='质疑和回复')
 
-    export_header_map = {'drug_name': '药物名称', 'drug_dose':'日使用剂量', 'use_time':'累积使用时间（月）'}
+    export_header_map = {'drug_name': '药物名称', 'drug_dose': '日使用剂量', 'use_time': '累积使用时间（月）'}
 
     def keys(self):
         return ['id', 'drug_name', 'drug_dose', 'use_time', 'modification', 'doubt']
@@ -853,7 +906,7 @@ class IniDiaPro(Base, PatDia, ModificationAndDoubt):
         return array_value
 
 
-class SpecimenInfo(Base,ModificationAndDoubt):
+class SpecimenInfo(Base, ModificationAndDoubt):
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id', index=True)
     number = Column(Text, comment="样本编号")

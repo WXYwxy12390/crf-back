@@ -6,6 +6,7 @@ from app.libs.error_code import SampleStatusError
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
 from app.models import json2db
+from app.models.base_line import Patient
 from app.models.cycle import Immunohis
 
 api = Redprint('immunohis')
@@ -32,21 +33,31 @@ def add_immunohis(pid, treNum):
 @api.route('/submit/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def submit_immunohis(pid, treNum):
-    immunohis = Immunohis.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if immunohis.submit():
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('Immunohis', treNum):
         return Success(msg='提交成功')
     else:
         return SampleStatusError('当前状态无法提交')
 
 
+@api.route('/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def begin_monitor_immunohis(pid, treNum):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('Immunohis', treNum):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
+
+
 @api.route('/finish/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def finish_immunohis(pid, treNum):
-    immunohis = Immunohis.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if immunohis.finish():
-        return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('Immunohis', treNum):
+        return Success(msg='监察已完成')
     else:
-        return SampleStatusError('当前状态无法结束监察')
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/doubt/<int:pid>/<int:treNum>', methods=['POST'])

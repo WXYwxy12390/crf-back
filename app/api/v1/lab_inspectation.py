@@ -11,6 +11,7 @@ from app.libs.error_code import SampleStatusError
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
 from app.models import json2db
+from app.models.base_line import Patient
 from app.models.lab_inspectation import BloodRoutine, BloodBio, Thyroid, Coagulation, MyocardialEnzyme, Cytokines, \
     LymSubsets, UrineRoutine, TumorMarker
 
@@ -39,21 +40,31 @@ def add_blood_routine(pid, treNum):
 @api.route('/blood_routine/submit/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def submit_blood_routine(pid, treNum):
-    item = BloodRoutine.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.submit():
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('BloodRoutine', treNum):
         return Success(msg='提交成功')
     else:
         return SampleStatusError('当前状态无法提交')
 
 
+@api.route('/blood_routine/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def begin_monitor_blood_routine(pid, treNum):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('BloodRoutine', treNum):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
+
+
 @api.route('/blood_routine/finish/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def finish_blood_routine(pid, treNum):
-    item = BloodRoutine.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.finish():
-        return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('BloodRoutine', treNum):
+        return Success(msg='监察已完成')
     else:
-        return SampleStatusError('当前状态无法结束监察')
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/blood_routine/doubt/<int:pid>/<int:treNum>', methods=['POST'])
@@ -101,21 +112,31 @@ def add_blood_bio(pid, treNum):
 @api.route('/blood_bio/submit/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def submit_blood_bio(pid, treNum):
-    item = BloodBio.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.submit():
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('BloodBio', treNum):
         return Success(msg='提交成功')
     else:
         return SampleStatusError('当前状态无法提交')
 
 
+@api.route('/blood_bio/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def begin_monitor_blood_bio(pid, treNum):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('BloodBio', treNum):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
+
+
 @api.route('/blood_bio/finish/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def finish_blood_bio(pid, treNum):
-    item = BloodBio.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.finish():
-        return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('BloodBio', treNum):
+        return Success(msg='监察已完成')
     else:
-        return SampleStatusError('当前状态无法结束监察')
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/blood_bio/doubt/<int:pid>/<int:treNum>', methods=['POST'])
@@ -163,21 +184,31 @@ def add_thyroid(pid, treNum):
 @api.route('/thyroid/submit/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def submit_thyroid(pid, treNum):
-    item = Thyroid.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.submit():
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('Thyroid', treNum):
         return Success(msg='提交成功')
     else:
         return SampleStatusError('当前状态无法提交')
 
 
+@api.route('/thyroid/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def begin_monitor_thyroid(pid, treNum):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('Thyroid', treNum):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
+
+
 @api.route('/thyroid/finish/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def finish_thyroid(pid, treNum):
-    item = Thyroid.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.finish():
-        return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('Thyroid', treNum):
+        return Success(msg='监察已完成')
     else:
-        return SampleStatusError('当前状态无法结束监察')
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/thyroid/doubt/<int:pid>/<int:treNum>', methods=['POST'])
@@ -225,21 +256,31 @@ def add_coagulation(pid, treNum):
 @api.route('/coagulation/submit/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def submit_coagulation(pid, treNum):
-    item = Coagulation.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.submit():
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('Coagulation', treNum):
         return Success(msg='提交成功')
     else:
         return SampleStatusError('当前状态无法提交')
 
 
+@api.route('/coagulation/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def begin_monitor_coagulation(pid, treNum):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('Coagulation', treNum):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
+
+
 @api.route('/coagulation/finish/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def finish_coagulation(pid, treNum):
-    item = Coagulation.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.finish():
-        return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('Coagulation', treNum):
+        return Success(msg='监察已完成')
     else:
-        return SampleStatusError('当前状态无法结束监察')
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/coagulation/doubt/<int:pid>/<int:treNum>', methods=['POST'])
@@ -287,21 +328,31 @@ def add_myocardialEnzyme(pid, treNum):
 @api.route('/myocardialEnzyme/submit/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def submit_myocardialEnzyme(pid, treNum):
-    item = MyocardialEnzyme.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.submit():
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('MyocardialEnzyme', treNum):
         return Success(msg='提交成功')
     else:
         return SampleStatusError('当前状态无法提交')
 
 
+@api.route('/myocardialEnzyme/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def begin_monitor_myocardialEnzyme(pid, treNum):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('MyocardialEnzyme', treNum):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
+
+
 @api.route('/myocardialEnzyme/finish/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def finish_myocardialEnzyme(pid, treNum):
-    item = MyocardialEnzyme.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.finish():
-        return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('MyocardialEnzyme', treNum):
+        return Success(msg='监察已完成')
     else:
-        return SampleStatusError('当前状态无法结束监察')
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/myocardialEnzyme/doubt/<int:pid>/<int:treNum>', methods=['POST'])
@@ -349,21 +400,31 @@ def add_cytokines(pid, treNum):
 @api.route('/cytokines/submit/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def submit_cytokines(pid, treNum):
-    item = Cytokines.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.submit():
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('Cytokines', treNum):
         return Success(msg='提交成功')
     else:
         return SampleStatusError('当前状态无法提交')
 
 
+@api.route('/cytokines/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def begin_monitor_cytokines(pid, treNum):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('Cytokines', treNum):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
+
+
 @api.route('/cytokines/finish/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def finish_cytokines(pid, treNum):
-    item = Cytokines.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.finish():
-        return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('Cytokines', treNum):
+        return Success(msg='监察已完成')
     else:
-        return SampleStatusError('当前状态无法结束监察')
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/cytokines/doubt/<int:pid>/<int:treNum>', methods=['POST'])
@@ -411,21 +472,31 @@ def add_lymSubsets(pid, treNum):
 @api.route('/lymSubsets/submit/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def submit_lymSubsets(pid, treNum):
-    item = LymSubsets.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.submit():
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('LymSubsets', treNum):
         return Success(msg='提交成功')
     else:
         return SampleStatusError('当前状态无法提交')
 
 
+@api.route('/lymSubsets/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def begin_monitor_lymSubsets(pid, treNum):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('LymSubsets', treNum):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
+
+
 @api.route('/lymSubsets/finish/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def finish_lymSubsets(pid, treNum):
-    item = LymSubsets.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.finish():
-        return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('LymSubsets', treNum):
+        return Success(msg='监察已完成')
     else:
-        return SampleStatusError('当前状态无法结束监察')
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/lymSubsets/doubt/<int:pid>/<int:treNum>', methods=['POST'])
@@ -473,21 +544,31 @@ def add_urine_routine(pid, treNum):
 @api.route('/urine_routine/submit/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def submit_urine_routine(pid, treNum):
-    item = UrineRoutine.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.submit():
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('UrineRoutine', treNum):
         return Success(msg='提交成功')
     else:
         return SampleStatusError('当前状态无法提交')
 
 
+@api.route('/urine_routine/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def begin_monitor_urine_routine(pid, treNum):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('UrineRoutine', treNum):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
+
+
 @api.route('/urine_routine/finish/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def finish_urine_routine(pid, treNum):
-    item = UrineRoutine.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.finish():
-        return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('UrineRoutine', treNum):
+        return Success(msg='监察已完成')
     else:
-        return SampleStatusError('当前状态无法结束监察')
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/urine_routine/doubt/<int:pid>/<int:treNum>', methods=['POST'])
@@ -535,21 +616,31 @@ def add_tumor_marker(pid, treNum):
 @api.route('/tumor_marker/submit/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def submit_tumor_marker(pid, treNum):
-    item = TumorMarker.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.submit():
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('TumorMarker', treNum):
         return Success(msg='提交成功')
     else:
         return SampleStatusError('当前状态无法提交')
 
 
+@api.route('/tumor_marker/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def begin_monitor_tumor_marker(pid, treNum):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('TumorMarker', treNum):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
+
+
 @api.route('/tumor_marker/finish/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def finish_tumor_marker(pid, treNum):
-    item = TumorMarker.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.finish():
-        return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('TumorMarker', treNum):
+        return Success(msg='监察已完成')
     else:
-        return SampleStatusError('当前状态无法结束监察')
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/tumor_marker/doubt/<int:pid>/<int:treNum>', methods=['POST'])

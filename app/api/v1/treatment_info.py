@@ -55,21 +55,31 @@ def add_treatment_evaluation(pid, treNum, trement):
 @api.route('/evaluation/submit/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def submit_treatment_evaluation(pid, treNum):
-    treRec = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if treRec.submit():
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('Evaluation', treNum):
         return Success(msg='提交成功')
     else:
         return SampleStatusError('当前状态无法提交')
 
 
+@api.route('/evaluation/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def begin_monitor_evaluation(pid, treNum):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('Evaluation', treNum):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
+
+
 @api.route('/evaluation/finish/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
-def finish_treatment_evaluation(pid, treNum):
-    treRec = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if treRec.finish():
-        return Success(msg='监察结束')
+def finish_evaluation(pid, treNum):
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('Evaluation', treNum):
+        return Success(msg='监察已完成')
     else:
-        return SampleStatusError('当前状态无法结束监察')
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/evaluation/doubt/<int:pid>/<int:treNum>', methods=['POST'])
@@ -130,25 +140,31 @@ def del_signs(pid,sign_id):
 @api.route('/signs/submit/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def submit_signs(pid, treNum):
-    signs = Signs.query.filter_by(pid=pid, treNum=treNum).all()
-    for sign in signs:
-        if sign.module_status != ModuleStatus.UnSubmitted.value:
-            return SampleStatusError('当前状态无法提交')
-    for sign in signs:
-        sign.submit()
-    return Success(msg='提交成功')
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('Signs', treNum):
+        return Success(msg='提交成功')
+    else:
+        return SampleStatusError('当前状态无法提交')
+
+
+@api.route('/signs/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def begin_monitor_signs(pid, treNum):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('Signs', treNum):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
 
 
 @api.route('/signs/finish/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def finish_signs(pid, treNum):
-    signs = Signs.query.filter_by(pid=pid, treNum=treNum).all()
-    for sign in signs:
-        if sign.module_status != ModuleStatus.Submitted.value:
-            return SampleStatusError('当前状态无法结束监察')
-    for sign in signs:
-        sign.finish()
-    return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('Signs', treNum):
+        return Success(msg='监察已完成')
+    else:
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/signs/doubt/<int:image_exam_id>', methods=['POST'])
@@ -209,25 +225,31 @@ def del_side_effect(pid,se_id):
 @api.route('/side_effect/submit/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def submit_side_effect(pid, treNum):
-    side_effects = SideEffect.query.filter_by(pid=pid, treNum=treNum).all()
-    for side_effect in side_effects:
-        if side_effect.module_status != ModuleStatus.UnSubmitted.value:
-            return SampleStatusError('当前状态无法提交')
-    for side_effect in side_effects:
-        side_effect.submit()
-    return Success(msg='提交成功')
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('SideEffect', treNum):
+        return Success(msg='提交成功')
+    else:
+        return SampleStatusError('当前状态无法提交')
+
+
+@api.route('/side_effect/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def begin_monitor_side_effect(pid, treNum):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('SideEffect', treNum):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
 
 
 @api.route('/side_effect/finish/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def finish_side_effect(pid, treNum):
-    side_effects = SideEffect.query.filter_by(pid=pid, treNum=treNum).all()
-    for side_effect in side_effects:
-        if side_effect.module_status != ModuleStatus.Submitted.value:
-            return SampleStatusError('当前状态无法结束监察')
-    for side_effect in side_effects:
-        side_effect.finish()
-    return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('SideEffect', treNum):
+        return Success(msg='监察已完成')
+    else:
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/side_effect/doubt/<int:image_exam_id>', methods=['POST'])
@@ -289,25 +311,31 @@ def del_follInfo(pid,fid):
 @api.route('/follInfo/submit/<int:pid>', methods=['GET'])
 @auth.login_required
 def submit_follInfo(pid):
-    follInfos = FollInfo.query.filter_by(pid=pid).all()
-    for follInfo in follInfos:
-        if follInfo.module_status != ModuleStatus.UnSubmitted.value:
-            return SampleStatusError('当前状态无法提交')
-    for follInfo in follInfos:
-        follInfo.submit()
-    return Success(msg='提交成功')
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('FollInfo', 0):
+        return Success(msg='提交成功')
+    else:
+        return SampleStatusError('当前状态无法提交')
+
+
+@api.route('/follInfo/begin_monitor/<int:pid>', methods=['GET'])
+@auth.login_required
+def begin_monitor_follInfo(pid):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('FollInfo', 0):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
 
 
 @api.route('/follInfo/finish/<int:pid>', methods=['GET'])
 @auth.login_required
 def finish_follInfo(pid):
-    follInfos = FollInfo.query.filter_by(pid=pid).all()
-    for follInfo in follInfos:
-        if follInfo.module_status != ModuleStatus.Submitted.value:
-            return SampleStatusError('当前状态无法结束监察')
-    for follInfo in follInfos:
-        follInfo.finish()
-    return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('FollInfo', 0):
+        return Success(msg='监察已完成')
+    else:
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/follInfo/doubt/<int:specimen_info_id>', methods=['POST'])

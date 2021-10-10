@@ -1,10 +1,13 @@
 import copy
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy as _SQLAlchemy, BaseQuery
-from sqlalchemy import Column, Integer, SmallInteger, Date, DateTime, func, JSON
+from sqlalchemy import Column, SmallInteger, DateTime, func
 from contextlib import contextmanager
+
+from sqlalchemy.orm.attributes import flag_modified
+
 from app.libs.enums import ModuleStatus
-from app.libs.error_code import NotFound, SampleStatusError
+from app.libs.error_code import NotFound
 
 
 class SQLAlchemy(_SQLAlchemy):
@@ -44,200 +47,101 @@ db = SQLAlchemy(query_class=Query)
 
 class ModificationAndDoubt:
 
-    def submit(self):
-        if self.module_status != ModuleStatus.UnSubmitted.value:
-            return False
-        with db.auto_commit():
-            self.module_status = ModuleStatus.Submitted.value
-        return True
-
-    def finish(self):
-        if self.module_status != ModuleStatus.Submitted.value:
-            return False
-        with db.auto_commit():
-            self.module_status = ModuleStatus.Finished.value
-        return True
-
     # 对某访视的某模块中某字段提出质疑
-    def question(self, data):
+    def question(self, data, pid, treNum):
+        flag = False
+        treNum_str = str(treNum)
+        from app.models.base_line import Patient
+        patient = Patient.query.get_or_404(pid)
+        module = self.__class__.__name__
+        print(module)
+        module_status = copy.copy(patient.module_status)
+        if module_status[module][treNum_str] not in [ModuleStatus.CRAMonitoring.value,
+                                                     ModuleStatus.CRADoubt.value, ModuleStatus.WithReply.value]:
+            return flag
+
+        flag = True
+        if module_status[module][treNum_str] == ModuleStatus.CRAMonitoring.value:
+            module_status[module][treNum_str] = ModuleStatus.CRADoubt.value
+            with db.auto_commit():
+                patient.module_status = module_status
+                flag_modified(patient, 'module_status')  # 加上这句JSON类型数据才可以更新到数据库。原因不明。
+
         data = copy.copy(data)
-        data['doubt_column'] = self.export_header_map.get(data['doubt_column'])
-        if self.module_status < ModuleStatus.Finished.value:
-            return False
-        from app.models import json2db_add
-        from app.models.doubt import Doubt
-        new_query = json2db_add(data, Doubt)
+        doubt = copy.copy(self.doubt)
+        index = len(data)
+        data['doubt_column_cn'] = self.export_header_map.get(data['doubt_column'])  # 该字段的中文
+        data['is_replied'] = 0
+        data['doubt_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        data['index'] = index  # 表示每一个质疑在质疑列表中的索引号。用于在所有质疑中定位到某索引。
+        if doubt is None:
+            doubt = []
+        doubt.append(data)
         with db.auto_commit():
-            if self.doubt is None:
-                self.doubt = []
-            temp = copy.copy(self.doubt)
-            temp.append(new_query.id)
-            self.doubt = copy.copy(temp)
-            # 修改状态
-            from app.models.base_line import SpecimenInfo, DrugHistory
-            from app.models.crf_info import FollInfo
-            from app.models.other_inspect import ImageExams
-            from app.models.cycle import Signs, SideEffect
-            from app.models.therapy_record import DetailTrePlan
+            self.doubt = doubt
+            flag_modified(patient, 'doubt')  # 加上这句JSON类型数据才可以更新到数据库。原因不明。
+        return flag
 
-            if self.__class__ in [SpecimenInfo, FollInfo, DrugHistory]:
-                item_ls = self.__class__.query.filter_by(pid=self.pid).all()
-                for item in item_ls:
-                    item.module_status = ModuleStatus.WithQuery.value
-            elif self.__class__ in [ImageExams, Signs, SideEffect, DetailTrePlan]:
-                item_ls = self.__class__.query.filter_by(pid=self.pid, treNum=self.treNum).all()
-                for item in item_ls:
-                    item.module_status = ModuleStatus.WithQuery.value
-            else:
-                self.module_status = ModuleStatus.WithQuery.value
+    def reply_doubt(self, data, pid, treNum, doubt_index):
+        flag = False
+        treNum_str = str(treNum)
+        from app.models.base_line import Patient
+        patient = Patient.query.get_or_404(pid)
+        module = self.__class__.__name__
+        print(module)
+        module_status = copy.copy(patient.module_status)
+        if module_status[module][treNum_str] not in [ModuleStatus.CRADoubt.value, ModuleStatus.WithReply.value]:
+            return flag
 
-        # 有的表和别的表属于同一模块。修改同一模块中其他表的状态。
-        from app.models.therapy_record import OneToFive, Radiotherapy, Surgery, DetailTrePlan
-        if self.__class__ in [OneToFive, Radiotherapy, Surgery]:
-            detail_tre_plans = DetailTrePlan.query.filter_by(pid=self.pid, treNum=self.treNum).all()
+        flag = True
+        if module_status[module][treNum_str] == ModuleStatus.CRADoubt.value:
+            module_status[module][treNum_str] = ModuleStatus.WithReply.value
             with db.auto_commit():
-                for detail_tre_plan in detail_tre_plans:
-                    detail_tre_plan.module_status = ModuleStatus.WithQuery.value
-        from app.models.base_line import PastHis, DrugHistory
-        if self.__class__ == PastHis:
-            drugHistory_ls = DrugHistory.query.filter_by(pid=self.pid).all()
-            with db.auto_commit():
-                for drugHistory in drugHistory_ls:
-                    drugHistory.module_status = ModuleStatus.WithQuery.value
-        if self.__class__ == DetailTrePlan:
-            one_to_five = OneToFive.query.filter_by(pid=self.pid, treNum=self.treNum).first()
-            surgery = Surgery.query.filter_by(pid=self.pid, treNum=self.treNum).first()
-            with db.auto_commit():
-                if one_to_five:
-                    one_to_five.module_status = ModuleStatus.WithQuery.value
-                if surgery:
-                    surgery.module_status = ModuleStatus.WithQuery.value
-        if self.__class__ == DrugHistory:
-            pastHis = PastHis.query.filter_by(pid=self.pid).first()
-            with db.auto_commit():
-                if pastHis:
-                    pastHis.module_status = ModuleStatus.WithQuery.value
-        return True
+                patient.module_status = module_status
+                flag_modified(patient, 'module_status')  # 加上这句JSON类型数据才可以更新到数据库。原因不明。
 
-    def reply_doubt(self, doubt_id, data):
-        if self.module_status != ModuleStatus.WithQuery.value:
-            return False
-        data['id'] = doubt_id
-        data['is_replied'] = 1
-        data['reply_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        from app.models import json2db
-        from app.models.doubt import Doubt
-        json2db(data, Doubt)
-
-        # 求同模块内存在的所有质疑的id列表
-        all_doubt_id = []
-        from app.models.base_line import SpecimenInfo, DrugHistory
-        from app.models.crf_info import FollInfo
-        from app.models.other_inspect import ImageExams
-        from app.models.cycle import Signs, SideEffect
-        from app.models.therapy_record import DetailTrePlan
-        if self.__class__ in [SpecimenInfo, FollInfo, DrugHistory]:
-            item_ls = self.__class__.query.filter_by(pid=self.pid).all()
-            for item in item_ls:
-                if item.doubt:
-                    all_doubt_id.extend(item.doubt)
-        elif self.__class__ in [ImageExams, Signs, SideEffect, DetailTrePlan]:
-            item_ls = self.__class__.query.filter_by(pid=self.pid, treNum=self.treNum).all()
-            for item in item_ls:
-                if item.doubt:
-                    all_doubt_id.extend(item.doubt)
-        else:
-            all_doubt_id.extend(self.doubt)
-
-        from app.models.therapy_record import OneToFive, Radiotherapy, Surgery
-        if self.__class__ in [OneToFive, Radiotherapy, Surgery]:
-            detail_tre_plans = DetailTrePlan.query.filter_by(pid=self.pid, treNum=self.treNum).all()
-            for detail_tre_plan in detail_tre_plans:
-                if detail_tre_plan.doubt:
-                    all_doubt_id.extend(detail_tre_plan.doubt)
-        from app.models.base_line import PastHis
-        if self.__class__ == PastHis:
-            drugHistory_ls = DrugHistory.query.filter_by(pid=self.pid).all()
-            for drugHistory in drugHistory_ls:
-                if drugHistory.doubt:
-                    all_doubt_id.extend(drugHistory.doubt)
-        if self.__class__ == DetailTrePlan:
-            one_to_five = OneToFive.query.filter_by(pid=self.pid, treNum=self.treNum).first()
-            surgery = Surgery.query.filter_by(pid=self.pid, treNum=self.treNum).first()
-            if one_to_five and one_to_five.doubt:
-                all_doubt_id.extend(one_to_five.doubt)
-            if surgery and surgery.doubt:
-                all_doubt_id.extend(surgery.doubt)
-        if self.__class__ == DrugHistory:
-            pastHis = PastHis.query.filter_by(pid=self.pid).first()
-            if pastHis and pastHis.doubt:
-                all_doubt_id.extend(pastHis.doubt)
-
-        # 检查是否还存在没有回复的质疑，若存在则不修改状态
-        doubt_ls = Doubt.query.filter(Doubt.is_delete == 0, Doubt.id.in_(all_doubt_id)).all()
-        for doubt in doubt_ls:
-            if doubt.is_replied == 0:
-                return True
-
+        data = copy.copy(data)
+        all_doubt = copy.copy(self.doubt)
+        all_doubt[doubt_index]['reply'] = data['reply']
+        all_doubt[doubt_index]['reply_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with db.auto_commit():
-            # 修改状态
-            if self.__class__ in [SpecimenInfo, FollInfo, DrugHistory]:
-                item_ls = self.__class__.query.filter_by(pid=self.pid).all()
-                for item in item_ls:
-                    item.module_status = ModuleStatus.AllReplied.value
-            elif self.__class__ in [ImageExams, Signs, SideEffect, DetailTrePlan]:
-                item_ls = self.__class__.query.filter_by(pid=self.pid, treNum=self.treNum).all()
-                for item in item_ls:
-                    item.module_status = ModuleStatus.AllReplied.value
-            else:
-                self.module_status = ModuleStatus.AllReplied.value
+            self.doubt = all_doubt
+            flag_modified(patient, 'doubt')  # 加上这句JSON类型数据才可以更新到数据库。原因不明。
+        return flag
 
-        # 有的表和别的表属于同一模块。修改同一模块中其他表的状态。
-        if self.__class__ in [OneToFive, Radiotherapy, Surgery]:
-            detail_tre_plans = DetailTrePlan.query.filter_by(pid=self.pid, treNum=self.treNum).all()
-            with db.auto_commit():
-                for detail_tre_plan in detail_tre_plans:
-                    detail_tre_plan.module_status = ModuleStatus.AllReplied.value
-        from app.models.base_line import PastHis
-        if self.__class__ == PastHis:
-            drugHistory_ls = DrugHistory.query.filter_by(pid=self.pid).all()
-            with db.auto_commit():
-                for drugHistory in drugHistory_ls:
-                    drugHistory.module_status = ModuleStatus.AllReplied.value
-        if self.__class__ == DetailTrePlan:
-            one_to_five = OneToFive.query.filter_by(pid=self.pid, treNum=self.treNum).first()
-            surgery = Surgery.query.filter_by(pid=self.pid, treNum=self.treNum).first()
-            with db.auto_commit():
-                if one_to_five:
-                    one_to_five.module_status = ModuleStatus.AllReplied.value
-                if surgery:
-                    surgery.module_status = ModuleStatus.AllReplied.value
-        if self.__class__ == DrugHistory:
-            pastHis = PastHis.query.filter_by(pid=self.pid).first()
-            with db.auto_commit():
-                if pastHis:
-                    pastHis.module_status = ModuleStatus.AllReplied.value
-        return True
+    def record_modification(self, data, pid, treNum):
+        flag = False  # 标记是否成功记录下修改
+        treNum_str = str(treNum)
+        from app.models.base_line import Patient
+        patient = Patient.query.get_or_404(pid)
+        module = self.__class__.__name__
+        module_status = patient.module_status
+        if module_status.get(module) is None:
+            return flag
+        if module_status[module].get(treNum_str) is None or \
+                module_status[module].get(treNum_str) == ModuleStatus.UnSubmitted.value:
+            return flag
 
-    def record_modification(self, data):
-        record = {'column': [], 'content': [], 'time': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-        for key, value in data.items():
-            record['column'].append(self.export_header_map.get(key))
-            record['content'].append(value)
+        flag = True
+        '''
+        参数data结构应该是
+        {
+            'column':'',    修改的字段
+            'content':''    修改的内容
+        }
+        现在要补充上修改的时间和修改字段的中文
+        '''
+        data = copy.copy(data)
+        data['time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        data['column_cn'] = self.export_header_map.get(data['column'])
+        modification = copy.copy(self.modification)
+        if modification is None:
+            modification = []
+        modification.append(data)
         with db.auto_commit():
-            if self.modification is None:
-                self.modification = []
-            temp = copy.copy(self.modification)
-            temp.append(record)
-            self.modification = copy.copy(temp)
-
-    # 将已提交的状态修改为未提交。在记录修改时调用，因为提交后每次修改都要把状态改为未提交。
-    def cancel_submit(self):
-        if self.module_status != ModuleStatus.Submitted.value:
-            return False
-        with db.auto_commit():
-            self.module_status = ModuleStatus.UnSubmitted.value
-        return True
+            self.modification = modification
+            flag_modified(self, 'modification')
+        return flag
 
 
 class Base(db.Model):

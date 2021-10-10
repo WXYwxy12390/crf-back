@@ -13,6 +13,7 @@ from app.libs.error_code import SampleStatusError
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
 from app.models import json2db, delete_array
+from app.models.base_line import Patient
 from app.models.therapy_record import TreRec, OneToFive, Surgery, Radiotherapy, DetailTrePlan
 
 api = Redprint('therapy_record')
@@ -57,50 +58,31 @@ def add_therapy_record(pid, treNum):
 @api.route('/submit/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def submit_therapy_record(pid, treNum):
-    tre_rec = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    trement = tre_rec.trement
-    if trement in ['one', 'two', 'three', 'four', 'five', 'other']:
-        trement = OneToFive.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    elif trement == 'surgery':
-        trement = Surgery.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    elif trement == 'radiotherapy':
-        trement = Radiotherapy.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if not trement.submit():
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('TreRec', treNum):
+        return Success(msg='提交成功')
+    else:
         return SampleStatusError('当前状态无法提交')
 
-    detail_tre_plans = DetailTrePlan.query.filter_by(pid=pid, treNum=treNum).all()
-    for detail_tre_plan in detail_tre_plans:
-        if detail_tre_plan.module_status != ModuleStatus.UnSubmitted.value:
-            return SampleStatusError('当前状态无法提交')
-    for detail_tre_plan in detail_tre_plans:
-        detail_tre_plan.submit()
 
-    return Success(msg='提交成功')
+@api.route('/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
+@auth.login_required
+def begin_monitor_signs(pid, treNum):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('TreRec', treNum):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
 
 
 @api.route('/finish/<int:pid>/<int:treNum>', methods=['GET'])
 @auth.login_required
 def finish_therapy_record(pid, treNum):
-    tre_rec = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    trement = tre_rec.trement
-    if trement in ['one', 'two', 'three', 'four', 'five', 'other']:
-        trement = OneToFive.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    elif trement == 'surgery':
-        trement = Surgery.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    elif trement == 'radiotherapy':
-        trement = Radiotherapy.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-
-    if not trement.finish():
-        return SampleStatusError('当前状态无法结束监察')
-
-    detail_tre_plans = DetailTrePlan.query.filter_by(pid=pid, treNum=treNum).all()
-    for detail_tre_plan in detail_tre_plans:
-        if detail_tre_plan.module_status != ModuleStatus.Submitted.value:
-            return SampleStatusError('当前状态无法结束监察')
-    for detail_tre_plan in detail_tre_plans:
-        detail_tre_plan.finish()
-
-    return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('TreRec', treNum):
+        return Success(msg='监察已完成')
+    else:
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/doubt/<int:pid>/<int:treNum>', methods=['POST'])

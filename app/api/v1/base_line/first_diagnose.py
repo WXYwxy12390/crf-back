@@ -37,21 +37,31 @@ def add_first_diagnose(pid):
 @api.route('/submit/<int:pid>', methods=['GET'])
 @auth.login_required
 def submit_first_diagnose(pid):
-    iniDiaPro = IniDiaPro.query.filter_by(pid=pid).first_or_404()
-    if iniDiaPro.submit():
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('IniDiaPro', 0):
         return Success(msg='提交成功')
     else:
         return SampleStatusError('当前状态无法提交')
 
 
+@api.route('/begin_monitor/<int:pid>', methods=['GET'])
+@auth.login_required
+def begin_monitor_first_diagnose(pid):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('IniDiaPro', 0):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
+
+
 @api.route('/finish/<int:pid>', methods=['GET'])
 @auth.login_required
 def finish_first_diagnose(pid):
-    iniDiaPro = IniDiaPro.query.filter_by(pid=pid).first_or_404()
-    if iniDiaPro.finish():
-        return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('IniDiaPro', 0):
+        return Success(msg='监察已完成')
     else:
-        return SampleStatusError('当前状态无法结束监察')
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/doubt/<int:pid>', methods=['POST'])

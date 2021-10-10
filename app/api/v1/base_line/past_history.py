@@ -39,35 +39,31 @@ def add_past_history(pid):
 @api.route('/submit/<int:pid>', methods=['GET'])
 @auth.login_required
 def submit_past_history(pid):
-    past_history = PastHis.query.filter_by(pid=pid).first_or_404()
-    if not past_history.submit():
+    patient = Patient.query.get_or_404(pid)
+    if patient.submit_module('PastHis', 0):
+        return Success(msg='提交成功')
+    else:
         return SampleStatusError('当前状态无法提交')
 
-    drug_history_ls = DrugHistory.query.filter_by(pid=pid).all()
-    for drug_history in drug_history_ls:
-        if drug_history.module_status != ModuleStatus.UnSubmitted.value:
-            return SampleStatusError('当前状态无法提交')
-    for drug_history in drug_history_ls:
-        drug_history.submit()
 
-    return Success(msg='提交成功')
+@api.route('/begin_monitor/<int:pid>', methods=['GET'])
+@auth.login_required
+def begin_monitor_past_history(pid):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('PastHis', 0):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
 
 
 @api.route('/finish/<int:pid>', methods=['GET'])
 @auth.login_required
 def finish_past_history(pid):
-    past_history = PastHis.query.filter_by(pid=pid).first_or_404()
-    if not past_history.finish():
-        return SampleStatusError('当前状态无法结束监察')
-
-    drug_history_ls = DrugHistory.query.filter_by(pid=pid).all()
-    for drug_history in drug_history_ls:
-        if drug_history.module_status != ModuleStatus.Submitted.value:
-            return SampleStatusError('当前状态无法结束监察')
-    for drug_history in drug_history_ls:
-        drug_history.finish()
-
-    return Success(msg='监察结束')
+    patient = Patient.query.get_or_404(pid)
+    if patient.finish('PastHis', 0):
+        return Success(msg='监察已完成')
+    else:
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/doubt/<int:pid>', methods=['POST'])

@@ -44,20 +44,30 @@ def add_patient(pid):
 @auth.login_required
 def submit_patient(pid):
     patient = Patient.query.get_or_404(pid)
-    if patient.submit():
+    if patient.submit_module('Patient', 0):
         return Success(msg='提交成功')
     else:
         return SampleStatusError('当前状态无法提交')
+
+
+@api.route('/begin_monitor/<int:pid>', methods=['GET'])
+@auth.login_required
+def begin_monitor_patient(pid):
+    patient = Patient.query.get_or_404(pid)
+    if patient.start_monitor('Patient', 0):
+        return Success(msg='启动监察成功')
+    else:
+        return SampleStatusError(msg='启动监察失败')
 
 
 @api.route('/finish/<int:pid>', methods=['GET'])
 @auth.login_required
 def finish_patient(pid):
     patient = Patient.query.get_or_404(pid)
-    if patient.finish():
-        return Success(msg='监察结束')
+    if patient.finish('Patient', 0):
+        return Success(msg='监察已完成')
     else:
-        return SampleStatusError('当前状态无法结束监察')
+        return SampleStatusError('当前无法完成监察')
 
 
 @api.route('/doubt/<int:pid>', methods=['POST'])
