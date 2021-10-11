@@ -69,19 +69,18 @@ def finish_first_diagnose(pid):
 def doubt_first_diagnose(pid):
     data = request.get_json()
     item = IniDiaPro.query.filter_by(pid=pid).first_or_404()
-
-    if item.question(data):
+    if item.question(data, pid, 0):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/reply/<int:pid>/<int:doubt_id>', methods=['POST'])
+@api.route('/reply/<int:pid>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_first_diagnose(pid, doubt_id):
+def reply_first_diagnose(pid, doubt_index):
     data = request.get_json()
     item = IniDiaPro.query.filter_by(pid=pid).first_or_404()
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, pid, 0, doubt_index):
         return Success()
     else:
         return SampleStatusError()

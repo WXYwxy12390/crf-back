@@ -71,19 +71,18 @@ def finish_past_history(pid):
 def doubt_past_history(pid):
     data = request.get_json()
     item = PastHis.query.filter_by(pid=pid).first_or_404()
-
-    if item.question(data):
+    if item.question(data, pid, 0):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/reply/<int:pid>/<int:doubt_id>', methods=['POST'])
+@api.route('/reply/<int:pid>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_past_history(pid, doubt_id):
+def reply_past_history(pid, doubt_index):
     data = request.get_json()
     item = PastHis.query.filter_by(pid=pid).first_or_404()
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, pid, 0, doubt_index):
         return Success()
     else:
         return SampleStatusError()

@@ -75,18 +75,18 @@ def finish_patient(pid):
 def doubt_patient(pid):
     data = request.get_json()
     item = Patient.query.get_or_404(pid)
-    if item.question(data):
+    if item.question(data, pid, 0):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/reply/<int:pid>/<int:doubt_id>', methods=['POST'])
+@api.route('/reply/<int:pid>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_patient(pid, doubt_id):
+def reply_patient(pid, doubt_index):
     data = request.get_json()
     item = Patient.query.get_or_404(pid)
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, pid, 0, doubt_index):
         return Success()
     else:
         return SampleStatusError()

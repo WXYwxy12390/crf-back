@@ -87,18 +87,18 @@ def finish_evaluation(pid, treNum):
 def doubt_evaluation(pid, treNum):
     data = request.get_json()
     item = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.question(data):
+    if item.question(data, pid, treNum):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/evaluation/reply/<int:pid>/<int:treNum>/<int:doubt_id>', methods=['POST'])
+@api.route('/evaluation/reply/<int:pid>/<int:treNum>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_evaluation(pid, treNum, doubt_id):
+def reply_evaluation(pid, treNum, doubt_index):
     data = request.get_json()
     item = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, pid, treNum, doubt_index):
         return Success()
     else:
         return SampleStatusError()
@@ -167,23 +167,23 @@ def finish_signs(pid, treNum):
         return SampleStatusError('当前无法完成监察')
 
 
-@api.route('/signs/doubt/<int:image_exam_id>', methods=['POST'])
+@api.route('/signs/doubt/<int:sign_id>', methods=['POST'])
 @auth.login_required
-def doubt_signs(image_exam_id):
+def doubt_signs(sign_id):
     data = request.get_json()
-    item = Signs.query.get_or_404(image_exam_id)
-    if item.question(data):
+    item = Signs.query.get_or_404(sign_id)
+    if item.question(data, item.pid, item.treNum):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/signs/reply/<int:image_exam_id>/<int:doubt_id>', methods=['POST'])
+@api.route('/signs/reply/<int:image_exam_id>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_signs(image_exam_id, doubt_id):
+def reply_signs(image_exam_id, doubt_index):
     data = request.get_json()
     item = Signs.query.get_or_404(image_exam_id)
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, item.pid, item.treNum, doubt_index):
         return Success()
     else:
         return SampleStatusError()
@@ -252,23 +252,23 @@ def finish_side_effect(pid, treNum):
         return SampleStatusError('当前无法完成监察')
 
 
-@api.route('/side_effect/doubt/<int:image_exam_id>', methods=['POST'])
+@api.route('/side_effect/doubt/<int:side_effect_id>', methods=['POST'])
 @auth.login_required
-def doubt_side_effect(image_exam_id):
+def doubt_side_effect(side_effect_id):
     data = request.get_json()
-    item = SideEffect.query.get_or_404(image_exam_id)
-    if item.question(data):
+    item = SideEffect.query.get_or_404(side_effect_id)
+    if item.question(data, item.pid, item.treNum):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/side_effect/reply/<int:image_exam_id>/<int:doubt_id>', methods=['POST'])
+@api.route('/side_effect/reply/<int:image_exam_id>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_side_effect(image_exam_id, doubt_id):
+def reply_side_effect(image_exam_id, doubt_index):
     data = request.get_json()
     item = SideEffect.query.get_or_404(image_exam_id)
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, item.pid, item.treNum, doubt_index):
         return Success()
     else:
         return SampleStatusError()
@@ -338,24 +338,23 @@ def finish_follInfo(pid):
         return SampleStatusError('当前无法完成监察')
 
 
-@api.route('/follInfo/doubt/<int:specimen_info_id>', methods=['POST'])
+@api.route('/follInfo/doubt/<int:follInfo_id>', methods=['POST'])
 @auth.login_required
-def doubt_follInfo(specimen_info_id):
+def doubt_follInfo(follInfo_id):
     data = request.get_json()
-    item = FollInfo.query.get_or_404(specimen_info_id)
-
-    if item.question(data):
+    item = FollInfo.query.get_or_404(follInfo_id)
+    if item.question(data, item.pid, 0):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/follInfo/reply/<int:specimen_info_id>/<int:doubt_id>', methods=['POST'])
+@api.route('/follInfo/reply/<int:specimen_info_id>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_follInfo(specimen_info_id, doubt_id):
+def reply_follInfo(specimen_info_id, doubt_index):
     data = request.get_json()
     item = FollInfo.query.get_or_404(specimen_info_id)
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, item.pid, 0, doubt_index):
         return Success()
     else:
         return SampleStatusError()

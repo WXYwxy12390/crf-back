@@ -109,19 +109,18 @@ def finish_specimen_info(pid):
 def doubt_specimen_info(specimen_info_id):
     data = request.get_json()
     item = SpecimenInfo.query.get_or_404(specimen_info_id)
-
-    if item.question(data):
+    if item.question(data, item.pid, 0):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/reply/<int:specimen_info_id>/<int:doubt_id>', methods=['POST'])
+@api.route('/reply/<int:specimen_info_id>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_specimen_info(specimen_info_id, doubt_id):
+def reply_specimen_info(specimen_info_id, doubt_index):
     data = request.get_json()
     item = SpecimenInfo.query.get_or_404(specimen_info_id)
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, specimen_info_id.pid, 0, doubt_index):
         return Success()
     else:
         return SampleStatusError()

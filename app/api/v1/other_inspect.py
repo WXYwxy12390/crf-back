@@ -74,18 +74,18 @@ def finish_lung(pid, treNum):
 def doubt_lung_function(pid, treNum):
     data = request.get_json()
     item = Lung.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.question(data):
+    if item.question(data, pid, treNum):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/lung_function/reply/<int:pid>/<int:treNum>/<int:doubt_id>', methods=['POST'])
+@api.route('/lung_function/reply/<int:pid>/<int:treNum>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_lung_function(pid, treNum, doubt_id):
+def reply_lung_function(pid, treNum, doubt_index):
     data = request.get_json()
     item = Lung.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, pid, treNum, doubt_index):
         return Success()
     else:
         return SampleStatusError()
@@ -145,18 +145,18 @@ def finish_other_exam(pid, treNum):
 def doubt_other_exam(pid, treNum):
     data = request.get_json()
     item = OtherExams.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.question(data):
+    if item.question(data, pid, treNum):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/other_exam/reply/<int:pid>/<int:treNum>/<int:doubt_id>', methods=['POST'])
+@api.route('/other_exam/reply/<int:pid>/<int:treNum>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_other_exam(pid, treNum, doubt_id):
+def reply_other_exam(pid, treNum, doubt_index):
     data = request.get_json()
     item = OtherExams.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, pid, treNum, doubt_index):
         return Success()
     else:
         return SampleStatusError()
@@ -231,18 +231,18 @@ def finish_image_exam(pid, treNum):
 def doubt_image_exam(image_exam_id):
     data = request.get_json()
     item = ImageExams.query.get_or_404(image_exam_id)
-    if item.question(data):
+    if item.question(data, item.pid, item.treNum):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/image_exam/reply/<int:image_exam_id>/<int:doubt_id>', methods=['POST'])
+@api.route('/image_exam/reply/<int:image_exam_id>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_image_exam(image_exam_id, doubt_id):
+def reply_image_exam(image_exam_id, doubt_index):
     data = request.get_json()
     item = ImageExams.query.get_or_404(image_exam_id)
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, item.pid, item.treNum, doubt_index):
         return Success()
     else:
         return SampleStatusError()

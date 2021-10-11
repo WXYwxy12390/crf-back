@@ -65,18 +65,18 @@ def finish_immunohis(pid, treNum):
 def doubt_immunohis(pid, treNum):
     data = request.get_json()
     item = Immunohis.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.question(data):
+    if item.question(data, pid, treNum):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/reply/<int:pid>/<int:treNum>/<int:doubt_id>', methods=['POST'])
+@api.route('/reply/<int:pid>/<int:treNum>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_immunohis(pid, treNum, doubt_id):
+def reply_immunohis(pid, treNum, doubt_index):
     data = request.get_json()
     item = Immunohis.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, pid, treNum, doubt_index):
         return Success()
     else:
         return SampleStatusError()

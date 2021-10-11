@@ -72,18 +72,18 @@ def finish_blood_routine(pid, treNum):
 def doubt_blood_routine(pid, treNum):
     data = request.get_json()
     item = BloodRoutine.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.question(data):
+    if item.question(data, pid, treNum):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/blood_routine/reply/<int:pid>/<int:treNum>/<int:doubt_id>', methods=['POST'])
+@api.route('/blood_routine/reply/<int:pid>/<int:treNum>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_blood_routine(pid, treNum, doubt_id):
+def reply_blood_routine(pid, treNum, doubt_index):
     data = request.get_json()
     item = BloodRoutine.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, pid, treNum, doubt_index):
         return Success()
     else:
         return SampleStatusError()
@@ -144,18 +144,18 @@ def finish_blood_bio(pid, treNum):
 def doubt_blood_bio(pid, treNum):
     data = request.get_json()
     item = BloodBio.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.question(data):
+    if item.question(data, pid, treNum):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/blood_bio/reply/<int:pid>/<int:treNum>/<int:doubt_id>', methods=['POST'])
+@api.route('/blood_bio/reply/<int:pid>/<int:treNum>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_blood_bio(pid, treNum, doubt_id):
+def reply_blood_bio(pid, treNum, doubt_index):
     data = request.get_json()
     item = BloodBio.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, pid, treNum, doubt_index):
         return Success()
     else:
         return SampleStatusError()
@@ -216,18 +216,18 @@ def finish_thyroid(pid, treNum):
 def doubt_thyroid(pid, treNum):
     data = request.get_json()
     item = Thyroid.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.question(data):
+    if item.question(data, pid, treNum):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/thyroid/reply/<int:pid>/<int:treNum>/<int:doubt_id>', methods=['POST'])
+@api.route('/thyroid/reply/<int:pid>/<int:treNum>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_thyroid(pid, treNum, doubt_id):
+def reply_thyroid(pid, treNum, doubt_index):
     data = request.get_json()
     item = Thyroid.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, pid, treNum, doubt_index):
         return Success()
     else:
         return SampleStatusError()
@@ -288,18 +288,18 @@ def finish_coagulation(pid, treNum):
 def doubt_coagulation(pid, treNum):
     data = request.get_json()
     item = Coagulation.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.question(data):
+    if item.question(data, pid, treNum):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/coagulation/reply/<int:pid>/<int:treNum>/<int:doubt_id>', methods=['POST'])
+@api.route('/coagulation/reply/<int:pid>/<int:treNum>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_coagulation(pid, treNum, doubt_id):
+def reply_coagulation(pid, treNum, doubt_index):
     data = request.get_json()
     item = Coagulation.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, pid, treNum, doubt_index):
         return Success()
     else:
         return SampleStatusError()
@@ -360,18 +360,18 @@ def finish_myocardialEnzyme(pid, treNum):
 def doubt_myocardialEnzyme(pid, treNum):
     data = request.get_json()
     item = MyocardialEnzyme.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.question(data):
+    if item.question(data, pid, treNum):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/myocardialEnzyme/reply/<int:pid>/<int:treNum>/<int:doubt_id>', methods=['POST'])
+@api.route('/myocardialEnzyme/reply/<int:pid>/<int:treNum>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_myocardialEnzyme(pid, treNum, doubt_id):
+def reply_myocardialEnzyme(pid, treNum, doubt_index):
     data = request.get_json()
     item = MyocardialEnzyme.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, pid, treNum, doubt_index):
         return Success()
     else:
         return SampleStatusError()
@@ -432,18 +432,18 @@ def finish_cytokines(pid, treNum):
 def doubt_cytokines(pid, treNum):
     data = request.get_json()
     item = Cytokines.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.question(data):
+    if item.question(data, pid, treNum):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/cytokines/reply/<int:pid>/<int:treNum>/<int:doubt_id>', methods=['POST'])
+@api.route('/cytokines/reply/<int:pid>/<int:treNum>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_cytokines(pid, treNum, doubt_id):
+def reply_cytokines(pid, treNum, doubt_index):
     data = request.get_json()
     item = Cytokines.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, pid, treNum, doubt_index):
         return Success()
     else:
         return SampleStatusError()
@@ -504,18 +504,18 @@ def finish_lymSubsets(pid, treNum):
 def doubt_lymSubsets(pid, treNum):
     data = request.get_json()
     item = LymSubsets.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.question(data):
+    if item.question(data, pid, treNum):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/lymSubsets/reply/<int:pid>/<int:treNum>/<int:doubt_id>', methods=['POST'])
+@api.route('/lymSubsets/reply/<int:pid>/<int:treNum>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_lymSubsets(pid, treNum, doubt_id):
+def reply_lymSubsets(pid, treNum, doubt_index):
     data = request.get_json()
     item = LymSubsets.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, pid, treNum, doubt_index):
         return Success()
     else:
         return SampleStatusError()
@@ -576,18 +576,18 @@ def finish_urine_routine(pid, treNum):
 def doubt_urine_routine(pid, treNum):
     data = request.get_json()
     item = UrineRoutine.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.question(data):
+    if item.question(data, pid, treNum):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/urine_routine/reply/<int:pid>/<int:treNum>/<int:doubt_id>', methods=['POST'])
+@api.route('/urine_routine/reply/<int:pid>/<int:treNum>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_urine_routine(pid, treNum, doubt_id):
+def reply_urine_routine(pid, treNum, doubt_index):
     data = request.get_json()
     item = UrineRoutine.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, pid, treNum, doubt_index):
         return Success()
     else:
         return SampleStatusError()
@@ -648,18 +648,18 @@ def finish_tumor_marker(pid, treNum):
 def doubt_tumor_marker(pid, treNum):
     data = request.get_json()
     item = TumorMarker.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.question(data):
+    if item.question(data, pid, treNum):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/tumor_marker/reply/<int:pid>/<int:treNum>/<int:doubt_id>', methods=['POST'])
+@api.route('/tumor_marker/reply/<int:pid>/<int:treNum>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_tumor_marker(pid, treNum, doubt_id):
+def reply_tumor_marker(pid, treNum, doubt_index):
     data = request.get_json()
     item = TumorMarker.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, pid, treNum, doubt_index):
         return Success()
     else:
         return SampleStatusError()

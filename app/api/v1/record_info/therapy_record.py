@@ -98,15 +98,15 @@ def doubt_therapy_record(pid, treNum):
         item = Radiotherapy.query.filter_by(pid=pid, treNum=treNum).first_or_404()
 
     data = request.get_json()
-    if item.question(data):
+    if item.question(data, item.pid, item.treNum):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/reply/<int:pid>/<int:treNum>/<int:doubt_id>', methods=['POST'])
+@api.route('/reply/<int:pid>/<int:treNum>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_therapy_record(pid, treNum, doubt_id):
+def reply_therapy_record(pid, treNum, doubt_index):
     data = request.get_json()
     tre_rec = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
     trement = tre_rec.trement
@@ -117,7 +117,7 @@ def reply_therapy_record(pid, treNum, doubt_id):
     elif trement == 'radiotherapy':
         item = Radiotherapy.query.filter_by(pid=pid, treNum=treNum).first_or_404()
 
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, pid, treNum, doubt_index):
         return Success()
     else:
         return SampleStatusError()
@@ -166,18 +166,18 @@ def del_therapy_plan(pid, treNum):
 def doubt_therapy_plan(therapy_plan_id):
     data = request.get_json()
     item = DetailTrePlan.query.get_or_404(therapy_plan_id)
-    if item.question(data):
+    if item.question(data, item.pid, item.treNum):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/therapy_plan/reply/<int:therapy_plan_id>/<int:doubt_id>', methods=['POST'])
+@api.route('/therapy_plan/reply/<int:therapy_plan_id>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_therapy_plan(therapy_plan_id, doubt_id):
+def reply_therapy_plan(therapy_plan_id, doubt_index):
     data = request.get_json()
     item = DetailTrePlan.query.get_or_404(therapy_plan_id)
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, item.pid, item.treNum, doubt_index):
         return Success()
     else:
         return SampleStatusError()

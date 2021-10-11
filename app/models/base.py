@@ -47,14 +47,34 @@ db = SQLAlchemy(query_class=Query)
 
 class ModificationAndDoubt:
 
-    # 对某访视的某模块中某字段提出质疑
+    '''
+    该方法用于对某访视的某模块中某字段提出质疑。
+    参数data的结构为
+    {
+        'doubt_column':'',  质疑的字段
+        'doubt_description':''  质疑的描述
+    }
+    每个质疑存入数据库的结构为
+    {
+        'doubt_column':'',  质疑的字段
+        'doubt_column_cn',  质疑的字段的中文
+        'doubt_description':''  质疑的描述
+        'is_replied':0,    是否已经回复，0表示未回复，1表示已回复
+        'doubt_time':  ,    质疑的时间
+        'index':  ,     该质疑在质疑列表中的索引号
+    }
+    '''
     def question(self, data, pid, treNum):
         flag = False
         treNum_str = str(treNum)
         from app.models.base_line import Patient
         patient = Patient.query.get_or_404(pid)
         module = self.__class__.__name__
-        print(module)
+        if module == 'TreRec':
+            module = 'Evaluation'
+        if module in ['OneToFive', 'Surgery', 'Radiotherapy', 'DetailTrePlan']:
+            module = 'TreRec'
+
         module_status = copy.copy(patient.module_status)
         if module_status[module][treNum_str] not in [ModuleStatus.CRAMonitoring.value,
                                                      ModuleStatus.CRADoubt.value, ModuleStatus.WithReply.value]:
@@ -69,26 +89,47 @@ class ModificationAndDoubt:
 
         data = copy.copy(data)
         doubt = copy.copy(self.doubt)
-        index = len(data)
+        if doubt is None:
+            doubt = []
+        index = len(doubt)
         data['doubt_column_cn'] = self.export_header_map.get(data['doubt_column'])  # 该字段的中文
         data['is_replied'] = 0
         data['doubt_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         data['index'] = index  # 表示每一个质疑在质疑列表中的索引号。用于在所有质疑中定位到某索引。
-        if doubt is None:
-            doubt = []
+
         doubt.append(data)
         with db.auto_commit():
             self.doubt = doubt
-            flag_modified(patient, 'doubt')  # 加上这句JSON类型数据才可以更新到数据库。原因不明。
+            flag_modified(self, 'doubt')  # 加上这句JSON类型数据才可以更新到数据库。原因不明。
         return flag
 
+    '''
+    该方法用于对某个质疑回复。
+    data结构为{ 'reply':'' ]
+    通过doubt_index定位到要回复的质疑，并添加回复的内容和回复的时间
+    回复后，该质疑的结构为
+    {
+        'doubt_column':'',  质疑的字段
+        'doubt_column_cn',  质疑的字段的中文
+        'doubt_description':''  质疑的描述
+        'is_replied':1,    是否已经回复，0表示未回复，1表示已回复
+        'doubt_time':  ,    质疑的时间
+        'index':  ,     该质疑在质疑列表中的索引号
+        'reply':'',     回复的内容
+        'reply_time':   回复的时间
+    }
+    '''
     def reply_doubt(self, data, pid, treNum, doubt_index):
         flag = False
         treNum_str = str(treNum)
         from app.models.base_line import Patient
         patient = Patient.query.get_or_404(pid)
         module = self.__class__.__name__
-        print(module)
+        if module == 'TreRec':
+            module = 'Evaluation'
+        if module in ['OneToFive', 'Surgery', 'Radiotherapy', 'DetailTrePlan']:
+            module = 'TreRec'
+
         module_status = copy.copy(patient.module_status)
         if module_status[module][treNum_str] not in [ModuleStatus.CRADoubt.value, ModuleStatus.WithReply.value]:
             return flag
@@ -106,7 +147,7 @@ class ModificationAndDoubt:
         all_doubt[doubt_index]['reply_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with db.auto_commit():
             self.doubt = all_doubt
-            flag_modified(patient, 'doubt')  # 加上这句JSON类型数据才可以更新到数据库。原因不明。
+            flag_modified(self, 'doubt')  # 加上这句JSON类型数据才可以更新到数据库。原因不明。
         return flag
 
     def record_modification(self, data, pid, treNum):
