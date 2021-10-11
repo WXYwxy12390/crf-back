@@ -57,10 +57,6 @@ def add_specimen_info(pid):
     data = request.get_json()
     data["pid"] = pid
 
-    # 状态和同病人同的其他标本信息一致
-    specimenInfo = SpecimenInfo.query.filter_by(pid=pid).first()
-    data['module_status'] = specimenInfo.module_status if specimenInfo else 0
-
     json2db(data, SpecimenInfo)
     return Success()
 

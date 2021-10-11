@@ -103,8 +103,6 @@ def get_drug_history(pid):
 # @record_modification(DrugHistory)
 def add_drug_history(pid):
     data = request.get_json()
-    drugHistory = DrugHistory.query.filter_by(pid=pid).first()
-    data['module_status'] = drugHistory.module_status if drugHistory else 0
     data["pid"] = pid
     json2db(data, DrugHistory)
     return Success()
@@ -128,18 +126,18 @@ def del_hormone_history(pid):
 def doubt_drug_history(drug_history_id):
     data = request.get_json()
     item = DrugHistory.query.get_or_404(drug_history_id)
-    if item.question(data):
+    if item.question(data, item.pid, 0):
         return Success()
     else:
         return SampleStatusError()
 
 
-@api.route('/drug_history/reply/<int:drug_history_id>/<int:doubt_id>', methods=['POST'])
+@api.route('/drug_history/reply/<int:drug_history_id>/<int:doubt_index>', methods=['POST'])
 @auth.login_required
-def reply_drug_history(drug_history_id, doubt_id):
+def reply_drug_history(drug_history_id, doubt_index):
     data = request.get_json()
     item = DrugHistory.query.get_or_404(drug_history_id)
-    if item.reply_doubt(doubt_id, data):
+    if item.reply_doubt(data, item.pid, 0, doubt_index):
         return Success()
     else:
         return SampleStatusError()

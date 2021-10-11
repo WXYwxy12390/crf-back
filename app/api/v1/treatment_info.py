@@ -118,11 +118,9 @@ def get_signs(pid, treNum):
 # @record_modification(Signs)
 def add_signs(pid, treNum):
     data = request.get_json()
-    sign = Signs.query.filter_by(pid=pid, treNum=treNum).first()
     for _data in data['data']:
         _data['pid'] = pid
         _data['treNum'] = treNum
-        _data['module_status'] = sign.module_status if sign else 0
         json2db(_data, Signs)
     return Success()
 
@@ -203,11 +201,9 @@ def get_side_effect(pid, treNum):
 # @record_modification(SideEffect)
 def add_side_effect(pid, treNum):
     data = request.get_json()
-    sideEffect = SideEffect.query.filter_by(pid=pid, treNum=treNum).first()
     for _data in data['data']:
         _data['pid'] = pid
         _data['treNum'] = treNum
-        _data['module_status'] = sideEffect.module_status if sideEffect else 0
         json2db(_data, SideEffect)
     return Success()
 
@@ -289,12 +285,9 @@ def get_follInfo(pid):
 # @record_modification(FollInfo)
 def add_follInfo(pid):
     data = request.get_json()
-    # 状态和同病人同的其他标本信息一致
-    follInfo = FollInfo.query.filter_by(pid=pid).first()
 
     for _data in data['data']:
         _data['pid'] = pid
-        _data['module_status'] = follInfo.module_status if follInfo else 0
         json2db(_data, FollInfo)
     return Success()
 

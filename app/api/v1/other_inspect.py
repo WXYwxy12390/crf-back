@@ -175,12 +175,9 @@ def get_image_exam(pid, treNum):
 # @record_modification(ImageExams)
 def add_image_exam(pid, treNum):
     data = request.get_json()
-    imageExam = ImageExams.query.filter_by(pid=pid, treNum=treNum).first()
-
     for _data in data['data']:
         _data['pid'] = pid
         _data['treNum'] = treNum
-        _data['module_status'] = imageExam.module_status if imageExam else 0
         json2db(_data, ImageExams)
     return Success()
 

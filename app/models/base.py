@@ -74,6 +74,8 @@ class ModificationAndDoubt:
             module = 'Evaluation'
         if module in ['OneToFive', 'Surgery', 'Radiotherapy', 'DetailTrePlan']:
             module = 'TreRec'
+        if module == 'DrugHistory':
+            module = 'PastHis'
 
         module_status = copy.copy(patient.module_status)
         if module_status[module][treNum_str] not in [ModuleStatus.CRAMonitoring.value,
@@ -129,6 +131,8 @@ class ModificationAndDoubt:
             module = 'Evaluation'
         if module in ['OneToFive', 'Surgery', 'Radiotherapy', 'DetailTrePlan']:
             module = 'TreRec'
+        if module == 'DrugHistory':
+            module = 'PastHis'
 
         module_status = copy.copy(patient.module_status)
         if module_status[module][treNum_str] not in [ModuleStatus.CRADoubt.value, ModuleStatus.WithReply.value]:
