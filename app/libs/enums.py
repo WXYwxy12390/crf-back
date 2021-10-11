@@ -15,8 +15,11 @@ class ModuleStatus(Enum):
     # CRA已完成
     CRAFinish = 5
 
-    # Submitted = 1
-    # Finished = 2
-    # WithQuery = 3
-    # AllReplied = 4
 
+class GeneValue(Enum):
+    # 阳
+    Yang = 1
+    # 阴
+    Yin = 0
+    # 未知
+    Unknown = 2

@@ -123,7 +123,7 @@ class MoleDetec(Base, ModificationAndDoubt):
     ROS1 = Column(Integer, comment='ROS1(0-阴性,1-阳性,2-无)')
     RET = Column(Integer, comment='RET(0-阴性,1-阳性,2-无)')
     UGT1A1 = Column(Integer, comment='UGT1A1(0-阴性,1-阳性,2-无)')
-    NTRK = Column(Integer)
+    NTRK = Column(Integer, comment='UGT1A1(0-阴性,1-阳性,2-无)')
 
     ALKSam = Column(String(255), comment='ALK检测样本')  # 下面的文本都要改
     BIMSam = Column(String(255), comment='BIM检测样本')

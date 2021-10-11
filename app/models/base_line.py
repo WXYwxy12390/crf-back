@@ -3,7 +3,7 @@ import copy
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Text, JSON, DateTime, SmallInteger, and_
 from sqlalchemy.orm.attributes import flag_modified
 
-from app.libs.enums import ModuleStatus
+from app.libs.enums import ModuleStatus, GeneValue
 from app.models.base import Base, ModificationAndDoubt, db
 # 病人基本信息表
 from app.models.crf_info import FollInfo
@@ -332,36 +332,109 @@ class Patient(Base, ModificationAndDoubt):
 
         res = []
         for pid, mole_detecs in mole_detec_map.items():
-            gene_record = set()
+            yang_record = set()
+            yin_record = set()
+            unknown_record = set()
             for mole_detec in mole_detecs:
-                if mole_detec.ALK == 1:
-                    gene_record.add('ALK')
-                if mole_detec.BIM == 1:
-                    gene_record.add('BIM')
-                if mole_detec.BRAF == 1:
-                    gene_record.add('BRAF')
-                if mole_detec.cMET == 1:
-                    gene_record.add('cMET')
-                if mole_detec.EGFR == 1:
-                    gene_record.add('EGFR')
-                if mole_detec.HER_2 == 1:
-                    gene_record.add('HER_2')
-                if mole_detec.KRAS == 1:
-                    gene_record.add('KRAS')
-                if mole_detec.PIK3CA == 1:
-                    gene_record.add('PIK3CA')
-                if mole_detec.ROS1 == 1:
-                    gene_record.add('ROS1')
-                if mole_detec.RET == 1:
-                    gene_record.add('RET')
-                if mole_detec.UGT1A1 == 1:
-                    gene_record.add('UGT1A1')
-                if len(gene_record) == 11:
-                    break
-            gene_record = list(gene_record)  # 去重
+                if mole_detec.ALK == GeneValue.Yang.value:
+                    yang_record.add('ALK')
+                elif mole_detec.ALK == GeneValue.Yin.value:
+                    yin_record.add('ALK')
+                elif mole_detec.ALK == GeneValue.Unknown.value:
+                    unknown_record.add('ALK')
+
+                if mole_detec.BIM == GeneValue.Yang.value:
+                    yang_record.add('BIM')
+                elif mole_detec.ALK == GeneValue.Yin.value:
+                    yin_record.add('BIM')
+                elif mole_detec.ALK == GeneValue.Unknown.value:
+                    unknown_record.add('BIM')
+
+                if mole_detec.BRAF == GeneValue.Yang.value:
+                    yang_record.add('BRAF')
+                elif mole_detec.ALK == GeneValue.Yin.value:
+                    yin_record.add('BRAF')
+                elif mole_detec.ALK == GeneValue.Unknown.value:
+                    unknown_record.add('BRAF')
+
+                if mole_detec.cMET == GeneValue.Yang.value:
+                    yang_record.add('cMET')
+                elif mole_detec.ALK == GeneValue.Yin.value:
+                    yin_record.add('cMET')
+                elif mole_detec.ALK == GeneValue.Unknown.value:
+                    unknown_record.add('cMET')
+
+                if mole_detec.EGFR == GeneValue.Yang.value:
+                    yang_record.add('EGFR')
+                elif mole_detec.ALK == GeneValue.Yin.value:
+                    yin_record.add('EGFR')
+                elif mole_detec.ALK == GeneValue.Unknown.value:
+                    unknown_record.add('EGFR')
+
+                if mole_detec.HER_2 == GeneValue.Yang.value:
+                    yang_record.add('HER_2')
+                elif mole_detec.ALK == GeneValue.Yin.value:
+                    yin_record.add('HER_2')
+                elif mole_detec.ALK == GeneValue.Unknown.value:
+                    unknown_record.add('HER_2')
+
+                if mole_detec.KRAS == GeneValue.Yang.value:
+                    yang_record.add('KRAS')
+                elif mole_detec.ALK == GeneValue.Yin.value:
+                    yin_record.add('KRAS')
+                elif mole_detec.ALK == GeneValue.Unknown.value:
+                    unknown_record.add('KRAS')
+
+                if mole_detec.PIK3CA == GeneValue.Yang.value:
+                    yang_record.add('PIK3CA')
+                elif mole_detec.ALK == GeneValue.Yin.value:
+                    yin_record.add('PIK3CA')
+                elif mole_detec.ALK == GeneValue.Unknown.value:
+                    unknown_record.add('PIK3CA')
+
+                if mole_detec.ROS1 == GeneValue.Yang.value:
+                    yang_record.add('ROS1')
+                elif mole_detec.ALK == GeneValue.Yin.value:
+                    yin_record.add('ROS1')
+                elif mole_detec.ALK == GeneValue.Unknown.value:
+                    unknown_record.add('ROS1')
+
+                if mole_detec.RET == GeneValue.Yang.value:
+                    yang_record.add('RET')
+                elif mole_detec.ALK == GeneValue.Yin.value:
+                    yin_record.add('RET')
+                elif mole_detec.ALK == GeneValue.Unknown.value:
+                    unknown_record.add('RET')
+
+                if mole_detec.UGT1A1 == GeneValue.Yang.value:
+                    yang_record.add('UGT1A1')
+                elif mole_detec.ALK == GeneValue.Yin.value:
+                    yin_record.add('UGT1A1')
+                elif mole_detec.ALK == GeneValue.Unknown.value:
+                    unknown_record.add('UGT1A1')
+
+                if mole_detec.UGT1A1 == GeneValue.Yang.value:
+                    yang_record.add('NTRK')
+                elif mole_detec.ALK == GeneValue.Yin.value:
+                    yin_record.add('NTRK')
+                elif mole_detec.ALK == GeneValue.Unknown.value:
+                    unknown_record.add('NTRK')
+
+            # 去重
+            yang_record = list(yang_record)
+            yin_record = list(yin_record)
+            unknown_record = list(unknown_record)
             flag = True
             for gene in genes:
-                if gene not in gene_record:
+                name = gene['gene']
+                value = gene['value']
+                if (value == GeneValue.Yang.value) and (name not in yang_record):
+                    flag = False
+                    break
+                if (value == GeneValue.Yin.value) and (name not in yin_record):
+                    flag = False
+                    break
+                if (value == GeneValue.Unknown.value) and (name not in unknown_record):
                     flag = False
                     break
             if flag:
