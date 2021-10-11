@@ -26,7 +26,7 @@ def get_first_diagnose(pid):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification(IniDiaPro)
+# @record_modification(IniDiaPro)
 def add_first_diagnose(pid):
     data = request.get_json()
     data["pid"] = pid

@@ -33,7 +33,7 @@ def get_therapy_record(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification('trement')  # 由于不确定是OneToFive、Surgery还是Radiotherapy，先传trement字符串标识，到装饰器中再单独做处理
+# @record_modification('trement')  # 由于不确定是OneToFive、Surgery还是Radiotherapy，先传trement字符串标识，到装饰器中再单独做处理
 def add_therapy_record(pid, treNum):
     data = request.get_json()
     if 'parent' in data:
@@ -139,7 +139,7 @@ def get_therapy_plan(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification(DetailTrePlan)
+# @record_modification(DetailTrePlan)
 def add_therapy_plan(pid, treNum):
     data = request.get_json()
     detailTrePlan = DetailTrePlan.query.filter_by(pid=pid, treNum=treNum).first()

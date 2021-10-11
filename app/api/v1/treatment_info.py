@@ -32,7 +32,7 @@ def get_treatment_evaluation(pid, treNum, trement):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification(TreRec)
+# @record_modification(TreRec)
 def add_treatment_evaluation(pid, treNum, trement):
     data = request.get_json()
     data['pid'] = pid
@@ -115,7 +115,7 @@ def get_signs(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification(Signs)
+# @record_modification(Signs)
 def add_signs(pid, treNum):
     data = request.get_json()
     sign = Signs.query.filter_by(pid=pid, treNum=treNum).first()
@@ -200,7 +200,7 @@ def get_side_effect(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification(SideEffect)
+# @record_modification(SideEffect)
 def add_side_effect(pid, treNum):
     data = request.get_json()
     sideEffect = SideEffect.query.filter_by(pid=pid, treNum=treNum).first()
@@ -286,7 +286,7 @@ def get_follInfo(pid):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification(FollInfo)
+# @record_modification(FollInfo)
 def add_follInfo(pid):
     data = request.get_json()
     # 状态和同病人同的其他标本信息一致

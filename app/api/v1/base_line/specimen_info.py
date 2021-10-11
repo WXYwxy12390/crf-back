@@ -52,7 +52,7 @@ def get_specimen_info(pid):
 
 @api.route('/<int:pid>', methods=['POST'])
 @auth.login_required
-@record_modification(SpecimenInfo)
+# @record_modification(SpecimenInfo)
 def add_specimen_info(pid):
     data = request.get_json()
     data["pid"] = pid

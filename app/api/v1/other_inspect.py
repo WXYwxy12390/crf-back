@@ -30,7 +30,7 @@ def get_lung_function(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification(Lung)
+# @record_modification(Lung)
 def add_lung_function(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -101,7 +101,7 @@ def get_other_exam(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification(OtherExams)
+# @record_modification(OtherExams)
 def add_other_exam(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -172,7 +172,7 @@ def get_image_exam(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification(ImageExams)
+# @record_modification(ImageExams)
 def add_image_exam(pid, treNum):
     data = request.get_json()
     imageExam = ImageExams.query.filter_by(pid=pid, treNum=treNum).first()

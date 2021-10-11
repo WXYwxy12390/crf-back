@@ -28,7 +28,7 @@ def get_blood_routine(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification(BloodRoutine)
+# @record_modification(BloodRoutine)
 def add_blood_routine(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -100,7 +100,7 @@ def get_blood_bio(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification(BloodBio)
+# @record_modification(BloodBio)
 def add_blood_bio(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -172,7 +172,7 @@ def get_thyroid(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification(Thyroid)
+# @record_modification(Thyroid)
 def add_thyroid(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -244,7 +244,7 @@ def get_coagulation(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification(Coagulation)
+# @record_modification(Coagulation)
 def add_coagulation(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -316,7 +316,7 @@ def get_myocardialEnzyme(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification(MyocardialEnzyme)
+# @record_modification(MyocardialEnzyme)
 def add_myocardialEnzyme(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -388,7 +388,7 @@ def get_cytokines(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification(Cytokines)
+# @record_modification(Cytokines)
 def add_cytokines(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -460,7 +460,7 @@ def get_lymSubsets(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification(LymSubsets)
+# @record_modification(LymSubsets)
 def add_lymSubsets(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -532,7 +532,7 @@ def get_urine_routine(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification(UrineRoutine)
+# @record_modification(UrineRoutine)
 def add_urine_routine(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
@@ -604,7 +604,7 @@ def get_tumor_marker(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
-@record_modification(TumorMarker)
+# @record_modification(TumorMarker)
 def add_tumor_marker(pid, treNum):
     data = request.get_json()
     data['pid'] = pid

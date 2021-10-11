@@ -22,7 +22,7 @@ def get_patient(id):
 @api.route('/<int:pid>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
-@record_modification(Patient)
+# @record_modification(Patient)
 def add_patient(pid):
     data = request.get_json()
     patient = Patient.query.get_or_404(pid)
