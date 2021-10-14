@@ -37,7 +37,10 @@ class Scope:
 
 class OperateUserCRF(Scope):
     allow_api = ['v1.sample+add_sample', 'v1.sample+get_sample_all', 'v1.sample+get_sample_updated',
-                 'v1.sample+sample_add_account']
+                 'v1.sample+sample_add_account',
+                 'v1.modification+submit_cycle', 'v1.modification+submit',
+                 'v1.modification+reply', 'v1.modification+get_history'
+                 ]
     allow_module = ['v1.first_diagnose', 'v1.past_history', 'v1.patient', 'v1.record_info', 'v1.therapy_record',
                     'v1.file', 'v1.immunohis', 'v1.lab_inspectation', 'v1.mole_detec', 'v1.other_inspect',
                     'v1.treatment_info', 'v1.specimen_info',
@@ -132,6 +135,11 @@ class Analysis(Scope):
 class OperateAllSpeciInfo(Scope):
     allow_api = ['v1.sample+add_sample']
     allow_module = ['v1.specimen_info']
+
+
+class CRA(Scope):
+    allow_api = ['v1.modification+begin_monitor', 'v1.modification+finish',
+                 'v1.modification+doubt']
 
 
 # 这里的endpoint 会带有蓝图v1 例如  v1.super_get_user

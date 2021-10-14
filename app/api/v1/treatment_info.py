@@ -1,9 +1,6 @@
 from datetime import timedelta as td, datetime
-
 from flask import request, g,current_app
-
-from app.libs.decorator import edit_need_auth, update_time, record_modification
-from app.libs.enums import ModuleStatus
+from app.libs.decorator import edit_need_auth, update_time
 from app.libs.error import Success
 from app.libs.error_code import SampleStatusError
 from app.libs.redprint import Redprint
@@ -15,6 +12,7 @@ from app.models.cycle import Signs, SideEffect
 from app.models.therapy_record import TreRec
 from app.spider.research_center import ResearchCenterSpider
 from app.utils.date import str2date
+from app.utils.modification import record_modification, if_status_allow_modification
 
 api = Redprint('treatment_info')
 
@@ -32,11 +30,20 @@ def get_treatment_evaluation(pid, treNum, trement):
 @auth.login_required
 @edit_need_auth
 @update_time
-# @record_modification(TreRec)
 def add_treatment_evaluation(pid, treNum, trement):
     data = request.get_json()
     data['pid'] = pid
     data['treNum'] = treNum
+    item = TreRec.query.filter_by(pid=pid, treNum=treNum).first()
+
+    # 当存在'modification_des'时，说明需要记录下该修改。
+    if 'modification_des' in data.keys():
+        if not record_modification(item, data, pid, treNum, 'TreRec'):
+            return SampleStatusError(msg='当前模块状态无法修改数据')
+    else:
+        if not if_status_allow_modification(pid, treNum, 'TreRec', False):
+            return SampleStatusError(msg='当前模块状态无法修改数据')
+
     data['trement'] = trement
     json2db(data, TreRec)
     """
@@ -46,62 +53,31 @@ def add_treatment_evaluation(pid, treNum, trement):
     # if 'proDate' in data and 'PFS_DFS' not in data:
     #     treRec = TreRec.query.filter_by(pid=pid,treNum=treNum).first()
     #     treRec.compute_FPS_DFS()
-    treRec = TreRec.query.filter_by(pid=pid, treNum=treNum).first()
-    if treRec.is_auto_compute == 1:
-        treRec.compute_FPS_DFS()
+    if item.is_auto_compute == 1:
+        item.compute_FPS_DFS()
     return Success()
 
 
-@api.route('/evaluation/submit/<int:pid>/<int:treNum>', methods=['GET'])
-@auth.login_required
-def submit_treatment_evaluation(pid, treNum):
-    patient = Patient.query.get_or_404(pid)
-    if patient.submit_module('Evaluation', treNum):
-        return Success(msg='提交成功')
-    else:
-        return SampleStatusError('当前状态无法提交')
-
-
-@api.route('/evaluation/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
-@auth.login_required
-def begin_monitor_evaluation(pid, treNum):
-    patient = Patient.query.get_or_404(pid)
-    if patient.start_monitor('Evaluation', treNum):
-        return Success(msg='启动监察成功')
-    else:
-        return SampleStatusError(msg='启动监察失败')
-
-
-@api.route('/evaluation/finish/<int:pid>/<int:treNum>', methods=['GET'])
-@auth.login_required
-def finish_evaluation(pid, treNum):
-    patient = Patient.query.get_or_404(pid)
-    if patient.finish('Evaluation', treNum):
-        return Success(msg='监察已完成')
-    else:
-        return SampleStatusError('当前无法完成监察')
-
-
-@api.route('/evaluation/doubt/<int:pid>/<int:treNum>', methods=['POST'])
-@auth.login_required
-def doubt_evaluation(pid, treNum):
-    data = request.get_json()
-    item = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.question(data, pid, treNum):
-        return Success()
-    else:
-        return SampleStatusError()
-
-
-@api.route('/evaluation/reply/<int:pid>/<int:treNum>/<int:doubt_index>', methods=['POST'])
-@auth.login_required
-def reply_evaluation(pid, treNum, doubt_index):
-    data = request.get_json()
-    item = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.reply_doubt(data, pid, treNum, doubt_index):
-        return Success()
-    else:
-        return SampleStatusError()
+# @api.route('/evaluation/doubt/<int:pid>/<int:treNum>', methods=['POST'])
+# @auth.login_required
+# def doubt_evaluation(pid, treNum):
+#     data = request.get_json()
+#     item = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+#     if item.question(data, pid, treNum):
+#         return Success()
+#     else:
+#         return SampleStatusError()
+#
+#
+# @api.route('/evaluation/reply/<int:pid>/<int:treNum>/<int:doubt_index>', methods=['POST'])
+# @auth.login_required
+# def reply_evaluation(pid, treNum, doubt_index):
+#     data = request.get_json()
+#     item = TreRec.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+#     if item.reply_doubt(data, pid, treNum, doubt_index):
+#         return Success()
+#     else:
+#         return SampleStatusError()
 
 
 # 症状体征的获取、提交、删除
@@ -115,12 +91,22 @@ def get_signs(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
-# @record_modification(Signs)
 def add_signs(pid, treNum):
     data = request.get_json()
     for _data in data['data']:
         _data['pid'] = pid
         _data['treNum'] = treNum
+
+        id = _data.get('id')
+        item = Signs.query.get_or_404(id) if id is not None else None
+        # 当存在'modification_des'时，说明需要记录下该修改。
+        if 'modification_des' in _data.keys():
+            if not record_modification(item, _data, pid, treNum, 'Signs'):
+                return SampleStatusError(msg='当前模块状态无法修改数据')
+        else:
+            if not if_status_allow_modification(pid, treNum, 'Signs', False):
+                return SampleStatusError(msg='当前模块状态无法修改数据')
+
         json2db(_data, Signs)
     return Success()
 
@@ -135,56 +121,26 @@ def del_signs(pid,sign_id):
     return Success()
 
 
-@api.route('/signs/submit/<int:pid>/<int:treNum>', methods=['GET'])
-@auth.login_required
-def submit_signs(pid, treNum):
-    patient = Patient.query.get_or_404(pid)
-    if patient.submit_module('Signs', treNum):
-        return Success(msg='提交成功')
-    else:
-        return SampleStatusError('当前状态无法提交')
-
-
-@api.route('/signs/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
-@auth.login_required
-def begin_monitor_signs(pid, treNum):
-    patient = Patient.query.get_or_404(pid)
-    if patient.start_monitor('Signs', treNum):
-        return Success(msg='启动监察成功')
-    else:
-        return SampleStatusError(msg='启动监察失败')
-
-
-@api.route('/signs/finish/<int:pid>/<int:treNum>', methods=['GET'])
-@auth.login_required
-def finish_signs(pid, treNum):
-    patient = Patient.query.get_or_404(pid)
-    if patient.finish('Signs', treNum):
-        return Success(msg='监察已完成')
-    else:
-        return SampleStatusError('当前无法完成监察')
-
-
-@api.route('/signs/doubt/<int:sign_id>', methods=['POST'])
-@auth.login_required
-def doubt_signs(sign_id):
-    data = request.get_json()
-    item = Signs.query.get_or_404(sign_id)
-    if item.question(data, item.pid, item.treNum):
-        return Success()
-    else:
-        return SampleStatusError()
-
-
-@api.route('/signs/reply/<int:image_exam_id>/<int:doubt_index>', methods=['POST'])
-@auth.login_required
-def reply_signs(image_exam_id, doubt_index):
-    data = request.get_json()
-    item = Signs.query.get_or_404(image_exam_id)
-    if item.reply_doubt(data, item.pid, item.treNum, doubt_index):
-        return Success()
-    else:
-        return SampleStatusError()
+# @api.route('/signs/doubt/<int:sign_id>', methods=['POST'])
+# @auth.login_required
+# def doubt_signs(sign_id):
+#     data = request.get_json()
+#     item = Signs.query.get_or_404(sign_id)
+#     if item.question(data, item.pid, item.treNum):
+#         return Success()
+#     else:
+#         return SampleStatusError()
+#
+#
+# @api.route('/signs/reply/<int:image_exam_id>/<int:doubt_index>', methods=['POST'])
+# @auth.login_required
+# def reply_signs(image_exam_id, doubt_index):
+#     data = request.get_json()
+#     item = Signs.query.get_or_404(image_exam_id)
+#     if item.reply_doubt(data, item.pid, item.treNum, doubt_index):
+#         return Success()
+#     else:
+#         return SampleStatusError()
 
 
 # 副反应的获取、提交、删除
@@ -198,12 +154,22 @@ def get_side_effect(pid, treNum):
 @auth.login_required
 @edit_need_auth
 @update_time
-# @record_modification(SideEffect)
 def add_side_effect(pid, treNum):
     data = request.get_json()
     for _data in data['data']:
         _data['pid'] = pid
         _data['treNum'] = treNum
+
+        id = _data.get('id')
+        item = SideEffect.query.get_or_404(id) if id is not None else None
+        # 当存在'modification_des'时，说明需要记录下该修改。
+        if 'modification_des' in _data.keys():
+            if not record_modification(item, _data, pid, treNum, 'SideEffect'):
+                return SampleStatusError(msg='当前模块状态无法修改数据')
+        else:
+            if not if_status_allow_modification(pid, treNum, 'SideEffect', False):
+                return SampleStatusError(msg='当前模块状态无法修改数据')
+
         json2db(_data, SideEffect)
     return Success()
 
@@ -218,56 +184,26 @@ def del_side_effect(pid,se_id):
     return Success()
 
 
-@api.route('/side_effect/submit/<int:pid>/<int:treNum>', methods=['GET'])
-@auth.login_required
-def submit_side_effect(pid, treNum):
-    patient = Patient.query.get_or_404(pid)
-    if patient.submit_module('SideEffect', treNum):
-        return Success(msg='提交成功')
-    else:
-        return SampleStatusError('当前状态无法提交')
-
-
-@api.route('/side_effect/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
-@auth.login_required
-def begin_monitor_side_effect(pid, treNum):
-    patient = Patient.query.get_or_404(pid)
-    if patient.start_monitor('SideEffect', treNum):
-        return Success(msg='启动监察成功')
-    else:
-        return SampleStatusError(msg='启动监察失败')
-
-
-@api.route('/side_effect/finish/<int:pid>/<int:treNum>', methods=['GET'])
-@auth.login_required
-def finish_side_effect(pid, treNum):
-    patient = Patient.query.get_or_404(pid)
-    if patient.finish('SideEffect', treNum):
-        return Success(msg='监察已完成')
-    else:
-        return SampleStatusError('当前无法完成监察')
-
-
-@api.route('/side_effect/doubt/<int:side_effect_id>', methods=['POST'])
-@auth.login_required
-def doubt_side_effect(side_effect_id):
-    data = request.get_json()
-    item = SideEffect.query.get_or_404(side_effect_id)
-    if item.question(data, item.pid, item.treNum):
-        return Success()
-    else:
-        return SampleStatusError()
-
-
-@api.route('/side_effect/reply/<int:image_exam_id>/<int:doubt_index>', methods=['POST'])
-@auth.login_required
-def reply_side_effect(image_exam_id, doubt_index):
-    data = request.get_json()
-    item = SideEffect.query.get_or_404(image_exam_id)
-    if item.reply_doubt(data, item.pid, item.treNum, doubt_index):
-        return Success()
-    else:
-        return SampleStatusError()
+# @api.route('/side_effect/doubt/<int:side_effect_id>', methods=['POST'])
+# @auth.login_required
+# def doubt_side_effect(side_effect_id):
+#     data = request.get_json()
+#     item = SideEffect.query.get_or_404(side_effect_id)
+#     if item.question(data, item.pid, item.treNum):
+#         return Success()
+#     else:
+#         return SampleStatusError()
+#
+#
+# @api.route('/side_effect/reply/<int:image_exam_id>/<int:doubt_index>', methods=['POST'])
+# @auth.login_required
+# def reply_side_effect(image_exam_id, doubt_index):
+#     data = request.get_json()
+#     item = SideEffect.query.get_or_404(image_exam_id)
+#     if item.reply_doubt(data, item.pid, item.treNum, doubt_index):
+#         return Success()
+#     else:
+#         return SampleStatusError()
 
 
 # 随访信息表的获取、提交、删除
@@ -282,12 +218,22 @@ def get_follInfo(pid):
 @auth.login_required
 @edit_need_auth
 @update_time
-# @record_modification(FollInfo)
 def add_follInfo(pid):
     data = request.get_json()
 
     for _data in data['data']:
         _data['pid'] = pid
+
+        id = data.get('id')
+        item = FollInfo.query.get_or_404(id) if id is not None else None
+        # 当存在'modification_des'时，说明需要记录下该修改。
+        if 'modification_des' in data.keys():
+            if not record_modification(item, data, pid, 0, 'FollInfo'):
+                return SampleStatusError(msg='当前模块状态无法修改数据')
+        else:
+            if not if_status_allow_modification(pid, 0, 'FollInfo', False):
+                return SampleStatusError(msg='当前模块状态无法修改数据')
+
         json2db(_data, FollInfo)
     return Success()
 
@@ -301,56 +247,26 @@ def del_follInfo(pid,fid):
     return Success()
 
 
-@api.route('/follInfo/submit/<int:pid>', methods=['GET'])
-@auth.login_required
-def submit_follInfo(pid):
-    patient = Patient.query.get_or_404(pid)
-    if patient.submit_module('FollInfo', 0):
-        return Success(msg='提交成功')
-    else:
-        return SampleStatusError('当前状态无法提交')
-
-
-@api.route('/follInfo/begin_monitor/<int:pid>', methods=['GET'])
-@auth.login_required
-def begin_monitor_follInfo(pid):
-    patient = Patient.query.get_or_404(pid)
-    if patient.start_monitor('FollInfo', 0):
-        return Success(msg='启动监察成功')
-    else:
-        return SampleStatusError(msg='启动监察失败')
-
-
-@api.route('/follInfo/finish/<int:pid>', methods=['GET'])
-@auth.login_required
-def finish_follInfo(pid):
-    patient = Patient.query.get_or_404(pid)
-    if patient.finish('FollInfo', 0):
-        return Success(msg='监察已完成')
-    else:
-        return SampleStatusError('当前无法完成监察')
-
-
-@api.route('/follInfo/doubt/<int:follInfo_id>', methods=['POST'])
-@auth.login_required
-def doubt_follInfo(follInfo_id):
-    data = request.get_json()
-    item = FollInfo.query.get_or_404(follInfo_id)
-    if item.question(data, item.pid, 0):
-        return Success()
-    else:
-        return SampleStatusError()
-
-
-@api.route('/follInfo/reply/<int:specimen_info_id>/<int:doubt_index>', methods=['POST'])
-@auth.login_required
-def reply_follInfo(specimen_info_id, doubt_index):
-    data = request.get_json()
-    item = FollInfo.query.get_or_404(specimen_info_id)
-    if item.reply_doubt(data, item.pid, 0, doubt_index):
-        return Success()
-    else:
-        return SampleStatusError()
+# @api.route('/follInfo/doubt/<int:follInfo_id>', methods=['POST'])
+# @auth.login_required
+# def doubt_follInfo(follInfo_id):
+#     data = request.get_json()
+#     item = FollInfo.query.get_or_404(follInfo_id)
+#     if item.question(data, item.pid, 0):
+#         return Success()
+#     else:
+#         return SampleStatusError()
+#
+#
+# @api.route('/follInfo/reply/<int:specimen_info_id>/<int:doubt_index>', methods=['POST'])
+# @auth.login_required
+# def reply_follInfo(specimen_info_id, doubt_index):
+#     data = request.get_json()
+#     item = FollInfo.query.get_or_404(specimen_info_id)
+#     if item.reply_doubt(data, item.pid, 0, doubt_index):
+#         return Success()
+#     else:
+#         return SampleStatusError()
 
 
 # 设置病人随访提醒

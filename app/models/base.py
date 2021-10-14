@@ -8,6 +8,7 @@ from sqlalchemy.orm.attributes import flag_modified
 
 from app.libs.enums import ModuleStatus
 from app.libs.error_code import NotFound
+from app.utils.modification import if_status_allow_modification, get_module_by_class_name
 
 
 class SQLAlchemy(_SQLAlchemy):
@@ -46,7 +47,6 @@ db = SQLAlchemy(query_class=Query)
 
 
 class ModificationAndDoubt:
-
     '''
     该方法用于对某访视的某模块中某字段提出质疑。
     参数data的结构为
@@ -64,18 +64,13 @@ class ModificationAndDoubt:
         'index':  ,     该质疑在质疑列表中的索引号
     }
     '''
+
     def question(self, data, pid, treNum):
         flag = False
         treNum_str = str(treNum)
         from app.models.base_line import Patient
         patient = Patient.query.get_or_404(pid)
-        module = self.__class__.__name__
-        if module == 'TreRec':
-            module = 'Evaluation'
-        if module in ['OneToFive', 'Surgery', 'Radiotherapy', 'DetailTrePlan']:
-            module = 'TreRec'
-        if module == 'DrugHistory':
-            module = 'PastHis'
+        module = get_module_by_class_name(self.__class__.__name__)
 
         module_status = copy.copy(patient.module_status)
         if module_status[module][treNum_str] not in [ModuleStatus.CRAMonitoring.value,
@@ -121,18 +116,13 @@ class ModificationAndDoubt:
         'reply_time':   回复的时间
     }
     '''
+
     def reply_doubt(self, data, pid, treNum, doubt_index):
         flag = False
         treNum_str = str(treNum)
         from app.models.base_line import Patient
         patient = Patient.query.get_or_404(pid)
-        module = self.__class__.__name__
-        if module == 'TreRec':
-            module = 'Evaluation'
-        if module in ['OneToFive', 'Surgery', 'Radiotherapy', 'DetailTrePlan']:
-            module = 'TreRec'
-        if module == 'DrugHistory':
-            module = 'PastHis'
+        module = get_module_by_class_name(self.__class__.__name__)
 
         module_status = copy.copy(patient.module_status)
         if module_status[module][treNum_str] not in [ModuleStatus.CRADoubt.value, ModuleStatus.WithReply.value]:
@@ -148,34 +138,25 @@ class ModificationAndDoubt:
         data = copy.copy(data)
         all_doubt = copy.copy(self.doubt)
         all_doubt[doubt_index]['reply'] = data['reply']
+        all_doubt[doubt_index]['is_replied'] = 1
         all_doubt[doubt_index]['reply_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with db.auto_commit():
             self.doubt = all_doubt
             flag_modified(self, 'doubt')  # 加上这句JSON类型数据才可以更新到数据库。原因不明。
         return flag
 
-    def record_modification(self, data, pid, treNum):
-        flag = False  # 标记是否成功记录下修改
-        treNum_str = str(treNum)
-        from app.models.base_line import Patient
-        patient = Patient.query.get_or_404(pid)
-        module = self.__class__.__name__
-        module_status = patient.module_status
-        if module_status.get(module) is None:
-            return flag
-        if module_status[module].get(treNum_str) is None or \
-                module_status[module].get(treNum_str) == ModuleStatus.UnSubmitted.value:
-            return flag
+    '''
+    该方法用于记录修改。
+    参数data结构应该是
+    {
+        'column':'',    修改的字段
+        'content':'',   修改的内容
+        'description:'' 修改的描述
+    }
+    在方法中要补充上修改的时间,修改字段的中文，然后存入数据库。
+    '''
 
-        flag = True
-        '''
-        参数data结构应该是
-        {
-            'column':'',    修改的字段
-            'content':''    修改的内容
-        }
-        现在要补充上修改的时间和修改字段的中文
-        '''
+    def record_modification(self, data):
         data = copy.copy(data)
         data['time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         data['column_cn'] = self.export_header_map.get(data['column'])
@@ -186,7 +167,34 @@ class ModificationAndDoubt:
         with db.auto_commit():
             self.modification = modification
             flag_modified(self, 'modification')
-        return flag
+
+    # 将修改记录和质疑按时间顺序放在一个列表中。若质疑已被回复，则以回复的时间为准。
+    def get_history(self):
+        history = []
+        modification = copy.copy(self.modification)
+        doubt = copy.copy(self.doubt)
+        history.extend(modification)
+        history.extend(doubt)
+        history_length = len(history)
+
+        def get_time(dic):
+            if dic.get('time') is not None:
+                time = dic['time']
+            elif dic['is_replied'] == 1:
+                time = dic['reply_time']
+            else:
+                time = dic['doubt_time']
+            return time
+
+        for i in range(0, history_length):
+            max_index = i
+            for j in range(i + 1, history_length):
+                if get_time(history[j]) > get_time(history[max_index]):
+                    max_index = j
+            temp = copy.copy(history[max_index])
+            history[max_index] = copy.copy(history[i])
+            history[i] = temp
+        return history
 
 
 class Base(db.Model):

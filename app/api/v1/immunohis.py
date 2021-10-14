@@ -8,6 +8,7 @@ from app.libs.token_auth import auth
 from app.models import json2db
 from app.models.base_line import Patient
 from app.models.cycle import Immunohis
+from app.utils.modification import record_modification, if_status_allow_modification
 
 api = Redprint('immunohis')
 
@@ -26,59 +27,39 @@ def add_immunohis(pid, treNum):
     data = request.get_json()
     data['pid'] = pid
     data['treNum'] = treNum
+    item = Immunohis.query.filter_by(pid=pid, treNum=treNum).first()
+
+    # 当存在'modification_des'时，说明需要记录下该修改。
+    if 'modification_des' in data.keys():
+        if not record_modification(item, data, pid, treNum, 'Immunohis'):
+            return SampleStatusError(msg='当前模块状态无法修改数据')
+    else:
+        if not if_status_allow_modification(pid, treNum, 'Immunohis', False):
+            return SampleStatusError(msg='当前模块状态无法修改数据')
+
     json2db(data, Immunohis)
     return Success()
 
 
-@api.route('/submit/<int:pid>/<int:treNum>', methods=['GET'])
-@auth.login_required
-def submit_immunohis(pid, treNum):
-    patient = Patient.query.get_or_404(pid)
-    if patient.submit_module('Immunohis', treNum):
-        return Success(msg='提交成功')
-    else:
-        return SampleStatusError('当前状态无法提交')
-
-
-@api.route('/begin_monitor/<int:pid>/<int:treNum>', methods=['GET'])
-@auth.login_required
-def begin_monitor_immunohis(pid, treNum):
-    patient = Patient.query.get_or_404(pid)
-    if patient.start_monitor('Immunohis', treNum):
-        return Success(msg='启动监察成功')
-    else:
-        return SampleStatusError(msg='启动监察失败')
-
-
-@api.route('/finish/<int:pid>/<int:treNum>', methods=['GET'])
-@auth.login_required
-def finish_immunohis(pid, treNum):
-    patient = Patient.query.get_or_404(pid)
-    if patient.finish('Immunohis', treNum):
-        return Success(msg='监察已完成')
-    else:
-        return SampleStatusError('当前无法完成监察')
-
-
-@api.route('/doubt/<int:pid>/<int:treNum>', methods=['POST'])
-@auth.login_required
-def doubt_immunohis(pid, treNum):
-    data = request.get_json()
-    item = Immunohis.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.question(data, pid, treNum):
-        return Success()
-    else:
-        return SampleStatusError()
-
-
-@api.route('/reply/<int:pid>/<int:treNum>/<int:doubt_index>', methods=['POST'])
-@auth.login_required
-def reply_immunohis(pid, treNum, doubt_index):
-    data = request.get_json()
-    item = Immunohis.query.filter_by(pid=pid, treNum=treNum).first_or_404()
-    if item.reply_doubt(data, pid, treNum, doubt_index):
-        return Success()
-    else:
-        return SampleStatusError()
+# @api.route('/doubt/<int:pid>/<int:treNum>', methods=['POST'])
+# @auth.login_required
+# def doubt_immunohis(pid, treNum):
+#     data = request.get_json()
+#     item = Immunohis.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+#     if item.question(data, pid, treNum):
+#         return Success()
+#     else:
+#         return SampleStatusError()
+#
+#
+# @api.route('/reply/<int:pid>/<int:treNum>/<int:doubt_index>', methods=['POST'])
+# @auth.login_required
+# def reply_immunohis(pid, treNum, doubt_index):
+#     data = request.get_json()
+#     item = Immunohis.query.filter_by(pid=pid, treNum=treNum).first_or_404()
+#     if item.reply_doubt(data, pid, treNum, doubt_index):
+#         return Success()
+#     else:
+#         return SampleStatusError()
 
 
