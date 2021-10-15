@@ -133,7 +133,7 @@ class Analysis(Scope):
 
 # 查看编辑所有标本信息
 class OperateAllSpeciInfo(Scope):
-    allow_api = ['v1.sample+add_sample']
+    allow_api = ['v1.sample+add_sample', 'v1.sample+get_sample_all']
     allow_module = ['v1.specimen_info']
 
 

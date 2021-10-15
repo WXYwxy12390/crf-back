@@ -31,16 +31,21 @@ def get_record_info_nav(pid):
 @auth.login_required
 def change_nav_pos(pid, old, new):
     tre_recs = TreRec.query.filter(TreRec.pid == pid,
-                                   TreRec.is_delete == 0).all()
+                                   TreRec.is_delete == 0).order_by(TreRec.treIndex).all()
     length = len(tre_recs)
-    if old > new or old < 1 or new > length:
+    if old < 1 or new > length or new < 1 or old > length:
         return ParameterException(msg='位置参数有误')
+    if old == new:
+        return Success()
     with db.auto_commit():
-        for tre_rec in tre_recs:
-            if new >= tre_rec.treIndex > old:
-                tre_rec.treIndex -= 1
-            elif tre_rec.treIndex == old:
-                tre_rec.treIndex = new
+        if new > old:
+            for i in range(old, new):
+                tre_recs[i].treIndex -= 1
+        else:
+            for i in range(new-1, old-1):
+                tre_recs[i].treIndex += 1
+        tre_recs[old-1].treIndex = new
+
     return Success()
 
 
