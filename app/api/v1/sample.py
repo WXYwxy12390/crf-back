@@ -28,19 +28,15 @@ def get_sample_all():
     limit = int(args['limit'])
     sort = int(args.get('sort')) if args.get('sort') else None
     patients = []
-    if 'OperateAllCRF' in g.user.scopes:
-        # patients = Patient.query.filter_by().order_by(Patient.update_time.desc()).all()
+    if 'OperateAllCRF' in g.user.scopes or 'OperateAllSpeciInfo' in g.user.scopes:
         patients = sort_samples_while_query(Patient.query.filter_by(), sort)
 
     elif 'CheckCenterCRF' in g.user.scopes:
         centers = ResearchCenterSpider().search_by_uid_project(current_app.config['PROJECT_ID'], g.user.user_id)['data']
         center_ids = [center['id'] for center in centers]
-        # patients = Patient.query.filter(Patient.is_delete == 0, Patient.researchCenter.in_(center_ids)
-        #                                 ).order_by(Patient.update_time.desc()).all()
         patients = sort_samples_while_query(Patient.query.filter(Patient.is_delete == 0,
                                                                  Patient.researchCenter.in_(center_ids)), sort)
     else:
-        # items = Patient.query.filter(Patient.is_delete == 0).order_by(Patient.update_time.desc()).all()
         items = sort_samples_while_query(Patient.query.filter(Patient.is_delete == 0), sort)
         for item in items:
             if item.account and g.user.user_id in item.account:
