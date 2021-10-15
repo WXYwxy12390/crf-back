@@ -27,6 +27,23 @@ def get_record_info_nav(pid):
     return Success(data=all_treIndex_treNum)
 
 
+@api.route('/nav/change/<int:pid>/<int:old>/<int:new>', methods=['GET'])
+@auth.login_required
+def change_nav_pos(pid, old, new):
+    tre_recs = TreRec.query.filter(TreRec.pid == pid,
+                                   TreRec.is_delete == 0).all()
+    length = len(tre_recs)
+    if old > new or old < 1 or new > length:
+        return ParameterException(msg='位置参数有误')
+    with db.auto_commit():
+        for tre_rec in tre_recs:
+            if new >= tre_rec.treIndex > old:
+                tre_rec.treIndex -= 1
+            elif tre_rec.treIndex == old:
+                tre_rec.treIndex = new
+    return Success()
+
+
 @api.route('/<int:pid>/<int:treIndex>', methods=['POST'])
 @auth.login_required
 @edit_need_auth
