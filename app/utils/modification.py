@@ -41,7 +41,8 @@ def if_status_allow_modification(pid, treNum, class_name, if_record):
                                                                ModuleStatus.CRAFinish.value]:
         return flag
 
-    if not if_record and module_status.get(module) is not None and module_status[module].get(treNum_str) is not None \
+    if not if_record and module_status is not None and module_status.get(module) is not None \
+            and module_status[module].get(treNum_str) is not None \
             and module_status[module][treNum_str] != ModuleStatus.UnSubmitted.value:
         return flag
 
