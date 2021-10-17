@@ -28,7 +28,7 @@ def get_sample_all():
     limit = int(args['limit'])
     sort = int(args.get('sort')) if args.get('sort') else None
     patients = []
-    if 'OperateAllCRF' in g.user.scopes or 'OperateAllSpeciInfo' in g.user.scopes:
+    if 'OperateAllCRF' in g.user.scopes:
         patients = sort_samples_while_query(Patient.query.filter_by(), sort)
 
     elif 'CheckCenterCRF' in g.user.scopes:
