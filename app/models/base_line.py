@@ -582,6 +582,8 @@ class Patient(Base, ModificationAndDoubt):
             return flag
         if not self.cycle_is_submit.get(treNum_str):
             return flag
+        if not self.module_status or not self.module_status.get(module) or not self.module_status[module].get(treNum_str):
+            return flag
         if self.module_status[module][treNum_str] != ModuleStatus.UnInitiateMonitoring.value:
             return flag
         temp = copy.copy(self.module_status)
@@ -595,6 +597,8 @@ class Patient(Base, ModificationAndDoubt):
     def finish(self, module, treNum):
         treNum_str = str(treNum)
         flag = False  # 标志是否成功完成模块
+        if not self.module_status or not self.module_status.get(module) or not self.module_status[module].get(treNum_str):
+            return flag
         if self.module_status[module][treNum_str] not in [ModuleStatus.CRAMonitoring.value, ModuleStatus.CRADoubt.value, ModuleStatus.WithReply.value]:
             return flag
         temp = copy.copy(self.module_status)

@@ -73,6 +73,8 @@ class ModificationAndDoubt:
         module = get_module_by_class_name(self.__class__.__name__)
 
         module_status = copy.copy(patient.module_status)
+        if not module_status or not module_status.get(module) or not module_status[module].get(treNum_str):
+            return flag
         if module_status[module][treNum_str] not in [ModuleStatus.CRAMonitoring.value,
                                                      ModuleStatus.CRADoubt.value, ModuleStatus.WithReply.value]:
             return flag
@@ -125,6 +127,8 @@ class ModificationAndDoubt:
         module = get_module_by_class_name(self.__class__.__name__)
 
         module_status = copy.copy(patient.module_status)
+        if not module_status or not module_status.get(module) or not module_status[module].get(treNum_str):
+            return flag
         if module_status[module][treNum_str] not in [ModuleStatus.CRADoubt.value, ModuleStatus.WithReply.value]:
             return flag
 
