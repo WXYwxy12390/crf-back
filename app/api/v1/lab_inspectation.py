@@ -4,19 +4,25 @@
 @time: 2020-09-05 12:30
 """
 from flask import request
-
 from app.libs.decorator import edit_need_auth, update_time
 from app.libs.error import Success
 from app.libs.error_code import SampleStatusError
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
 from app.models import json2db
-from app.models.base_line import Patient
 from app.models.lab_inspectation import BloodRoutine, BloodBio, Thyroid, Coagulation, MyocardialEnzyme, Cytokines, \
     LymSubsets, UrineRoutine, TumorMarker
 from app.utils.modification import record_modification, if_status_allow_modification
+from app.utils.ocr import lab_inspectation_ocr
 
 api = Redprint('lab_inspectation')
+
+
+@api.route('/ocr/<string:module>', methods=['POST'])
+def ocr(module):
+    file = request.files['file']  # 获取到用户上传的文件对象file
+    data = lab_inspectation_ocr(file, module)
+    return Success(data=data)
 
 
 @api.route('/blood_routine/<int:pid>/<int:treNum>', methods=['GET'])
@@ -451,7 +457,6 @@ def add_tumor_marker(pid, treNum):
 
     json2db(data, TumorMarker)
     return Success()
-
 
 # @api.route('/tumor_marker/doubt/<int:pid>/<int:treNum>', methods=['POST'])
 # @auth.login_required

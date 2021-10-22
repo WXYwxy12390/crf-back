@@ -29,12 +29,7 @@ def get_file(folder, pid, id):
 def add_file(folder, pid, id):
     file = request.files['file']  # 获取到用户上传的文件对象file
     StaticFile(folder).add_file(id, file)
-    path = os.path.join(current_app.static_folder, folder, str(id), file.filename)
-    try:
-        data = lab_inspectation_ocr(path, folder)
-    except Exception as e:
-        data = {}
-    return Success(data=data)
+    return Success()
 
 
 @api.route('/<string:folder>/<int:pid>/<int:id>', methods=['DELETE'])
