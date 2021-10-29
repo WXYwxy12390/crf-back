@@ -3,6 +3,7 @@ import shutil
 
 from flask import jsonify, current_app
 
+from app.libs.error import Success
 from app.libs.redprint import Redprint
 from app.models import db, json2db
 from app.models.base_line import Patient, PastHis, DrugHistory, IniDiaPro
@@ -14,6 +15,28 @@ from app.models.other_inspect import Lung, OtherExams, ImageExams
 from app.models.therapy_record import Surgery, Radiotherapy, OneToFive, TreRec
 
 api = Redprint('migrate')
+
+
+@api.route('/trement')
+def migrate_trement():
+    items = TreRec.query.filter_by().all()
+    with db.auto_commit():
+        for item in items:
+            if item._trement == 'one':
+                item.trement = '1'
+            elif item._trement == 'two':
+                item.trement = '2'
+            elif item._trement == 'three':
+                item.trement = '3'
+            elif item._trement == 'four':
+                item.trement = '4'
+            elif item._trement == 'five':
+                item.trement = '5'
+            elif item._trement == 'surgery':
+                item.trement = 'surgery'
+            elif item._trement == 'radiotherapy':
+                item.trement = 'radiotherapy'
+    return Success()
 
 
 @api.route('/4_2')
@@ -28,6 +51,7 @@ def migrate_4_2():
                 i = i + 1
     return 'ok'
 
+
 @api.route('/4_17')
 def migrate_4_17():
     items = Patient.query.filter_by(researchCenter=23).all()
@@ -36,9 +60,10 @@ def migrate_4_17():
             item.researchCenter = 1
     return 'ok'
 
+
 @api.route('/TJ_samples/<int:center_id>')
 def migrate_TJ_sample(center_id):
-    items = Patient.query.filter(Patient.is_delete==0,Patient.patNumber.like("TJ%")).all()
+    items = Patient.query.filter(Patient.is_delete == 0, Patient.patNumber.like("TJ%")).all()
     p = Patient.query.filter_by(patientName="周苏建").first()
     with db.auto_commit():
         for item in items:
@@ -46,7 +71,6 @@ def migrate_TJ_sample(center_id):
         if p:
             p.researchCenter = center_id
     return str(len(items))
-
 
 
 def generate_value(str):
@@ -112,102 +136,105 @@ def migrate_gene():
         change(new, item_list)
     return 'ok'
 
+
 @api.route('/center')
 def migrate_center():
-    patient_names = ['王剑','熊隆明',
-'李卫',
-'李义军',
-'陶银清',
-'叶生发',
-'熊青龙',
-'李晓宏',
-'易传安',
-'付超',
-'张远红',
-'刘玉荣',
-'陈应秀',
-'刘支旺',
-'陈继',
-'陈东初',
-'金绍松',
-'陈春红',
-'密涛',
-'刘为军',
-'刘继仁',
-'邓端友',
-'熊元松',
-'谢成国',
-'方小平',
-'刘炳文',
-'熊甲吾',
-'周俊',
-'胡军强',
-'郑四清',
-'何晓望',
-'沈小龙',
-'李华平',
-'邵国成',
-'胡学礼',
-'曾小平',
-'卢平',
-'黄啟疆',
-'邹先林',
-'李广秀',
-'孙章礼',
-'冉崇来',
-'陈俊',
-'金发申',
-'苗新珍',
-'宋永林',
-'周苏建',
-'王卫平',
-'黄海棠',
-'柳学珍',
-'丁春梅',
-'朱大海',
-'杨敬兵',
-'陈升其',
-'倪超群',
-'邱榴华',
-'唐敦中',
-'刘先模',
-'张国民',
-'谭明栋',
-'陈绪林',
-'夏永乐',
-'杨光明',
-'朱定明',
-'廖维兵',
-'刘尧清',
-'熊旭',
-'余国成',
-'张迎春',
-'陈瑶',
-'孙舒文',
-'彭义红',
-'印永捷',
-'刘善军',
-'章旺明',
-'余小凤',
-'王能光',
-'汪水英',
-'张绪学',
-'夏先民',
-'龙媛秀',
-'郑宏军',
-'吴晓',
-'陈志',
-'曾伶',
-'张爱华',
-'刘子刚',
-'付贵荣',
-'杨新建']
-    items = Patient.query.filter(Patient.is_delete==0,Patient.patientName.in_(patient_names)).all()
+    patient_names = ['王剑', '熊隆明',
+                     '李卫',
+                     '李义军',
+                     '陶银清',
+                     '叶生发',
+                     '熊青龙',
+                     '李晓宏',
+                     '易传安',
+                     '付超',
+                     '张远红',
+                     '刘玉荣',
+                     '陈应秀',
+                     '刘支旺',
+                     '陈继',
+                     '陈东初',
+                     '金绍松',
+                     '陈春红',
+                     '密涛',
+                     '刘为军',
+                     '刘继仁',
+                     '邓端友',
+                     '熊元松',
+                     '谢成国',
+                     '方小平',
+                     '刘炳文',
+                     '熊甲吾',
+                     '周俊',
+                     '胡军强',
+                     '郑四清',
+                     '何晓望',
+                     '沈小龙',
+                     '李华平',
+                     '邵国成',
+                     '胡学礼',
+                     '曾小平',
+                     '卢平',
+                     '黄啟疆',
+                     '邹先林',
+                     '李广秀',
+                     '孙章礼',
+                     '冉崇来',
+                     '陈俊',
+                     '金发申',
+                     '苗新珍',
+                     '宋永林',
+                     '周苏建',
+                     '王卫平',
+                     '黄海棠',
+                     '柳学珍',
+                     '丁春梅',
+                     '朱大海',
+                     '杨敬兵',
+                     '陈升其',
+                     '倪超群',
+                     '邱榴华',
+                     '唐敦中',
+                     '刘先模',
+                     '张国民',
+                     '谭明栋',
+                     '陈绪林',
+                     '夏永乐',
+                     '杨光明',
+                     '朱定明',
+                     '廖维兵',
+                     '刘尧清',
+                     '熊旭',
+                     '余国成',
+                     '张迎春',
+                     '陈瑶',
+                     '孙舒文',
+                     '彭义红',
+                     '印永捷',
+                     '刘善军',
+                     '章旺明',
+                     '余小凤',
+                     '王能光',
+                     '汪水英',
+                     '张绪学',
+                     '夏先民',
+                     '龙媛秀',
+                     '郑宏军',
+                     '吴晓',
+                     '陈志',
+                     '曾伶',
+                     '张爱华',
+                     '刘子刚',
+                     '付贵荣',
+                     '杨新建']
+    items = Patient.query.filter(Patient.is_delete == 0, Patient.patientName.in_(patient_names)).all()
     with db.auto_commit():
         for item in items:
             item.researchCenter = 23
     return 'ok'
-def change(model_item,items):
+
+
+def change(model_item, items):
     with db.auto_commit():
         for item in items:
             value = getattr(model_item, item)
