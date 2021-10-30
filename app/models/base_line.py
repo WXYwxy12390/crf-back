@@ -955,10 +955,10 @@ class IniDiaPro(Base, PatDia, ModificationAndDoubt):
             return '/'
         stage_str = str(stage)
         split_list = stage_str.split(',')
-        split_list[0] = 'T:' + split_list[0]
-        split_list[1] = 'N:' + split_list[1]
-        split_list[2] = 'M:' + split_list[2]
-        value = split_list[0] + ',' + split_list[1] + ',' + split_list[2]
+        split_list[0] = 'T' + split_list[0]
+        split_list[1] = 'N' + split_list[1]
+        split_list[2] = 'M' + split_list[2]
+        value = split_list[0] + split_list[1] + split_list[2]
         return value
 
     def format_cliniDia(self, obj):
