@@ -582,7 +582,8 @@ class Patient(Base, ModificationAndDoubt):
             return flag
         if not self.cycle_is_submit.get(treNum_str):
             return flag
-        if not self.module_status or not self.module_status.get(module) or not self.module_status[module].get(treNum_str):
+        if not self.module_status or not self.module_status.get(module) or not self.module_status[module].get(
+                treNum_str):
             return flag
         if self.module_status[module][treNum_str] != ModuleStatus.UnInitiateMonitoring.value:
             return flag
@@ -597,9 +598,11 @@ class Patient(Base, ModificationAndDoubt):
     def finish(self, module, treNum):
         treNum_str = str(treNum)
         flag = False  # 标志是否成功完成模块
-        if not self.module_status or not self.module_status.get(module) or not self.module_status[module].get(treNum_str):
+        if not self.module_status or not self.module_status.get(module) or not self.module_status[module].get(
+                treNum_str):
             return flag
-        if self.module_status[module][treNum_str] not in [ModuleStatus.CRAMonitoring.value, ModuleStatus.CRADoubt.value, ModuleStatus.WithReply.value]:
+        if self.module_status[module][treNum_str] not in [ModuleStatus.CRAMonitoring.value, ModuleStatus.CRADoubt.value,
+                                                          ModuleStatus.WithReply.value]:
             return flag
         temp = copy.copy(self.module_status)
         temp[module][treNum_str] = ModuleStatus.CRAFinish.value
@@ -925,31 +928,19 @@ class IniDiaPro(Base, PatDia, ModificationAndDoubt):
                 row = np.append(row, value)
             elif column == 'cStage':
                 stage_value = self.filter_none(obj, 'stage')
-                if stage_value == '3' or stage_value == '5':
-                    value = str(x) if x else '/'
-                else:
-                    value = '/'
+                value = self.format_TNM(x) if stage_value in ['3', '5'] else '/'
                 row = np.append(row, value)
             elif column == 'cliStage' or column == 'cRemark':
                 stage_value = self.filter_none(obj, 'stage')
-                if stage_value == '3' or stage_value == '5':
-                    value = self.filter_none(obj, column)
-                else:
-                    value = '/'
+                value = self.filter_none(obj, column) if stage_value in ['3', '5'] else '/'
                 row = np.append(row, value)
             elif column == 'patStage' or column == 'pRemark':
                 stage_value = self.filter_none(obj, 'stage')
-                if stage_value == '4' or stage_value == '5':
-                    value = self.filter_none(obj, column)
-                else:
-                    value = '/'
+                value = self.filter_none(obj, column) if stage_value in ['4', '5'] else '/'
                 row = np.append(row, value)
             elif column == 'pStage':
                 stage_value = self.filter_none(obj, 'stage')
-                if stage_value == '4' or stage_value == '5':
-                    value = str(x) if x else '/'
-                else:
-                    value = '/'
+                value = self.format_TNM(x) if stage_value in ['4', '5'] else '/'
                 row = np.append(row, value)
             elif type(x) == bool:
                 value = self.filter_none(self.change_bool_to_yes_or_no(x))
@@ -958,6 +949,17 @@ class IniDiaPro(Base, PatDia, ModificationAndDoubt):
                 value = self.filter_none(obj, column)
                 row = np.append(row, value)
         return row
+
+    def format_TNM(self, stage):
+        if not stage:
+            return '/'
+        stage_str = str(stage)
+        split_list = stage_str.split(',')
+        split_list[0] = 'T' + split_list[0]
+        split_list[1] = 'N' + split_list[1]
+        split_list[2] = 'M' + split_list[2]
+        value = split_list[0] + split_list[1] + split_list[2]
+        return value
 
     def format_cliniDia(self, obj):
         cliniDia_map = {'lung_can': '肺癌', 'eso_can': '食道癌', 'bre_can': '乳腺癌', 'thy_can': '胸腺癌',

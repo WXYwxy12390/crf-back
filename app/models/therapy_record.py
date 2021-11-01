@@ -135,6 +135,7 @@ class TreRec(Base, PatDia, ModificationAndDoubt):
     treNum = Column(Integer, comment='1-n，治疗信息id')
     treIndex = Column(Integer, comment='1-n，表示对应第x条治疗记录')
     trement = Column(String(255), comment='几线治疗（手术、放疗、其他、1-5）(one,two,three,four,five,surgery,radiotherapy,other)')
+    _trement = Column(String(255), comment='几线治疗（手术、放疗、其他、1-5）(one,two,three,four,five,surgery,radiotherapy,other)')
     date = Column(DateTime, comment='结束日期')
     beEffEvaDate = Column(Date, comment='最佳疗效评估日期')
     beEffEva = Column(String(255), comment='最佳疗效评估')
