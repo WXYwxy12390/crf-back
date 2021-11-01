@@ -43,18 +43,8 @@ def add_therapy_record(pid, treNum):
         trement = tre_rec.trement
         data['child']['pid'] = pid
         data['child']['treNum'] = treNum
-        if trement in ['one', 'two', 'three', 'four', 'five', 'other']:
-            item = OneToFive.query.filter_by(pid=pid, treNum=treNum).first()
-            # 当存在'modification_des'时，说明需要记录下该修改。
-            if 'modification_des' in data.keys():
-                if not record_modification(item, data, pid, treNum, 'OneToFive'):
-                    return SampleStatusError(msg='当前模块状态无法修改数据')
-            else:
-                if not if_status_allow_modification(pid, treNum, 'OneToFive', False):
-                    return SampleStatusError(msg='当前模块状态无法修改数据')
 
-            json2db(data['child'], OneToFive)
-        elif trement == 'surgery':
+        if trement == 'surgery':
             item = Surgery.query.filter_by(pid=pid, treNum=treNum).first()
             # 当存在'modification_des'时，说明需要记录下该修改。
             if 'modification_des' in data.keys():
@@ -76,6 +66,17 @@ def add_therapy_record(pid, treNum):
                     return SampleStatusError(msg='当前模块状态无法修改数据')
 
             json2db(data['child'], Radiotherapy)
+        else:
+            item = OneToFive.query.filter_by(pid=pid, treNum=treNum).first()
+            # 当存在'modification_des'时，说明需要记录下该修改。
+            if 'modification_des' in data.keys():
+                if not record_modification(item, data, pid, treNum, 'OneToFive'):
+                    return SampleStatusError(msg='当前模块状态无法修改数据')
+            else:
+                if not if_status_allow_modification(pid, treNum, 'OneToFive', False):
+                    return SampleStatusError(msg='当前模块状态无法修改数据')
+
+            json2db(data['child'], OneToFive)
     return Success()
 
 
