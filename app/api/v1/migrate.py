@@ -36,6 +36,8 @@ def migrate_trement():
                 item.trement = 'surgery'
             elif item._trement == 'radiotherapy':
                 item.trement = 'radiotherapy'
+            elif item._trement == 'other':
+                item.trement = 'other'
     return Success()
 
 

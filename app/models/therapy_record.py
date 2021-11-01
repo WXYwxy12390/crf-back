@@ -268,14 +268,12 @@ class TreRec(Base, PatDia, ModificationAndDoubt):
 
     def get_child(self):
         trement = self.trement
-        if trement in ['one', 'two', 'three', 'four', 'five', 'other']:
-            child = OneToFive.query.filter_by(pid=self.pid, treNum=self.treNum).first()
-        elif trement == 'surgery':
+        if trement == 'surgery':
             child = Surgery.query.filter_by(pid=self.pid, treNum=self.treNum).first()
         elif trement == 'radiotherapy':
             child = Radiotherapy.query.filter_by(pid=self.pid, treNum=self.treNum).first()
         else:
-            child = {}
+            child = OneToFive.query.filter_by(pid=self.pid, treNum=self.treNum).first()
         return child if child else {}
 
     def delete(self):
