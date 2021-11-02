@@ -12,6 +12,7 @@ from app.models.therapy_record import PatDia
 from app.models.therapy_record import TreRec, OneToFive, Surgery, Radiotherapy
 from app.utils.date import get_birth_date_by_id_card, get_age_by_birth
 import numpy as np
+from app.libs.enums import BioReason
 
 
 class Patient(Base, ModificationAndDoubt):
@@ -993,6 +994,7 @@ class SpecimenInfo(Base, ModificationAndDoubt):
     amount = Column(Text, comment="样本数量")
     samplingTime = Column(Date, comment='取样时间')
     storeSite = Column(Text, comment="存储位置")
+    bioReason = Column(JSON, comment="活检原因")
     note = Column(Text)
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
@@ -1000,12 +1002,11 @@ class SpecimenInfo(Base, ModificationAndDoubt):
 
     # 和导出功能有关
     export_header_map = {'number': '样本编号', 'type': '样本类型', 'amount': '样本数量',
-                         'samplingTime': '取样时间', 'storeSite': '样本储存位置',
+                         'samplingTime': '取样时间', 'storeSite': '样本储存位置', 'bioReason': '活检原因',
                          'note': '备注'}
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        # header = []
         header = np.zeros(0, dtype=str)
         # 求最多有多少条
         max_num = 0
@@ -1021,17 +1022,14 @@ class SpecimenInfo(Base, ModificationAndDoubt):
 
         for i in range(1, header_num + 1):
             for column in columns:
-                # header.append(self.export_header_map.get(column) + str(i))
                 header = np.append(header, self.export_header_map.get(column) + str(i))
         SpecimenInfo.header_num = len(header)
         return header
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
-        # row = []
         row = np.zeros(0, dtype=str)
         if buffer.get('SpecimenInfo').get(pid) is None:
-            # row.extend(['/']*SpecimenInfo.header_num)
             row = np.append(row, ['/'] * SpecimenInfo.header_num)
             return row
         obj_array = buffer.get('SpecimenInfo').get(pid)
@@ -1040,22 +1038,45 @@ class SpecimenInfo(Base, ModificationAndDoubt):
             for column in columns:
                 if column == 'type':
                     value = self.format_type(obj)
-                    # row.append(value)
+                    row = np.append(row, value)
+                elif column == 'bioReason':
+                    value = self.format_bioReason(obj)
                     row = np.append(row, value)
                 else:
                     value = self.filter_none(obj, column)
-                    # row.append(value)
                     row = np.append(row, value)
-        # row.extend(['/']*(SpecimenInfo.header_num - len(row)))
         row = np.append(row, ['/'] * (SpecimenInfo.header_num - len(row)))
         return row
 
     def format_type(self, obj):
         type_dict = getattr(obj, 'type')
+        value = '/'
+        if not type_dict:
+            return value
+        radio_dict = type_dict['radio'][0]
+        radio = None
+        if radio_dict:
+            radio = radio_dict[0]
+            for i in range(1, len(radio_dict)):
+                radio += '-' + radio_dict[i]
+
+
+        other = type_dict.get('other')
+        if radio:
+            value = radio
+            if other:
+                value += ':' + other
+        return value
+
+    def format_bioReason(self, obj):
+        bioReason_map = {BioReason.IniDiag.value:'初诊诊断', BioReason.Relapse.value:'复发',
+                         BioReason.TargetedDrugResis.value:'靶向耐药', BioReason.ImmuneResis.value:'免疫耐药',
+                         BioReason.SpeCliSig.value:'特殊临床意义', BioReason.Other.value:'其他'}
+        type_dict = getattr(obj, 'bioReason')
         if not type_dict:
             return '/'
         value = '/'
-        radio = type_dict['radio'][0]
+        radio = bioReason_map.get(type_dict['radio'])
         other = type_dict.get('other')
         if radio:
             value = radio
@@ -1064,5 +1085,5 @@ class SpecimenInfo(Base, ModificationAndDoubt):
         return value
 
     def keys(self):
-        return ['id', 'number', 'type', 'amount', 'samplingTime', 'note', 'storeSite',
+        return ['id', 'number', 'type', 'amount', 'samplingTime', 'note', 'storeSite', 'bioReason',
                 'modification', 'doubt']

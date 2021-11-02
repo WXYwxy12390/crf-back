@@ -23,3 +23,19 @@ class GeneValue(Enum):
     Yin = 0
     # 未知
     Unknown = 2
+
+
+class BioReason(Enum):
+    # 初诊诊断
+    IniDiag = 0
+    # 复发
+    Relapse = 1
+    # 靶向耐药
+    TargetedDrugResis = 2
+    # 免疫耐药
+    ImmuneResis = 3
+    # 特殊临床意义,可以手动输入具体的原因
+    SpeCliSig = 4
+    # 其他,可以手动输入具体的原因
+    Other = 5
+
