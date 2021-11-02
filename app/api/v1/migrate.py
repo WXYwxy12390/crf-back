@@ -1,12 +1,14 @@
+import copy
 import os
 import shutil
 
 from flask import jsonify, current_app
+from sqlalchemy.orm.attributes import flag_modified
 
 from app.libs.error import Success
 from app.libs.redprint import Redprint
 from app.models import db, json2db
-from app.models.base_line import Patient, PastHis, DrugHistory, IniDiaPro
+from app.models.base_line import Patient, PastHis, DrugHistory, IniDiaPro, SpecimenInfo
 from app.models.crf_info import FollInfo
 from app.models.cycle import Immunohis, MoleDetec
 from app.models.lab_inspectation import BloodRoutine, BloodBio, Thyroid, Coagulation, MyocardialEnzyme, Cytokines, \
@@ -17,6 +19,7 @@ from app.models.therapy_record import Surgery, Radiotherapy, OneToFive, TreRec
 api = Redprint('migrate')
 
 
+# 为了扩充大于五线的治疗记录，改成可以输入线数。因此原来数据中的'one'-'five'改成了'1'-'5'
 @api.route('/trement')
 def migrate_trement():
     items = TreRec.query.filter_by().all()
@@ -38,6 +41,27 @@ def migrate_trement():
                 item.trement = 'radiotherapy'
             elif item._trement == 'other':
                 item.trement = 'other'
+    return Success()
+
+
+@api.route('/specimen_type')
+def migrate_specimen_type():
+    items = SpecimenInfo.query.filter_by().all()
+    for item in items:
+        specimen_type = copy.copy(item.type)
+        if specimen_type is None:
+            continue
+        print(specimen_type)
+        radio = specimen_type['radio'][0]
+        if radio == '组织标本(包括新鲜冰冰组织，蜡块，切片)':
+            with db.auto_commit():
+                item.type = {'other': None, 'radio': [None]}
+                flag_modified(item, 'type')
+        elif radio is not None and type(radio) != list:
+            other = specimen_type['other']
+            with db.auto_commit():
+                item.type = {'other': other, 'radio': [[radio]]}
+                flag_modified(item, 'type')
     return Success()
 
 

@@ -80,7 +80,7 @@ class Immunohis(Base, ModificationAndDoubt):
         immunohis_map = {0: '无', 1: '-', 2: '±', 3: '+', 4: '++', 5: '+++', "/": "/"}
         row = np.zeros(0, dtype=str)
         if buffer.get('Immunohis').get(pid) is None or buffer.get('Immunohis').get(pid).get(treIndex) is None:
-            row = np.append(row, ['/']*Immunohis.header_num)
+            row = np.append(row, ['/'] * Immunohis.header_num)
             return row
         obj = buffer.get('Immunohis').get(pid).get(treIndex)
         for column in columns:
@@ -88,7 +88,7 @@ class Immunohis(Base, ModificationAndDoubt):
                 value = self.filter_none(obj, column)
                 value = str(value) + "%" if value != '/' else value
                 row = np.append(row, value)
-            elif column in ['detectTime','patNum']:
+            elif column in ['detectTime', 'patNum']:
                 value = self.filter_none(obj, column)
                 row = np.append(row, value)
             else:
@@ -174,6 +174,7 @@ class MoleDetec(Base, ModificationAndDoubt):
 
     TMB = Column(String(20), comment='TMB')  # ???
     detectTime = Column(Date, comment='检测时间')
+    detectCompany = Column(String(255), comment='检测公司')
     sampleType = Column(String(255), comment='样本类型')
 
     modification = Column(JSON, comment='溯源功能。记录提交后的修改记录')
@@ -181,19 +182,23 @@ class MoleDetec(Base, ModificationAndDoubt):
 
     # 和导出功能有关
     export_header_map = {
-        'MSI': 'MSI', 'PD1': 'PD-1表达','PD1KT': 'PD1KT', 'PDL1': 'PD-L1表达', 'PDL1KT': 'PDL1KT', 'TMB': 'TMB',
-        'other': '其他', 'detectTime': '分子检测检测时间', 'sampleType': '样本类型',
+        'MSI': 'MSI', 'PD1': 'PD-1表达', 'PD1KT': 'PD1KT', 'PDL1': 'PD-L1表达', 'PDL1KT': 'PDL1KT', 'TMB': 'TMB',
+        'other': '其他', 'detectTime': '分子检测检测时间', 'detectCompany': '检测公司', 'sampleType': '样本类型',
         'EGFR': 'EGFR', 'ALK': 'ALK', 'ROS1': 'ROS1', 'HER_2': 'HER_2', 'BRAF': 'BRAF',
         'cMET': 'cMET', 'RET': 'RET', 'NTRK': 'NTRK', 'KRAS': 'KRAS', 'BIM': 'BIM',
         'PIK3CA': 'PIK3CA', 'UGT1A1': 'UGT1A1',
-        'EGFRSam': 'EGFR检测样本', 'ALKSam': 'ALK检测样本', 'ROS1Sam': 'ROS1检测样本', 'HER_2Sam': 'HER_2检测样本', 'BRAFSam': 'BRAF检测样本',
+        'EGFRSam': 'EGFR检测样本', 'ALKSam': 'ALK检测样本', 'ROS1Sam': 'ROS1检测样本', 'HER_2Sam': 'HER_2检测样本',
+        'BRAFSam': 'BRAF检测样本',
         'cMETSam': 'cMET检测样本', 'RETSam': 'RET检测样本', 'NTRKSam': 'NTRK检测样本', 'KRASSam': 'KRAS检测样本', 'BIMSam': 'BIM检测样本',
         'PIK3CASam': 'PIK3CA检测样本', 'UGT1A1Sam': 'UGT1A1检测样本',
-        'EGFRMed': 'EGFR检测方法', 'ALKMed': 'ALK检测方法', 'ROS1Med': 'ROS1检测方法', 'HER_2Med': 'HER_2检测方法', 'BRAFMed': 'BRAF检测方法',
+        'EGFRMed': 'EGFR检测方法', 'ALKMed': 'ALK检测方法', 'ROS1Med': 'ROS1检测方法', 'HER_2Med': 'HER_2检测方法',
+        'BRAFMed': 'BRAF检测方法',
         'cMETMed': 'cMET检测方法', 'RETMed': 'RET检测方法', 'NTRKMed': 'NTRK检测方法', 'KRASMed': 'KRAS检测方法', 'BIMMed': 'BIM检测方法',
         'PIK3CAMed': 'PIK3CA检测方法', 'UGT1A1Med': 'UGT1A1检测方法',
-        'EGFRDesc': 'EGFR结果描述', 'ALKDesc': 'ALK结果描述', 'ROS1Desc': 'ROS1结果描述', 'HER_2Desc': 'HER_2结果描述', 'BRAFDesc': 'BRAF结果描述',
-        'cMETDesc': 'cMET结果描述', 'RETDesc': 'RET结果描述', 'NTRKDesc': 'NTRK结果描述', 'KRASDesc': 'KRAS结果描述', 'BIMDesc': 'BIM结果描述',
+        'EGFRDesc': 'EGFR结果描述', 'ALKDesc': 'ALK结果描述', 'ROS1Desc': 'ROS1结果描述', 'HER_2Desc': 'HER_2结果描述',
+        'BRAFDesc': 'BRAF结果描述',
+        'cMETDesc': 'cMET结果描述', 'RETDesc': 'RET结果描述', 'NTRKDesc': 'NTRK结果描述', 'KRASDesc': 'KRAS结果描述',
+        'BIMDesc': 'BIM结果描述',
         'PIK3CADesc': 'PIK3CA结果描述', 'UGT1A1Desc': 'UGT1A1结果描述'
     }
 
@@ -206,8 +211,7 @@ class MoleDetec(Base, ModificationAndDoubt):
                 'RETDetMed', 'UGT1A1DetMed', 'ALKDesc', 'BIMDesc', 'BRAFDesc', 'cMETDesc', 'EGFRDesc', 'HER_2Desc',
                 'KRASDesc', 'PIK3CADesc',
                 'ROS1Desc', 'RETDesc', 'UGT1A1Desc', 'NTRKDesc', 'path', 'MSI', 'other', 'PDL1', 'PDL1KT', 'TMB', 'PD1',
-                'PD1KT', 'sampleType', 'detectTime',
-                'modification', 'doubt']
+                'PD1KT', 'sampleType', 'detectTime', 'detectCompany', 'modification', 'doubt']
 
     # 和导出功能有关
     def get_export_row(self, columns, buffer, pid, treIndex):
@@ -216,60 +220,45 @@ class MoleDetec(Base, ModificationAndDoubt):
         moleDetec_MSI_map = {0: 'MSS', 1: 'MSIH', 2: 'MSIL', "/": "/"}
         moleDetec_fields = ['ALK', 'BIM', 'BRAF', 'cMET', 'EGFR', 'HER_2', 'KRAS',
                             'PIK3CA', 'ROS1', 'RET', 'UGT1A1', 'NTRK']
-        # row = []
         row = np.zeros(0, dtype=str)
         if buffer.get('MoleDetec').get(pid) is None or buffer.get('MoleDetec').get(pid).get(treIndex) is None:
-            # row.extend(['/'] * MoleDetec.header_num)
-            row = np.append(row, ['/']*MoleDetec.header_num)
+            row = np.append(row, ['/'] * MoleDetec.header_num)
             return row
         obj = buffer.get('MoleDetec').get(pid).get(treIndex)
         for column in columns:
             if column in moleDetec_fields:
                 value = self.filter_none(obj, column)
                 value = moleDetec_map.get(value)
-                # row.append(value)
                 row = np.append(row, value)
                 if value == '阳性':
                     valueSam = self.filter_none(obj, column + 'Sam')
                     valueDetMed = self.filter_none(obj, column + 'DetMed')
                     valueDetMed = moleDetec_DetMed_map.get(valueDetMed)
                     valueDesc = self.filter_none(obj, column + 'Desc')
-                    # row.extend([valueSam, valueDetMed, valueDesc])
-                    row = np.append(row, [valueSam,valueDetMed,valueDesc])
+                    row = np.append(row, [valueSam, valueDetMed, valueDesc])
                 else:
-                    # row.extend(['/', '/', '/'])
-                    row = np.append(row, ['/','/','/'])
+                    row = np.append(row, ['/', '/', '/'])
             elif column == 'MSI':
                 value = self.filter_none(obj, column)
                 value = moleDetec_MSI_map.get(value)
-                # row.append(value)
                 row = np.append(row, value)
             elif column == 'PD1' or column == 'PDL1':
                 value = self.filter_none(obj, column)
                 value = str(value) + "%" if value != '/' else value
-                # row.append(value)
                 row = np.append(row, value)
             else:
                 value = self.filter_none(obj, column)
-                # row.append(value)
                 row = np.append(row, value)
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
     def get_export_header(self, columns, buffer):
-        # header = []
         header = np.zeros(0, dtype=str)
         for column in columns:
-            if (column == 'MSI' or column == 'PD1' or column == 'PD1KT' or
-                    column == 'PDL1' or column == 'PDL1KT' or column == 'TMB' or
-                    column == 'other' or column == 'detectTime' or column == 'sampleType'):
-                # header.append(self.export_header_map.get(column))
+            if column in ['MSI', 'PD1', 'PD1KT', 'PDL1', 'PDL1KT', 'TMB',
+                          'other', 'detectTime', 'detectCompany', 'sampleType']:
                 header = np.append(header, self.export_header_map.get(column))
             else:
-                # header.extend([self.export_header_map.get(column),
-                #                self.export_header_map.get(column) + '检测样本',
-                #                self.export_header_map.get(column) + '检测方法',
-                #                self.export_header_map.get(column) + '检测描述'])
                 header = np.append(header, [self.export_header_map.get(column),
                                             self.export_header_map.get(column) + '检测样本',
                                             self.export_header_map.get(column) + '检测方法',
@@ -279,7 +268,7 @@ class MoleDetec(Base, ModificationAndDoubt):
 
 
 # 症状体征表
-class Signs(Base,ModificationAndDoubt):
+class Signs(Base, ModificationAndDoubt):
     __tablename__ = 'signs'
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id')
@@ -303,7 +292,7 @@ class Signs(Base,ModificationAndDoubt):
         row = np.zeros(0, dtype=str)
         if buffer.get('Signs').get(pid) is None or buffer.get('Signs').get(pid).get(treIndex) is None:
             # row.extend(['/'] * Signs.header_num)
-            row = np.append(row, ['/']*Signs.header_num)
+            row = np.append(row, ['/'] * Signs.header_num)
             return row
         obj_array = buffer.get('Signs').get(pid).get(treIndex)
 
@@ -327,7 +316,7 @@ class Signs(Base,ModificationAndDoubt):
                     # row.append(value)
                     row = np.append(row, value)
         # row.extend(['/'] * (Signs.header_num - len(row)))
-        row = np.append(row, ['/']*(Signs.header_num - len(row)))
+        row = np.append(row, ['/'] * (Signs.header_num - len(row)))
         return row
 
     # 和导出功能有关，得到导出的表的中文抬头
