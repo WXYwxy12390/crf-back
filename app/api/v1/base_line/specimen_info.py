@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, jsonify, g
 from app.libs.error import Success
 from app.libs.error_code import SampleStatusError
 from app.libs.redprint import Redprint
@@ -7,6 +7,7 @@ from app.models import json2db, db, delete_array
 from app.models.base_line import SpecimenInfo, Patient
 from app.utils.export import Export
 from app.utils.modification import record_modification, if_status_allow_modification
+from app.utils.sort import sort_samples_while_query
 
 api = Redprint('specimen_info')
 
@@ -15,9 +16,17 @@ api = Redprint('specimen_info')
 @api.route('/all', methods=['POST', 'GET'])
 @auth.login_required
 def get_specimen_info_all():
-    all_patients = Patient.query.filter_by().order_by(Patient.update_time.desc()).all()
-    all_specimen_info = SpecimenInfo.query.filter_by().order_by(SpecimenInfo.update_time.desc()).all()
+    args = request.args.to_dict()
+    sort = int(args.get('sort')) if args.get('sort') else None
+    all_patients = []
+    items = sort_samples_while_query(Patient.query.filter(Patient.is_delete == 0), sort)
+    for item in items:
+        if item.account and g.user.user_id in item.account:
+            all_patients.append(item)
     all_pids = [patient.id for patient in all_patients]
+    all_specimen_info = SpecimenInfo.query.filter(SpecimenInfo.is_delete == 0,
+                                                  SpecimenInfo.pid.in_(all_pids)).all()
+
     buffer = {'patient': Export.classify_by_pid(all_patients),
               'specimen_info': Export.array_classify_by_pid(all_specimen_info)}
     res = []
@@ -36,9 +45,10 @@ def get_specimen_info_all():
         "code": 200,
         "msg": "获取样本成功",
         "data": res,
-        "all_pids": all_pids
+        "all_pids": all_pids,
+        "total": len(all_pids)
     }
-    return Success(data=res)
+    return Success(data=data)
 
 
 @api.route('/<int:pid>', methods=['GET'])
