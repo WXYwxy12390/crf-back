@@ -7,6 +7,7 @@ from app.models import json2db, db, delete_array
 from app.models.base_line import SpecimenInfo, Patient
 from app.utils.export import Export
 from app.utils.modification import record_modification, if_status_allow_modification
+from app.utils.paging import get_paging
 from app.utils.sort import sort_samples_while_query
 
 api = Redprint('specimen_info')
@@ -17,6 +18,8 @@ api = Redprint('specimen_info')
 @auth.login_required
 def get_specimen_info_all():
     args = request.args.to_dict()
+    page = int(args.get('page')) if args.get('page') else 1
+    limit = int(args.get('limit')) if args.get('limit') else 20
     sort = int(args.get('sort')) if args.get('sort') else None
     all_patients = []
     items = sort_samples_while_query(Patient.query.filter(Patient.is_delete == 0), sort)
@@ -41,12 +44,14 @@ def get_specimen_info_all():
         dic['patNumber'] = patient.patNumber
         dic['specimen_info'] = specimen_info
         res.append(dic)
+
+    res, total = get_paging(res, page, limit)
     data = {
         "code": 200,
         "msg": "获取样本成功",
         "data": res,
         "all_pids": all_pids,
-        "total": len(all_pids)
+        "total": total
     }
     return Success(data=data)
 
