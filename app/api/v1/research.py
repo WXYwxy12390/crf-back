@@ -16,7 +16,7 @@ api = Redprint('research')
 
 
 @api.route('', methods=['POST'])
-@auth.login_required()
+@auth.login_required
 def create_research():
     data = request.get_json()
     research_name = data.get('name')
@@ -29,7 +29,7 @@ def create_research():
 
 
 @api.route('/<int:rid>', methods=['DELETE'])
-@auth.login_required()
+@auth.login_required
 def del_research_by_rid(rid):
     item = Research.query.get_or_404(rid)
     item.delete()
@@ -37,21 +37,21 @@ def del_research_by_rid(rid):
 
 
 @api.route('/<int:rid>', methods=['GET'])
-@auth.login_required()
+@auth.login_required
 def get_research_by_rid(rid):
     item = Research.query.get_or_404(rid)
     return Success(data=item)
 
 
 @api.route('/all', methods=['GET'])
-@auth.login_required()
+@auth.login_required
 def get_all_research():
     items = Research.query.filter_by().all()
     return Success(data=items)
 
 
 @api.route('/get_patients/<int:rid>', methods=['GET'])
-@auth.login_required()
+@auth.login_required
 def get_patients_by_research(rid):
     args = request.args.to_dict()
     page = int(args.get('page')) if args.get('page') else 1
@@ -76,7 +76,7 @@ def get_patients_by_research(rid):
 
 
 @api.route('/add_patients', methods=['POST'])
-@auth.login_required()
+@auth.login_required
 def add_patients_to_research():
     data = request.get_json()
     rid = data['rid']
@@ -86,7 +86,7 @@ def add_patients_to_research():
 
 
 @api.route('/remove_patients', methods=['DELETE'])
-@auth.login_required()
+@auth.login_required
 def remove_patients_from_research():
     data = request.get_json()
     rid = data['rid']
