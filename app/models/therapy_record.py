@@ -185,10 +185,9 @@ class TreRec(Base, PatDia, ModificationAndDoubt):
 
         for column in columns:
             if column == 'trement':
-                trement_map = {'one': '1线', 'two': '2线', 'three': '3线', 'four': '4线',
-                               'five': '5线', 'surgery': '手术', 'radiotherapy': '放疗', 'other': '其他', '/': '/'}
+                trement_map = {'surgery': '手术', 'radiotherapy': '放疗', 'other': '其他', '/': '/'}
                 value = self.filter_none(obj, column)
-                value = trement_map.get(value)
+                value = trement_map.get(value) if trement_map.get(value) else value + '线'
                 row = np.append(row, value)
             elif column == 'beEffEva':
                 beEffEva_map = {'1': 'PD-进展', '2': 'SD-稳定', '3': 'PR-部分缓解', '4': 'CR-完全缓解', '5': '术后未发现新病灶', '/': '/',
