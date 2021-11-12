@@ -18,6 +18,7 @@ api = Redprint('specimen_info')
 @auth.login_required
 def get_specimen_info_all():
     args = request.args.to_dict()
+    data = request.get_json()
     page = int(args.get('page')) if args.get('page') else 1
     limit = int(args.get('limit')) if args.get('limit') else 20
     sort = int(args.get('sort')) if args.get('sort') else None
@@ -27,25 +28,24 @@ def get_specimen_info_all():
         if item.account and g.user.user_id in item.account:
             all_patients.append(item)
     all_pids = [patient.id for patient in all_patients]
+    if data and len(data) > 0:
+        patients, total, all_pids = Patient.search(all_patients, data, page, limit, sort)
+    else:
+        patients, total = get_paging(all_patients, page, limit)
+
     all_specimen_info = SpecimenInfo.query.filter(SpecimenInfo.is_delete == 0,
                                                   SpecimenInfo.pid.in_(all_pids)).all()
 
     buffer = {'patient': Export.classify_by_pid(all_patients),
               'specimen_info': Export.array_classify_by_pid(all_specimen_info)}
     res = []
-    for pid in all_pids:
-        dic = {}
-        patient = buffer['patient'].get(pid)
+    for re in patients:
+        pid = re.id
+        re = re.to_dict()
         specimen_info = buffer['specimen_info'].get(pid)
-        dic['pid'] = pid
-        dic['patientName'] = patient.patientName
-        dic['hospitalNumber'] = patient.hospitalNumber
-        dic['idNumber'] = patient.idNumber
-        dic['patNumber'] = patient.patNumber
-        dic['specimen_info'] = specimen_info
-        res.append(dic)
+        re['specimen_info'] = specimen_info
+        res.append(re)
 
-    res, total = get_paging(res, page, limit)
     data = {
         "code": 200,
         "msg": "获取样本成功",
@@ -90,7 +90,6 @@ def del_specimen_info(pid):
     items = SpecimenInfo.query.filter(SpecimenInfo.is_delete == 0, SpecimenInfo.id.in_(data['ids'])).all()
     delete_array(items)
     return Success()
-
 
 # @api.route('/doubt/<int:specimen_info_id>', methods=['POST'])
 # @auth.login_required
