@@ -4,6 +4,7 @@
 @time: 2020-09-16 20:44
 """
 from flask import request
+from sqlalchemy import func
 
 from app.libs.decorator import edit_need_auth, update_time
 from app.libs.error import Success, APIException
@@ -42,9 +43,9 @@ def change_nav_pos(pid, old, new):
             for i in range(old, new):
                 tre_recs[i].treIndex -= 1
         else:
-            for i in range(new-1, old-1):
+            for i in range(new - 1, old - 1):
                 tre_recs[i].treIndex += 1
-        tre_recs[old-1].treIndex = new
+        tre_recs[old - 1].treIndex = new
 
     return Success()
 
@@ -95,3 +96,19 @@ def del_record_info(pid, treIndex):
                 tre_rec.delete()
 
     return Success()
+
+
+@api.route('/max_treIndex', methods=['POST'])
+def get_max_treIndex():
+    data = request.get_json()
+    pids = data.get('pids') if data is not None else None
+    if pids:
+        res = TreRec.query.filter(TreRec.is_delete == 0,
+                                  TreRec.pid.in_(pids)).all()
+        max = 0
+        for treRec in res:
+            max = treRec.treIndex if treRec.treIndex > max else max
+    else:
+        res = db.session.query(func.max(TreRec.treIndex)).first()
+        max = res[0]
+    return Success(data=max)
