@@ -24,8 +24,9 @@ def create_research():
         return ParameterException()
     if Research.get_by_name(research_name):
         return APIException(msg='该名称的研究已存在，请输入其他名称')
-    item = json2db_add(data, Research)
-    return Success(data=item)
+    research = json2db_add(data, Research)
+    json2db_add({'uid': g.user.user_id, 'rid': research.id}, ResearchUser)
+    return Success()
 
 
 @api.route('/<int:rid>', methods=['DELETE'])

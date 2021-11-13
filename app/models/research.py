@@ -25,8 +25,8 @@ class Research(Base):
         return item
 
     def delete(self):
-        research_patient_list = ResearchPatient.query.filter_by(rid=self.rid).all()
-        research_user_list = ResearchUser.query.filter_by(rid=self.rid).all()
+        research_patient_list = ResearchPatient.query.filter_by(rid=self.id).all()
+        research_user_list = ResearchUser.query.filter_by(rid=self.id).all()
 
         with db.auto_commit():
             for item in research_patient_list:
