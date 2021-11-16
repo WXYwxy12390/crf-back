@@ -40,7 +40,7 @@ def authorize_roles_all_research():
 
 # 赋予某些用户某些研究的查看权限
 @api.route('/authorize_research', methods=['POST'])
-def authorize_roles_all_research():
+def authorize_research():
     data = request.get_json()
     uids = data.get('user_ids')
     rids = data.get('research_ids')
