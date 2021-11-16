@@ -37,18 +37,16 @@ def del_research_by_rid(rid):
     return Success()
 
 
-@api.route('/<int:rid>', methods=['GET'])
-@auth.login_required
-def get_research_by_rid(rid):
-    item = Research.query.get_or_404(rid)
-    return Success(data=item)
-
-
 @api.route('/all', methods=['GET'])
 @auth.login_required
 def get_all_research():
-    items = Research.query.filter_by().all()
-    return Success(data=items)
+    uid = g.user.user_id
+    # 返回当前用户有权限的所有研究
+    research_user_list = ResearchUser.query.filter_by(uid=uid).all()
+    rids = [research_user.rid for research_user in research_user_list]
+    items = Research.query.filter(Research.is_delete == 0,
+                                  Research.id.in_(rids)).all()
+    return Success(data=items if items else [])
 
 
 @api.route('/get_patients/<int:rid>', methods=['GET'])
@@ -59,8 +57,9 @@ def get_patients_by_research(rid):
     limit = int(args.get('limit')) if args.get('limit') else 20
     sort = int(args.get('sort')) if args.get('sort') else None
     flag = ResearchUser.if_user_in_research(g.user.user_id, rid)
+    user = g.user
     if flag:
-        pids = ResearchPatient.get_patients_by_research(rid)
+        pids = ResearchPatient.get_patients_by_research(rid, user)
         patients = sort_samples_while_query(Patient.query.filter(Patient.id.in_(pids)), sort)
         res, total = get_paging(patients, page, limit)
         res = [patient.get_fotmat_info() for patient in res]
@@ -80,9 +79,10 @@ def get_patients_by_research(rid):
 @auth.login_required
 def add_patients_to_research():
     data = request.get_json()
+    uid = g.user.user_id
     rid = data['rid']
     pids = data['pids']
-    ResearchPatient.add_patients_to_research(rid, pids)
+    ResearchPatient.add_patients_to_research(rid, pids, uid)
     return Success()
 
 

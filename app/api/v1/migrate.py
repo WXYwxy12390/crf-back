@@ -2,21 +2,53 @@ import copy
 import os
 import shutil
 
-from flask import jsonify, current_app
+from flask import jsonify, current_app, request
 from sqlalchemy.orm.attributes import flag_modified
 
 from app.libs.error import Success
 from app.libs.redprint import Redprint
-from app.models import db, json2db
+from app.models import db, json2db, json2db_add
 from app.models.base_line import Patient, PastHis, DrugHistory, IniDiaPro, SpecimenInfo
 from app.models.crf_info import FollInfo
 from app.models.cycle import Immunohis, MoleDetec
 from app.models.lab_inspectation import BloodRoutine, BloodBio, Thyroid, Coagulation, MyocardialEnzyme, Cytokines, \
     LymSubsets, UrineRoutine, TumorMarker
 from app.models.other_inspect import Lung, OtherExams, ImageExams
+from app.models.research import Research
+from app.models.researchUser import ResearchUser
 from app.models.therapy_record import Surgery, Radiotherapy, OneToFive, TreRec
+from app.spider.user_info import UserInfo
 
 api = Redprint('migrate')
+
+
+# 赋予某些角色的账户所有研究查看的权限
+@api.route('/authorize_roles_all_research', methods=['POST'])
+def authorize_roles_all_research():
+    data = request.get_json()
+    role_ids = data.get('role_ids')
+    users = UserInfo.search_by_role_ids(role_ids).get('data')
+    for user in users:
+        uid = user['id']
+        all_researches = Research.query.filter_by().all()
+        all_rids = [research.id for research in all_researches]
+        for rid in all_rids:
+            if not ResearchUser.if_user_in_research(uid, rid):
+                json2db_add({'rid': rid, 'uid': uid}, ResearchUser)
+    return Success()
+
+
+# 赋予某些用户某些研究的查看权限
+@api.route('/authorize_research', methods=['POST'])
+def authorize_roles_all_research():
+    data = request.get_json()
+    uids = data.get('user_ids')
+    rids = data.get('research_ids')
+    for uid in uids:
+        for rid in rids:
+            if not ResearchUser.if_user_in_research(uid, rid):
+                json2db_add({'rid': rid, 'uid': uid}, ResearchUser)
+    return Success()
 
 
 # 为了扩充大于五线的治疗记录，改成可以输入线数。因此原来数据中的'one'-'five'改成了'1'-'5'

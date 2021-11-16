@@ -17,30 +17,12 @@ class Scope:
         return self  # 返回实例对象，使其能够支持链式调用
 
 
-# class AdminScope(Scope):
-#     #allow_api = ['v1.super_get_user']
-#     allow_module = ['v1.user']
-#
-# class UserScope(Scope):
-#     #allow_api = []
-#     forbidden = ['v1.user+super_get_user','v1.user+super_delete_user']
-#
-#     def __init__(self):
-#         self + AdminScope()
-#
-#
-# class SuperScope(Scope):
-#     allow_api = []
-#     def __init__(self):
-#         #通过运算符重载，实现了 干净的代码--舒服
-#         self +  UserScope()+ AdminScope()
-
 class OperateUserCRF(Scope):
     allow_api = ['v1.sample+add_sample', 'v1.sample+get_sample_all', 'v1.sample+get_sample_updated',
                  'v1.sample+sample_add_account',
                  'v1.modification+submit_cycle', 'v1.modification+submit',
                  'v1.modification+reply', 'v1.modification+get_history',
-                 'v1.research+get_research_by_rid', 'v1.research+get_all_research',
+                 'v1.research+get_all_research',
                  'v1.research+get_patients_by_research'
                  ]
     allow_module = ['v1.first_diagnose', 'v1.past_history', 'v1.patient', 'v1.record_info', 'v1.therapy_record',
@@ -72,7 +54,7 @@ class DeleteCRF(Scope):
 
 class Export(Scope):
     # 导出
-    allow_api = []
+    allow_api = ['v1.export+export']
 
 
 class InputCRF(Scope):
@@ -148,7 +130,15 @@ class CRA(Scope):
 
 
 class OperateResearch(Scope):
-    allow_module = ['v1.research']
+    allow_api = ['v1.research+create_research', 'v1.research+del_research_by_rid']
+
+
+class OperatePatientsInResearch(Scope):
+    allow_api = ['v1.research+add_patients_to_research', 'v1.research+remove_patients_from_research']
+
+
+class CheckAllInResearch(Scope):
+    forbidden = []
 
 
 # 这里的endpoint 会带有蓝图v1 例如  v1.super_get_user

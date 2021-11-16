@@ -1,5 +1,6 @@
 from flask import request
 from app.libs.redprint import Redprint
+from app.libs.token_auth import auth
 from app.utils.export import Export
 
 api = Redprint('export')
@@ -14,6 +15,7 @@ therapy_record_py = getattr(models_package, 'therapy_record')
 
 
 @api.route('', methods=['POST'])
+@auth.login_required()
 def export():
     data = request.get_json()
     keys = data.keys()

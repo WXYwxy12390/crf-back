@@ -1,3 +1,5 @@
+import json
+
 import requests
 
 
@@ -19,6 +21,14 @@ class HTTP:
                     else:
                         return ''
         """
+        if r.status_code != 200 or r.json()['code'] != 200:
+            return {} if return_json else ''
+        else:
+            return r.json() if return_json else r.text
+
+    @staticmethod
+    def post(url, data, return_json=True):
+        r = requests.post(url, data=json.dumps(data), headers={'Content-Type': 'application/json'})
         if r.status_code != 200 or r.json()['code'] != 200:
             return {} if return_json else ''
         else:
