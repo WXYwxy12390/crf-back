@@ -7,8 +7,12 @@ from app.libs.enums import ModuleStatus, GeneValue
 from app.models.base import Base, ModificationAndDoubt, db
 # 病人基本信息表
 from app.models.crf_info import FollInfo
-from app.models.cycle import MoleDetec
-from app.models.therapy_record import PatDia
+from app.models.cycle import MoleDetec, Immunohis, Signs, SideEffect
+from app.models.lab_inspectation import BloodRoutine, BloodBio, Thyroid, Coagulation, MyocardialEnzyme, Cytokines, \
+    LymSubsets, UrineRoutine, TumorMarker
+from app.models.other_inspect import Lung, OtherExams, ImageExams
+from app.models.researchPatient import ResearchPatient
+from app.models.therapy_record import PatDia, DetailTrePlan
 from app.models.therapy_record import TreRec, OneToFive, Surgery, Radiotherapy
 from app.utils.date import get_birth_date_by_id_card, get_age_by_birth
 import numpy as np
@@ -124,6 +128,49 @@ class Patient(Base, ModificationAndDoubt):
             'livSta': liv_sta_info
         }
         return data
+
+    def delete(self):
+        self.is_delete = 1
+        self.delete_table(PastHis)
+        self.delete_table(DrugHistory)
+        self.delete_table(IniDiaPro)
+        self.delete_table(SpecimenInfo)
+        self.delete_table(FollInfo)
+
+        self.delete_table(BloodRoutine)
+        self.delete_table(BloodBio)
+        self.delete_table(Thyroid)
+        self.delete_table(Coagulation)
+        self.delete_table(MyocardialEnzyme)
+        self.delete_table(Cytokines)
+        self.delete_table(LymSubsets)
+        self.delete_table(UrineRoutine)
+        self.delete_table(TumorMarker)
+
+        self.delete_table(Lung)
+        self.delete_table(OtherExams)
+        self.delete_table(ImageExams)
+
+        self.delete_table(Immunohis)
+        self.delete_table(MoleDetec)
+        self.delete_table(Signs)
+        self.delete_table(SideEffect)
+
+        self.delete_table(TreRec)
+        self.delete_table(OneToFive)
+        self.delete_table(Surgery)
+        self.delete_table(Radiotherapy)
+        self.delete_table(DetailTrePlan)
+
+        self.delete_table(ResearchPatient)
+
+    # 删除该病人在T模块的数据
+    def delete_table(self, T):
+        pid = self.id
+        records = T.query.filter_by(pid=pid).all()
+        with db.auto_commit():
+            for record in records:
+                record.delete()
 
     @classmethod
     def search(cls, patients, search_data, page, limit, sort=None):

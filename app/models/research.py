@@ -33,4 +33,6 @@ class Research(Base):
                 item.delete()
             for item in research_user_list:
                 item.delete()
-            self.delete()
+            self.is_delete = 1
+
+
