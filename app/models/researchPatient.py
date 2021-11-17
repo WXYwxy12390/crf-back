@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer
 
 from app.models import json2db_add
 from app.models.base import Base, db
+from app.spider.user_info import UserInfo
 
 
 class ResearchPatient(Base):
@@ -36,9 +37,22 @@ class ResearchPatient(Base):
         scopes = user.scopes
         if 'CheckAllInResearch' in scopes:
             items = ResearchPatient.query.filter_by(rid=rid).all()
+            pids = [item.pid for item in items]
+        elif 'CheckCenterInResearch' in scopes:
+            user_info = UserInfo().search_by_uid(uid).get('data')
+            research_center_id = user_info['research_center_id']
+            all_items = ResearchPatient.query.filter_by(rid=rid).all()
+            all_pids = [item.pid for item in all_items]
+            from app.models.base_line import Patient
+            all_patients = Patient.query.filter(Patient.is_delete == 0,
+                                                Patient.id.in_(all_pids)).all()
+            pids = []
+            for patient in all_patients:
+                if patient.researchCenter == research_center_id:
+                    pids.append(patient.id)
         else:
             items = ResearchPatient.query.filter_by(rid=rid, uid=uid).all()
-        pids = [item.pid for item in items]
+            pids = [item.pid for item in items]
         return pids
 
 

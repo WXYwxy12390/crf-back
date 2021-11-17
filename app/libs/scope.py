@@ -22,8 +22,6 @@ class OperateUserCRF(Scope):
                  'v1.sample+sample_add_account',
                  'v1.modification+submit_cycle', 'v1.modification+submit',
                  'v1.modification+reply', 'v1.modification+get_history',
-                 'v1.research+get_all_research',
-                 'v1.research+get_patients_by_research'
                  ]
     allow_module = ['v1.first_diagnose', 'v1.past_history', 'v1.patient', 'v1.record_info', 'v1.therapy_record',
                     'v1.file', 'v1.immunohis', 'v1.lab_inspectation', 'v1.mole_detec', 'v1.other_inspect',
@@ -137,8 +135,19 @@ class OperatePatientsInResearch(Scope):
     allow_api = ['v1.research+add_patients_to_research', 'v1.research+remove_patients_from_research']
 
 
-class CheckAllInResearch(Scope):
+class CheckUserInResearch(Scope):
+    allow_api = ['v1.research+get_all_research', 'v1.research+get_patients_by_research']
     forbidden = []
+
+
+class CheckCenterInResearch(Scope):
+    def __init__(self):
+        self + CheckUserInResearch()
+
+
+class CheckAllInResearch(Scope):
+    def __init__(self):
+        self + CheckUserInResearch()
 
 
 # 这里的endpoint 会带有蓝图v1 例如  v1.super_get_user
