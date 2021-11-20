@@ -26,31 +26,51 @@ api = Redprint('migrate')
 @api.route('/ARION/<int:arion_rid>')
 def ARION(arion_rid):
     admin_uid = 1
-    tongji_arion_patients = Patient.query.filter_by(researchCenter=23).all()
-    with db.auto_commit():
-        for patient in tongji_arion_patients:
-            patient.researchCenter = 1
+
     arion_patients = Patient.query.filter(Patient.is_delete == 0,
                                           Patient.researchCenter.in_([23, 16, 22, 27])).all()
     arion_pids = [patient.id for patient in arion_patients]
     ResearchPatient.add_patients_to_research(arion_rid, arion_pids, admin_uid)
-    return Success
+
+    json2db_add({'pid': 1, 'rid': 1}, ResearchUser)
+    json2db_add({'pid': 7, 'rid': 1}, ResearchUser)
+    json2db_add({'pid': 72, 'rid': 1}, ResearchUser)
+    json2db_add({'pid': 73, 'rid': 1}, ResearchUser)
+    json2db_add({'pid': 74, 'rid': 1}, ResearchUser)
+    json2db_add({'pid': 75, 'rid': 1}, ResearchUser)
+    json2db_add({'pid': 87, 'rid': 1}, ResearchUser)
+    json2db_add({'pid': 88, 'rid': 1}, ResearchUser)
+    json2db_add({'pid': 89, 'rid': 1}, ResearchUser)
+    json2db_add({'pid': 110, 'rid': 1}, ResearchUser)
+    json2db_add({'pid': 111, 'rid': 1}, ResearchUser)
+    json2db_add({'pid': 112, 'rid': 1}, ResearchUser)
+    json2db_add({'pid': 113, 'rid': 1}, ResearchUser)
+    json2db_add({'pid': 114, 'rid': 1}, ResearchUser)
+    json2db_add({'pid': 115, 'rid': 1}, ResearchUser)
+    json2db_add({'pid': 90, 'rid': 1}, ResearchUser)
+    json2db_add({'pid': 116, 'rid': 1}, ResearchUser)
+
+    tongji_arion_patients = Patient.query.filter_by(researchCenter=23).all()
+    with db.auto_commit():
+        for patient in tongji_arion_patients:
+            patient.researchCenter = 1
+    return Success()
 
 
 # 赋予某些角色的账户所有研究查看的权限
-@api.route('/authorize_roles_all_research', methods=['POST'])
-def authorize_roles_all_research():
-    data = request.get_json()
-    role_ids = data.get('role_ids')
-    users = UserInfo.search_by_role_ids(role_ids).get('data')
-    for user in users:
-        uid = user['id']
-        all_researches = Research.query.filter_by().all()
-        all_rids = [research.id for research in all_researches]
-        for rid in all_rids:
-            if not ResearchUser.if_user_in_research(uid, rid):
-                json2db_add({'rid': rid, 'uid': uid}, ResearchUser)
-    return Success()
+# @api.route('/authorize_roles_all_research', methods=['POST'])
+# def authorize_roles_all_research():
+#     data = request.get_json()
+#     role_ids = data.get('role_ids')
+#     users = UserInfo.search_by_role_ids(role_ids).get('data')
+#     for user in users:
+#         uid = user['id']
+#         all_researches = Research.query.filter_by().all()
+#         all_rids = [research.id for research in all_researches]
+#         for rid in all_rids:
+#             if not ResearchUser.if_user_in_research(uid, rid):
+#                 json2db_add({'rid': rid, 'uid': uid}, ResearchUser)
+#     return Success()
 
 
 # 赋予某些用户某些研究的查看权限
