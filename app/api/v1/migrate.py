@@ -23,37 +23,38 @@ from app.spider.user_info import UserInfo
 api = Redprint('migrate')
 
 
-@api.route('/ARION/<int:arion_rid>')
-def ARION(arion_rid):
+@api.route('/ARION')
+def ARION():
     admin_uid = 1
+    arion_rid = 1
 
     arion_patients = Patient.query.filter(Patient.is_delete == 0,
                                           Patient.researchCenter.in_([23, 16, 22, 27])).all()
     arion_pids = [patient.id for patient in arion_patients]
     ResearchPatient.add_patients_to_research(arion_rid, arion_pids, admin_uid)
 
-    json2db_add({'pid': 1, 'rid': 1}, ResearchUser)
-    json2db_add({'pid': 7, 'rid': 1}, ResearchUser)
-    json2db_add({'pid': 72, 'rid': 1}, ResearchUser)
-    json2db_add({'pid': 73, 'rid': 1}, ResearchUser)
-    json2db_add({'pid': 74, 'rid': 1}, ResearchUser)
-    json2db_add({'pid': 75, 'rid': 1}, ResearchUser)
-    json2db_add({'pid': 87, 'rid': 1}, ResearchUser)
-    json2db_add({'pid': 88, 'rid': 1}, ResearchUser)
-    json2db_add({'pid': 89, 'rid': 1}, ResearchUser)
-    json2db_add({'pid': 110, 'rid': 1}, ResearchUser)
-    json2db_add({'pid': 111, 'rid': 1}, ResearchUser)
-    json2db_add({'pid': 112, 'rid': 1}, ResearchUser)
-    json2db_add({'pid': 113, 'rid': 1}, ResearchUser)
-    json2db_add({'pid': 114, 'rid': 1}, ResearchUser)
-    json2db_add({'pid': 115, 'rid': 1}, ResearchUser)
-    json2db_add({'pid': 90, 'rid': 1}, ResearchUser)
-    json2db_add({'pid': 116, 'rid': 1}, ResearchUser)
+    # json2db_add({'uid': 1, 'rid': 1}, ResearchUser)
+    # json2db_add({'uid': 7, 'rid': 1}, ResearchUser)
+    # json2db_add({'uid': 72, 'rid': 1}, ResearchUser)
+    # json2db_add({'uid': 73, 'rid': 1}, ResearchUser)
+    # json2db_add({'uid': 74, 'rid': 1}, ResearchUser)
+    # json2db_add({'uid': 75, 'rid': 1}, ResearchUser)
+    # json2db_add({'uid': 87, 'rid': 1}, ResearchUser)
+    # json2db_add({'uid': 88, 'rid': 1}, ResearchUser)
+    # json2db_add({'uid': 89, 'rid': 1}, ResearchUser)
+    # json2db_add({'uid': 110, 'rid': 1}, ResearchUser)
+    # json2db_add({'uid': 111, 'rid': 1}, ResearchUser)
+    # json2db_add({'uid': 112, 'rid': 1}, ResearchUser)
+    # json2db_add({'uid': 113, 'rid': 1}, ResearchUser)
+    # json2db_add({'uid': 114, 'rid': 1}, ResearchUser)
+    # json2db_add({'uid': 115, 'rid': 1}, ResearchUser)
+    # json2db_add({'uid': 90, 'rid': 1}, ResearchUser)
+    # json2db_add({'uid': 116, 'rid': 1}, ResearchUser)
 
-    tongji_arion_patients = Patient.query.filter_by(researchCenter=23).all()
-    with db.auto_commit():
-        for patient in tongji_arion_patients:
-            patient.researchCenter = 1
+    # tongji_arion_patients = Patient.query.filter_by(researchCenter=23).all()
+    # with db.auto_commit():
+    #     for patient in tongji_arion_patients:
+    #         patient.researchCenter = 1
     return Success()
 
 
