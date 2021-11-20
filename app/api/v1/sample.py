@@ -6,11 +6,13 @@
 
 from flask import request, jsonify, g, current_app
 
+from app.config.secure import fudan_zhongliu_research_center_id, fudan_zhongshan_research_center_id, ARION_research_id
 from app.libs.error import Success
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
 from app.models import json2db, db, delete_array, json2db_add
 from app.models.base_line import Patient
+from app.models.researchPatient import ResearchPatient
 from app.spider.research_center import ResearchCenterSpider
 from app.spider.user_info import UserInfo
 from app.utils.paging import get_paging
@@ -167,6 +169,10 @@ def add_sample():
     }
     patient = json2db_add(model_data, Patient)
     return_data['pid'] = patient.id
+    # 复旦肿瘤和复旦中山两个中心的主任录入病人后，病人自动被移入ARION研究
+    if user['research_center_id'] in [fudan_zhongliu_research_center_id, fudan_zhongshan_research_center_id] and \
+            'OperatePatientsInResearch' in g.user.scopes and 'CheckCenterInResearch' in g.user.scopes:
+        json2db_add({'pid': patient.id, 'rid': ARION_research_id, 'uid': user['id']}, ResearchPatient)
     return Success(data=return_data)
 
 
