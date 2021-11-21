@@ -79,10 +79,9 @@ def get_patients_by_research(rid):
 @auth.login_required
 def add_patients_to_research():
     data = request.get_json()
-    uid = g.user.user_id
     rid = data['rid']
     pids = data['pids']
-    ResearchPatient.add_patients_to_research(rid, pids, uid)
+    ResearchPatient.add_patients_to_research(rid, pids)
     return Success()
 
 

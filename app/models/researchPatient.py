@@ -11,17 +11,16 @@ class ResearchPatient(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     pid = Column(Integer, comment='病人id。patient表中的id')
     rid = Column(Integer, comment='研究id。research表中的id')
-    uid = Column(Integer, comment='加入该病人至该研究的用户id')
 
     def keys(self):
-        return ['id', 'pid', 'rid', 'uid']
+        return ['id', 'pid', 'rid']
 
     @classmethod
-    def add_patients_to_research(cls, rid, pids, uid):
+    def add_patients_to_research(cls, rid, pids):
         for pid in pids:
             item = ResearchPatient.query.filter_by(rid=rid, pid=pid).first()
             if item is None:
-                json2db_add({'pid': pid, 'rid': rid, 'uid': uid}, ResearchPatient)
+                json2db_add({'pid': pid, 'rid': rid}, ResearchPatient)
 
     @classmethod
     def remove_patients_from_research(cls, rid, pids):
@@ -51,13 +50,13 @@ class ResearchPatient(Base):
                 if patient.researchCenter == research_center_id:
                     pids.append(patient.id)
         else:
-            items = ResearchPatient.query.filter_by(rid=rid, uid=uid).all()
-            pids = [item.pid for item in items]
+            all_items = ResearchPatient.query.filter_by(rid=rid).all()
+            all_pids = [item.pid for item in all_items]
+            from app.models.base_line import Patient
+            all_patients = Patient.query.filter(Patient.is_delete == 0,
+                                                Patient.id.in_(all_pids)).all()
+            pids = []
+            for patient in all_patients:
+                if patient.account and uid in patient.account:
+                    pids.append(patient.id)
         return pids
-
-
-    @classmethod
-    def get_researches_by_patient(cls, pid):
-        items = ResearchPatient.query.filter_by(pid=pid).all()
-        rids = [item.rid for item in items]
-        return rids
