@@ -38,6 +38,19 @@ def get_sample_all():
         center_ids = [center['id'] for center in centers]
         patients = sort_samples_while_query(Patient.query.filter(Patient.is_delete == 0,
                                                                  Patient.researchCenter.in_(center_ids)), sort)
+    elif 'CheckAllInResearch' in g.user.scopes:
+        all_research_patient = ResearchPatient.query.filter_by().all()
+        pids_in_all_research = [research_patient.pid for research_patient in all_research_patient]
+        patients = sort_samples_while_query(Patient.query.filter(Patient.is_delete == 0,
+                                                                 Patient.id.in_(pids_in_all_research)), sort)
+    elif 'CheckCenterInResearch' in g.user.scopes:
+        centers = ResearchCenterSpider().search_by_uid_project(current_app.config['PROJECT_ID'], g.user.user_id)['data']
+        center_ids = [center['id'] for center in centers]
+        all_research_patient = ResearchPatient.query.filter_by().all()
+        pids_in_all_research = [research_patient.pid for research_patient in all_research_patient]
+        patients = sort_samples_while_query(Patient.query.filter(Patient.is_delete == 0,
+                                                                 Patient.id.in_(pids_in_all_research),
+                                                                 Patient.researchCenter.in_(center_ids)), sort)
     else:
         items = sort_samples_while_query(Patient.query.filter(Patient.is_delete == 0), sort)
         for item in items:

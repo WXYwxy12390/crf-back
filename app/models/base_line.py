@@ -220,6 +220,9 @@ class Patient(Base, ModificationAndDoubt):
         # 样本类型 SpecimenInfo
         if 'specimenType' in search_data:
             pids = Patient.filter_specimenType(pids, search_data['specimenType'])
+        # 研究的id号 Research
+        if 'research_id' in search_data:
+            pids = Patient.filter_research(pids, search_data['research_id'])
 
         pids = list(set(pids))
         pagination = Patient.query.filter(Patient.is_delete == 0, Patient.id.in_(pids)).order_by(
@@ -594,6 +597,15 @@ class Patient(Base, ModificationAndDoubt):
             if flag:
                 patient_ids.append(key)
         return patient_ids
+
+    @classmethod
+    def filter_research(cls, pids, rid):
+        research_patient_list = ResearchPatient.query.filter(ResearchPatient.is_delete == 0,
+                                                             ResearchPatient.rid == rid,
+                                                             ResearchPatient.pid.in_(pids)).all()
+        patient_ids = [research_patient.pid for research_patient in research_patient_list]
+        return patient_ids
+
 
     @classmethod
     def array_classify_by_pid(cls, items):

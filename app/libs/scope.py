@@ -22,6 +22,7 @@ class OperateUserCRF(Scope):
                  'v1.sample+sample_add_account',
                  'v1.modification+submit_cycle', 'v1.modification+submit',
                  'v1.modification+reply', 'v1.modification+get_history',
+                 'v1.research+get_all_research'
                  ]
     allow_module = ['v1.first_diagnose', 'v1.past_history', 'v1.patient', 'v1.record_info', 'v1.therapy_record',
                     'v1.file', 'v1.immunohis', 'v1.lab_inspectation', 'v1.mole_detec', 'v1.other_inspect',
@@ -30,10 +31,7 @@ class OperateUserCRF(Scope):
 
 
 class CheckCenterCRF(Scope):
-    allow_api = ['v1.sample+get_sample_all', 'v1.sample+get_sample_updated',
-                 'v1.research+get_research_by_rid', 'v1.research+get_all_research',
-                 'v1.research+get_patients_by_research'
-                 ]
+    allow_api = ['v1.sample+get_sample_all', 'v1.sample+get_sample_updated']
 
 
 class EditCenterCRF(Scope):
@@ -55,60 +53,60 @@ class Export(Scope):
     allow_api = ['v1.export+export']
 
 
-class InputCRF(Scope):
-    # 8 多中心录入CRF
-    allow_module = ['v1.adverse_event', 'v1.concomitant_medication', 'v1.criteria', 'v1.cycle', 'v1.demography',
-                    'v1.ecog',
-                    'v1.effect_evaluation', 'v1.file', 'v1.lab_inspection', 'v1.medicine_usage_research',
-                    'v1.other_inspect', 'v1.other_tumor_therapy', 'v1.past_history', 'v1.physical_examination',
-                    'v1.QoL',
-                    'v1.relative_inspect', 'v1.sample', 'v1.stop_modify_dose', 'v1.summary', 'v1.survival_cycle',
-                    'v1.vital_sign',
-                    'v1.action_record', 'v1.specimen_info'
-                    ]
-
-
-class CheckCRF(Scope):
-    allow_api = ["v1.adverse_event+get_adverse_event",
-                 "v1.concomitant_medication+get_concomitant_medication",
-                 'v1.criteria+get_inclusion_criteria', 'v1.criteria+get_exclusion_criteria',
-                 'v1.cycle+get_cycle_nav', 'v1.cycle+get_cycle_info', 'v1.cycle+get_cycle_status',
-                 'v1.demography+get_demography',
-                 'v1.ecog+get_ecog',
-                 'v1.effect_evaluation+get_effect_evaluation', 'v1.effect_evaluation+get_targeted_lesion',
-                 'v1.effect_evaluation+get_not_targeted_lesion', 'v1.effect_evaluation+get_new_lesion',
-                 'v1.effect_evaluation+get_not_new_lesion',
-                 'v1.file+get_signiture_path', 'v1.file+get_file',
-
-                 'v1.lab_inspection+get_blood_routine', 'v1.lab_inspection+get_blood_biochemistry',
-                 'v1.lab_inspection+get_blood_clotting',
-                 'v1.lab_inspection+get_thyroid_function', 'v1.lab_inspection+get_myocardial_enzyme',
-                 'v1.lab_inspection+get_AMY',
-                 'v1.lab_inspection+get_LPS', 'v1.lab_inspection+get_tumor_marker',
-                 'v1.lab_inspection+get_virus_indicator',
-                 'v1.lab_inspection+get_HCG', 'v1.lab_inspection+get_urinalysis', 'v1.lab_inspection+get_shit_routine',
-
-                 'v1.medicine_usage_research+get_medicine_usage_research',
-                 'v1.other_inspect+get_12_lead_ecg', 'v1.other_inspect+get_UCG', 'v1.other_inspect+get_photo_inspect',
-                 'v1.other_inspect+get_lung_function',
-                 'v1.other_tumor_therapy+get_other_tumor_therapy',
-                 'v1.past_history+get_smoke_drink_history', 'v1.past_history+get_lung_cancer_histroy',
-                 'v1.past_history+get_lung_cancer_therapy_histroy', 'v1.past_history+get_lung_cancer_past_disease',
-                 'v1.physical_examination+get_physical_examination',
-                 'v1.QoL+get_QoL', 'v1.QoL+get_Qol_C30_result', 'v1.QoL+get_Qol_LC13_result',
-                 'v1.relative_inspect+get_relative_inspect',
-                 'v1.sample+get_sample_all',
-                 'v1.stop_modify_dose+get_stop_modify_dose',
-                 'v1.summary+get_summary', 'v1.summary+get_adverse_event_table',
-                 'v1.survival_cycle+get_survival_cycle', 'v1.survival_cycle+get_disease_progress_or_die_date_record',
-                 'v1.vital_sign+get_vital_sign', 'v1.vital_sign+get_blood_pressure',
-                 'v1.action_record+get_unlock_record'
-                 ]
-
-
-# 能够查看全部样本
-class CheckAllCrf(Scope):
-    forbidden = []
+# class InputCRF(Scope):
+#     # 8 多中心录入CRF
+#     allow_module = ['v1.adverse_event', 'v1.concomitant_medication', 'v1.criteria', 'v1.cycle', 'v1.demography',
+#                     'v1.ecog',
+#                     'v1.effect_evaluation', 'v1.file', 'v1.lab_inspection', 'v1.medicine_usage_research',
+#                     'v1.other_inspect', 'v1.other_tumor_therapy', 'v1.past_history', 'v1.physical_examination',
+#                     'v1.QoL',
+#                     'v1.relative_inspect', 'v1.sample', 'v1.stop_modify_dose', 'v1.summary', 'v1.survival_cycle',
+#                     'v1.vital_sign',
+#                     'v1.action_record', 'v1.specimen_info'
+#                     ]
+#
+#
+# class CheckCRF(Scope):
+#     allow_api = ["v1.adverse_event+get_adverse_event",
+#                  "v1.concomitant_medication+get_concomitant_medication",
+#                  'v1.criteria+get_inclusion_criteria', 'v1.criteria+get_exclusion_criteria',
+#                  'v1.cycle+get_cycle_nav', 'v1.cycle+get_cycle_info', 'v1.cycle+get_cycle_status',
+#                  'v1.demography+get_demography',
+#                  'v1.ecog+get_ecog',
+#                  'v1.effect_evaluation+get_effect_evaluation', 'v1.effect_evaluation+get_targeted_lesion',
+#                  'v1.effect_evaluation+get_not_targeted_lesion', 'v1.effect_evaluation+get_new_lesion',
+#                  'v1.effect_evaluation+get_not_new_lesion',
+#                  'v1.file+get_signiture_path', 'v1.file+get_file',
+#
+#                  'v1.lab_inspection+get_blood_routine', 'v1.lab_inspection+get_blood_biochemistry',
+#                  'v1.lab_inspection+get_blood_clotting',
+#                  'v1.lab_inspection+get_thyroid_function', 'v1.lab_inspection+get_myocardial_enzyme',
+#                  'v1.lab_inspection+get_AMY',
+#                  'v1.lab_inspection+get_LPS', 'v1.lab_inspection+get_tumor_marker',
+#                  'v1.lab_inspection+get_virus_indicator',
+#                  'v1.lab_inspection+get_HCG', 'v1.lab_inspection+get_urinalysis', 'v1.lab_inspection+get_shit_routine',
+#
+#                  'v1.medicine_usage_research+get_medicine_usage_research',
+#                  'v1.other_inspect+get_12_lead_ecg', 'v1.other_inspect+get_UCG', 'v1.other_inspect+get_photo_inspect',
+#                  'v1.other_inspect+get_lung_function',
+#                  'v1.other_tumor_therapy+get_other_tumor_therapy',
+#                  'v1.past_history+get_smoke_drink_history', 'v1.past_history+get_lung_cancer_histroy',
+#                  'v1.past_history+get_lung_cancer_therapy_histroy', 'v1.past_history+get_lung_cancer_past_disease',
+#                  'v1.physical_examination+get_physical_examination',
+#                  'v1.QoL+get_QoL', 'v1.QoL+get_Qol_C30_result', 'v1.QoL+get_Qol_LC13_result',
+#                  'v1.relative_inspect+get_relative_inspect',
+#                  'v1.sample+get_sample_all',
+#                  'v1.stop_modify_dose+get_stop_modify_dose',
+#                  'v1.summary+get_summary', 'v1.summary+get_adverse_event_table',
+#                  'v1.survival_cycle+get_survival_cycle', 'v1.survival_cycle+get_disease_progress_or_die_date_record',
+#                  'v1.vital_sign+get_vital_sign', 'v1.vital_sign+get_blood_pressure',
+#                  'v1.action_record+get_unlock_record'
+#                  ]
+#
+#
+# # 能够查看全部样本
+# class CheckAllCrf(Scope):
+#     forbidden = []
 
 
 # 统计分析
@@ -135,19 +133,14 @@ class OperatePatientsInResearch(Scope):
     allow_api = ['v1.research+add_patients_to_research', 'v1.research+remove_patients_from_research']
 
 
-class CheckUserInResearch(Scope):
-    allow_api = ['v1.research+get_all_research', 'v1.research+get_patients_by_research']
-    forbidden = []
-
-
 class CheckCenterInResearch(Scope):
     def __init__(self):
-        self + CheckUserInResearch()
+        self + OperateUserCRF()
 
 
 class CheckAllInResearch(Scope):
     def __init__(self):
-        self + CheckUserInResearch()
+        self + OperateUserCRF()
 
 
 # 这里的endpoint 会带有蓝图v1 例如  v1.super_get_user
