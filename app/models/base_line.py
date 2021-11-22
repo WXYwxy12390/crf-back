@@ -600,12 +600,19 @@ class Patient(Base, ModificationAndDoubt):
 
     @classmethod
     def filter_research(cls, pids, rid):
-        research_patient_list = ResearchPatient.query.filter(ResearchPatient.is_delete == 0,
-                                                             ResearchPatient.rid == rid,
-                                                             ResearchPatient.pid.in_(pids)).all()
-        patient_ids = [research_patient.pid for research_patient in research_patient_list]
+        if rid == -1:
+            all_research_patient = ResearchPatient.query.filter_by().all()
+            all_research_patient_id = [research_patient.pid for research_patient in all_research_patient]
+            patient_ids = []
+            for pid in pids:
+                if pid not in all_research_patient_id:
+                    patient_ids.append(pid)
+        else:
+            research_patient_list = ResearchPatient.query.filter(ResearchPatient.is_delete == 0,
+                                                                 ResearchPatient.rid == rid,
+                                                                 ResearchPatient.pid.in_(pids)).all()
+            patient_ids = [research_patient.pid for research_patient in research_patient_list]
         return patient_ids
-
 
     @classmethod
     def array_classify_by_pid(cls, items):
