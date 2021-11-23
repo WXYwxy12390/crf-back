@@ -3,6 +3,7 @@
 @file: patient.py
 @time: 2020-09-17 15:06
 """
+import copy
 
 from flask import request, jsonify, g, current_app
 
@@ -198,7 +199,18 @@ def sample_add_account(pid):
 @api.route('', methods=['DELETE'])
 @auth.login_required
 def del_sample():
+    scopes = g.user.scopes
+    uid = g.user.user_id
     data = request.get_json()
-    patients = Patient.query.filter(Patient.is_delete == 0, Patient.id.in_(data['ids'])).all()
-    delete_array(patients)
+    pids = data['ids']
+    patients = Patient.query.filter(Patient.is_delete == 0, Patient.id.in_(pids)).all()
+    if 'OperateAllCRF' in scopes or 'EditCenterCRF' in scopes or 'CheckCenterCRF' in scopes:
+        delete_array(patients)
+    elif 'OperateUserCRF' in scopes:
+        for patient in patients:
+            if uid in patient.account:
+                account = copy.copy(patient.account)
+                account.remove(uid)
+                with db.auto_commit():
+                    patient.account = account
     return Success()
