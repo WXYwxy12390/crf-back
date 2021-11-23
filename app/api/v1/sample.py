@@ -38,6 +38,19 @@ def get_sample_all():
         center_ids = [center['id'] for center in centers]
         patients = sort_samples_while_query(Patient.query.filter(Patient.is_delete == 0,
                                                                  Patient.researchCenter.in_(center_ids)), sort)
+    elif 'CheckAllInResearch' in g.user.scopes:
+        all_research_patient = ResearchPatient.query.filter_by().all()
+        pids_in_all_research = [research_patient.pid for research_patient in all_research_patient]
+        patients = sort_samples_while_query(Patient.query.filter(Patient.is_delete == 0,
+                                                                 Patient.id.in_(pids_in_all_research)), sort)
+    elif 'CheckCenterInResearch' in g.user.scopes:
+        centers = ResearchCenterSpider().search_by_uid_project(current_app.config['PROJECT_ID'], g.user.user_id)['data']
+        center_ids = [center['id'] for center in centers]
+        all_research_patient = ResearchPatient.query.filter_by().all()
+        pids_in_all_research = [research_patient.pid for research_patient in all_research_patient]
+        patients = sort_samples_while_query(Patient.query.filter(Patient.is_delete == 0,
+                                                                 Patient.id.in_(pids_in_all_research),
+                                                                 Patient.researchCenter.in_(center_ids)), sort)
     else:
         items = sort_samples_while_query(Patient.query.filter(Patient.is_delete == 0), sort)
         for item in items:
@@ -124,7 +137,7 @@ def add_sample():
     # 0表示该样本不存在，直接添加
     # 1表示该样本存在，但是不由当前账号录入
     # -1表示该样本存在，由当前账号录入，让用户选择是否直接进入
-    # 2表示该样本存在，由当前账号录入，让用户选择是新建还是进入
+    # 2表示该样本存在，让用户选择是新建还是进入
     return_data = {
         "status": 0,
         "pid": None,
@@ -148,12 +161,6 @@ def add_sample():
     elif name_patients and 'if_create' not in data:
         return_data['status'] = 2
         for patient in name_patients:
-            # 当得到同名已存在的样本时，直接将这些样本改为当前账号录入
-            if not (g.user.user_id in patient.account):
-                account = patient.account[:]
-                account.append(g.user.user_id)
-                with db.auto_commit():
-                    patient.account = account
             return_data['samples'].append(patient)
         return Success(data=return_data)
 
