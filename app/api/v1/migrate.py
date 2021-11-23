@@ -1,6 +1,7 @@
 import copy
 import os
 import shutil
+import random
 
 from flask import jsonify, current_app, request
 from sqlalchemy.orm.attributes import flag_modified
@@ -23,47 +24,56 @@ from app.spider.user_info import UserInfo
 api = Redprint('migrate')
 
 
-@api.route('/ARION')
-def ARION():
-    research = json2db_add({'name': 'ARION'}, Research)
-    # admin_uid = 1
-    arion_rid = research.id
-
-    arion_patients = Patient.query.filter(Patient.is_delete == 0,
-                                          Patient.researchCenter.in_([23, 16, 22, 27])).all()
-    arion_pids = [patient.id for patient in arion_patients]
-    ResearchPatient.add_patients_to_research(arion_rid, arion_pids)
-
-    json2db_add({'uid': 1, 'rid': 1}, ResearchUser)
-    json2db_add({'uid': 7, 'rid': 1}, ResearchUser)
-    json2db_add({'uid': 72, 'rid': 1}, ResearchUser)
-    json2db_add({'uid': 73, 'rid': 1}, ResearchUser)
-    json2db_add({'uid': 74, 'rid': 1}, ResearchUser)
-    json2db_add({'uid': 75, 'rid': 1}, ResearchUser)
-    json2db_add({'uid': 87, 'rid': 1}, ResearchUser)
-    json2db_add({'uid': 88, 'rid': 1}, ResearchUser)
-    json2db_add({'uid': 89, 'rid': 1}, ResearchUser)
-    json2db_add({'uid': 110, 'rid': 1}, ResearchUser)
-    json2db_add({'uid': 111, 'rid': 1}, ResearchUser)
-    json2db_add({'uid': 112, 'rid': 1}, ResearchUser)
-    json2db_add({'uid': 113, 'rid': 1}, ResearchUser)
-    json2db_add({'uid': 114, 'rid': 1}, ResearchUser)
-    json2db_add({'uid': 115, 'rid': 1}, ResearchUser)
-    json2db_add({'uid': 90, 'rid': 1}, ResearchUser)
-    json2db_add({'uid': 116, 'rid': 1}, ResearchUser)
-
-    # json2db_add({'uid': 114, 'rid': 1}, ResearchUser)
-    # json2db_add({'uid': 115, 'rid': 1}, ResearchUser)
-    # json2db_add({'uid': 116, 'rid': 1}, ResearchUser)
-    # json2db_add({'uid': 117, 'rid': 1}, ResearchUser)
-    # json2db_add({'uid': 119, 'rid': 1}, ResearchUser)
+def GBK2312():
+    head = random.randint(0xb0, 0xf7)
+    body = random.randint(0xa1, 0xfe)
+    val = f'{head:x} {body:x}'
+    str = bytes.fromhex(val).decode('gb2312')
+    return str
 
 
-    # tongji_arion_patients = Patient.query.filter_by(researchCenter=23).all()
-    # with db.auto_commit():
-    #     for patient in tongji_arion_patients:
-    #         patient.researchCenter = 1
-    return Success()
+# @api.route('/randome_patientName')
+# def randome_patientName():
+#     first_name = ["王", "李", "张", "刘", "赵", "蒋", "孟", "陈", "徐", "杨", "沈", "马", "高", "殷", "周", "钟", "常"]
+#     second_name = ["伟", "华", "", "洋", "刚", "", "", "牧", "陆", "路", "昕", "鑫", "兵", "硕", "", "峰", "磊", "雷", "文",
+#                    "", "光", "超", "军", "达", "志", "国", "", ""]
+#     patients = Patient.query.filter_by().all()
+#     for patient in patients:
+#         name = random.choice(first_name) + random.choice(second_name) + GBK2312()
+#         with db.auto_commit():
+#             patient.patientName = name
+
+
+# @api.route('/ARION')
+# def ARION():
+#     research = json2db_add({'name': 'ARION'}, Research)
+#     # admin_uid = 1
+#     arion_rid = research.id
+#
+#     arion_patients = Patient.query.filter(Patient.is_delete == 0,
+#                                           Patient.researchCenter.in_([23, 16, 22, 27])).all()
+#     arion_pids = [patient.id for patient in arion_patients]
+#     ResearchPatient.add_patients_to_research(arion_rid, arion_pids)
+#
+#     json2db_add({'uid': 1, 'rid': 1}, ResearchUser)
+#     json2db_add({'uid': 7, 'rid': 1}, ResearchUser)
+#     json2db_add({'uid': 72, 'rid': 1}, ResearchUser)
+#     json2db_add({'uid': 73, 'rid': 1}, ResearchUser)
+#     json2db_add({'uid': 74, 'rid': 1}, ResearchUser)
+#     json2db_add({'uid': 75, 'rid': 1}, ResearchUser)
+#     json2db_add({'uid': 87, 'rid': 1}, ResearchUser)
+#     json2db_add({'uid': 88, 'rid': 1}, ResearchUser)
+#     json2db_add({'uid': 89, 'rid': 1}, ResearchUser)
+#     json2db_add({'uid': 110, 'rid': 1}, ResearchUser)
+#     json2db_add({'uid': 111, 'rid': 1}, ResearchUser)
+#     json2db_add({'uid': 112, 'rid': 1}, ResearchUser)
+#     json2db_add({'uid': 113, 'rid': 1}, ResearchUser)
+#     json2db_add({'uid': 114, 'rid': 1}, ResearchUser)
+#     json2db_add({'uid': 115, 'rid': 1}, ResearchUser)
+#     json2db_add({'uid': 90, 'rid': 1}, ResearchUser)
+#     json2db_add({'uid': 116, 'rid': 1}, ResearchUser)
+#
+#     return Success()
 
 
 # 赋予某些角色的账户所有研究查看的权限
@@ -81,18 +91,6 @@ def ARION():
 #                 json2db_add({'rid': rid, 'uid': uid}, ResearchUser)
 #     return Success()
 
-
-# 赋予某些用户某些研究的查看权限
-@api.route('/authorize_research', methods=['POST'])
-def authorize_research():
-    data = request.get_json()
-    uids = data.get('user_ids')
-    rids = data.get('research_ids')
-    for uid in uids:
-        for rid in rids:
-            if not ResearchUser.if_user_in_research(uid, rid):
-                json2db_add({'rid': rid, 'uid': uid}, ResearchUser)
-    return Success()
 
 #
 # # 为了扩充大于五线的治疗记录，改成可以输入线数。因此原来数据中的'one'-'five'改成了'1'-'5'
